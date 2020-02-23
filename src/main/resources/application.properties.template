@@ -1,0 +1,7 @@
+# configure the MongoDB client for a single node cluster on atlas
+spring.data.mongodb.uri = mongodb+srv://<username>:<password>@<url>
+
+# mandatory if you don't specify the name of the database using @MongoEntity
+spring.data.mongodb.database = <database>
+
+spring.data.http.cors=true

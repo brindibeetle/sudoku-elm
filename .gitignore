@@ -1,0 +1,5 @@
+/target/
+/frontend/elm-stuff/
+/frontend/main.js
+/frontend/env.js
+/src/main/resources/application.properties
