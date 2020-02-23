@@ -1,5 +1,9 @@
-/target/
+/.idea/
+
 /frontend/elm-stuff/
-/frontend/main.js
-/frontend/env.js
-/src/main/resources/application.properties
+
+#/src/main/resources/application.properties
+#/src/main/resources/static/env.js
+#/src/main/resources/static/main.js
+
+/target/

@@ -31,6 +31,6 @@ getRandomSudokuQuiz msg session =
 sudokuQuizDecoder : Decoder SudokuQuiz
 sudokuQuizDecoder =
     Decode.succeed SudokuQuiz
-        |> required "_id" int
+        |> required "id" int
         |> required "quizzes" string
         |> required "solutions" string
