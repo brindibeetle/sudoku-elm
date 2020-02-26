@@ -1,12 +1,21 @@
-module SudokuFaults exposing (initFaults, recomputeFaults, getFault, getOptionFault)
+module SudokuFaults exposing (initFaults, recomputeFaults, getFault, getOptionFault, valueOkayOrNot)
 
 import SudokuModel exposing (..)
 
 import Array exposing (..)
 import Dict exposing (..)
 
+-- Dict String because String is an Ordered type and i dont know how to order my own type
 initFaults : Dict String ( Dict ( Int, Int) Bool )
 initFaults = Dict.fromList [ ("column", Dict.empty), ("row", Dict.empty), ("block", Dict.empty) ]
+
+
+valueOkayOrNot : Array Field -> Int -> Int -> Bool
+valueOkayOrNot fields fieldNumber value =
+    fieldToAllEffected fieldNumber
+        |> fieldsToValueDictionary fields                       -- fieldsToValueDictionary : Array Field -> Array Int -> Dict Int ( Array Int )
+        |> (\valueDict -> Dict.member value valueDict )
+        |> not
 
 recomputeFaults : Array Field -> Int -> Dict String (Dict (Int, Int) Bool) -> Dict String (Dict (Int, Int) Bool) 
 recomputeFaults fields fieldNumber faults =
@@ -25,8 +34,8 @@ recomputeFaults fields fieldNumber faults =
 --
 -- when a field is changed, all fields in the row, column and block are effected
 fieldToEffected : Int -> String -> Array Int
-fieldToEffected fieldNumber check =
-    case check of
+fieldToEffected fieldNumber dimension =
+    case dimension of
         "column" ->
             let
                 topMostOfColumn = modBy 9 fieldNumber
@@ -49,6 +58,19 @@ fieldToEffected fieldNumber check =
         
         _ ->
             Array.empty
+
+
+-- get an array of all the fields that are effected
+fieldToAllEffected : Int -> Array Int
+fieldToAllEffected fieldNumber =
+    Dict.foldl
+        (\dimension _ fields ->
+            fieldToEffected fieldNumber dimension               -- fieldToEffected : Int -> String -> Array Int
+                |> Array.filter (\f -> (f /= fieldNumber))      -- filter out the field
+                |> Array.append fields
+        )
+        Array.empty
+        initFaults
 
 --
 -- Helper function that returns the value of a field

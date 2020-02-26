@@ -6319,6 +6319,7 @@ var $elm$core$String$toList = function (string) {
 var $author$project$Sudoku$init = function (session) {
 	return _Utils_Tuple2(
 		{
+			buttonClicked: $elm$core$Maybe$Nothing,
 			faults: $author$project$SudokuFaults$initFaults,
 			fields: $elm$core$Array$fromList(
 				A2(
@@ -6335,7 +6336,8 @@ var $author$project$Sudoku$init = function (session) {
 						$elm$core$List$map,
 						$author$project$SudokuModel$charToCijfer,
 						$elm$core$String$toList($author$project$SudokuModel$sudokuExample)))),
-			focus: $author$project$SudokuModel$FocusBlurred
+			focus: $author$project$SudokuModel$FocusBlurred,
+			highlight: $elm$core$Maybe$Nothing
 		},
 		A2($author$project$Domain$SudokuQuiz$getRandomSudokuQuiz, $author$project$Sudoku$SudokuQuizReceived, session));
 };
@@ -6363,10 +6365,12 @@ var $author$project$Sudoku$MovedFocus = function (a) {
 };
 var $author$project$Sudoku$MsgNone = {$: 'MsgNone'};
 var $author$project$Sudoku$North = {$: 'North'};
-var $author$project$Sudoku$OptionsToggled = {$: 'OptionsToggled'};
 var $author$project$Sudoku$South = {$: 'South'};
 var $author$project$Sudoku$ValueCleared = {$: 'ValueCleared'};
 var $author$project$Sudoku$West = {$: 'West'};
+var $author$project$Sudoku$HighLighted = {$: 'HighLighted'};
+var $author$project$Sudoku$OptionsToggled = {$: 'OptionsToggled'};
+var $author$project$Sudoku$Possibilities = {$: 'Possibilities'};
 var $author$project$Sudoku$ValueChanged = function (a) {
 	return {$: 'ValueChanged', a: a};
 };
@@ -6392,6 +6396,18 @@ var $author$project$Sudoku$toKeyChar = function (_char) {
 			return $author$project$Sudoku$ValueChanged(9);
 		case ' ':
 			return $author$project$Sudoku$ValueCleared;
+		case 'O':
+			return $author$project$Sudoku$OptionsToggled;
+		case 'o':
+			return $author$project$Sudoku$OptionsToggled;
+		case 'h':
+			return $author$project$Sudoku$HighLighted;
+		case 'H':
+			return $author$project$Sudoku$HighLighted;
+		case 'p':
+			return $author$project$Sudoku$Possibilities;
+		case 'P':
+			return $author$project$Sudoku$Possibilities;
 		default:
 			return $author$project$Sudoku$MsgNone;
 	}
@@ -6410,8 +6426,6 @@ var $author$project$Sudoku$toKey = function (keyValue) {
 			return $author$project$Sudoku$ValueCleared;
 		case 'Delete':
 			return $author$project$Sudoku$ValueCleared;
-		case 'Shift':
-			return $author$project$Sudoku$OptionsToggled;
 		default:
 			var _v1 = $elm$core$String$uncons(keyValue);
 			if (_v1.$ === 'Just') {
@@ -6709,6 +6723,8 @@ var $author$project$Main$toModel = F3(
 			A2($author$project$Main$Sudoku, sudokuModel, session1),
 			cmd);
 	});
+var $author$project$SudokuModel$ButtonClear = {$: 'ButtonClear'};
+var $author$project$SudokuModel$ButtonNew = {$: 'ButtonNew'};
 var $author$project$SudokuModel$FocusEdit = function (a) {
 	return {$: 'FocusEdit', a: a};
 };
@@ -6718,6 +6734,44 @@ var $author$project$SudokuModel$FocusOptions = F2(
 	});
 var $author$project$SudokuModel$Options = function (a) {
 	return {$: 'Options', a: a};
+};
+var $author$project$Sudoku$clearField = function (field) {
+	switch (field.$) {
+		case 'Edit':
+			return $author$project$SudokuModel$Edit($elm$core$Maybe$Nothing);
+		case 'Options':
+			return $author$project$SudokuModel$Edit($elm$core$Maybe$Nothing);
+		default:
+			return field;
+	}
+};
+var $elm$core$Elm$JsArray$map = _JsArray_map;
+var $elm$core$Array$map = F2(
+	function (func, _v0) {
+		var len = _v0.a;
+		var startShift = _v0.b;
+		var tree = _v0.c;
+		var tail = _v0.d;
+		var helper = function (node) {
+			if (node.$ === 'SubTree') {
+				var subTree = node.a;
+				return $elm$core$Array$SubTree(
+					A2($elm$core$Elm$JsArray$map, helper, subTree));
+			} else {
+				var values = node.a;
+				return $elm$core$Array$Leaf(
+					A2($elm$core$Elm$JsArray$map, func, values));
+			}
+		};
+		return A4(
+			$elm$core$Array$Array_elm_builtin,
+			len,
+			startShift,
+			A2($elm$core$Elm$JsArray$map, helper, tree),
+			A2($elm$core$Elm$JsArray$map, func, tail));
+	});
+var $author$project$Sudoku$clearFields = function (fields) {
+	return A2($elm$core$Array$map, $author$project$Sudoku$clearField, fields);
 };
 var $elm$core$Bitwise$and = _Bitwise_and;
 var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
@@ -6775,6 +6829,9 @@ var $author$project$Sudoku$clearOption = F2(
 	function (field, options) {
 		return A3($elm$core$Array$set, field, $elm$core$Maybe$Nothing, options);
 	});
+var $author$project$SudokuModel$FocusFrozen = function (a) {
+	return {$: 'FocusFrozen', a: a};
+};
 var $elm$core$Array$getHelp = F3(
 	function (shift, index, tree) {
 		getHelp:
@@ -6808,6 +6865,24 @@ var $elm$core$Array$get = F2(
 			A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, tail)) : $elm$core$Maybe$Just(
 			A3($elm$core$Array$getHelp, startShift, index, tree)));
 	});
+var $author$project$SudokuModel$fieldNumberToFocus = F2(
+	function (fields, _v0) {
+		var fieldNumber = _v0.a;
+		var fieldOptionNumber = _v0.b;
+		var _v1 = A2($elm$core$Array$get, fieldNumber, fields);
+		if (_v1.$ === 'Just') {
+			switch (_v1.a.$) {
+				case 'Edit':
+					return $author$project$SudokuModel$FocusEdit(fieldNumber);
+				case 'Frozen':
+					return $author$project$SudokuModel$FocusFrozen(fieldNumber);
+				default:
+					return A2($author$project$SudokuModel$FocusOptions, fieldNumber, fieldOptionNumber);
+			}
+		} else {
+			return $author$project$SudokuModel$FocusBlurred;
+		}
+	});
 var $author$project$SudokuModel$focusToField = F2(
 	function (fields, focus) {
 		switch (focus.$) {
@@ -6816,247 +6891,202 @@ var $author$project$SudokuModel$focusToField = F2(
 			case 'FocusEdit':
 				var fieldFocus = focus.a;
 				return A2($elm$core$Array$get, fieldFocus, fields);
+			case 'FocusFrozen':
+				var fieldFocus = focus.a;
+				return A2($elm$core$Array$get, fieldFocus, fields);
 			default:
 				var fieldFocus = focus.a;
 				return A2($elm$core$Array$get, fieldFocus, fields);
 		}
 	});
-var $author$project$Sudoku$maybeJoin = function (maybeMaybeA) {
-	if ((maybeMaybeA.$ === 'Just') && (maybeMaybeA.a.$ === 'Just')) {
-		var value = maybeMaybeA.a.a;
-		return $elm$core$Maybe$Just(value);
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
-var $author$project$Sudoku$getOption = F2(
-	function (field, options) {
-		return $author$project$Sudoku$maybeJoin(
-			A2($elm$core$Array$get, field, options));
-	});
-var $elm$core$Array$repeat = F2(
-	function (n, e) {
-		return A2(
-			$elm$core$Array$initialize,
-			n,
-			function (_v0) {
-				return e;
-			});
-	});
-var $author$project$Sudoku$initOptions = function (maybeValue) {
-	if (maybeValue.$ === 'Just') {
-		var value = maybeValue.a;
-		return A3(
-			$elm$core$Array$set,
-			0,
-			$elm$core$Maybe$Just(value),
-			A2($elm$core$Array$repeat, 9, $elm$core$Maybe$Nothing));
-	} else {
-		return A2($elm$core$Array$repeat, 9, $elm$core$Maybe$Nothing);
-	}
-};
-var $author$project$SudokuModel$fieldNumberToFocus = F2(
-	function (fields, _v0) {
-		var fieldNumber = _v0.a;
-		var fieldOptionNumber = _v0.b;
-		var _v1 = A2($elm$core$Array$get, fieldNumber, fields);
-		_v1$2:
-		while (true) {
-			if (_v1.$ === 'Just') {
-				switch (_v1.a.$) {
-					case 'Edit':
-						return $author$project$SudokuModel$FocusEdit(fieldNumber);
-					case 'Options':
-						return A2($author$project$SudokuModel$FocusOptions, fieldNumber, fieldOptionNumber);
-					default:
-						break _v1$2;
-				}
-			} else {
-				break _v1$2;
-			}
-		}
-		return $author$project$SudokuModel$FocusBlurred;
-	});
-var $elm$core$Basics$modBy = _Basics_modBy;
-var $elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return value;
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
 		} else {
-			return _default;
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
 		}
 	});
-var $author$project$SudokuModel$modelToField = F2(
-	function (fields, field) {
-		return A2(
-			$elm$core$Maybe$withDefault,
-			$author$project$SudokuModel$Frozen(0),
-			A2($elm$core$Array$get, field, fields));
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
 	});
-var $author$project$Sudoku$moveField = F3(
-	function (_v0, fields, direction) {
-		moveField:
+var $elm$core$List$repeatHelp = F3(
+	function (result, n, value) {
+		repeatHelp:
 		while (true) {
-			var fieldNumber = _v0.a;
-			var fieldOptionNumber = _v0.b;
-			var _v1 = function () {
-				switch (direction.$) {
-					case 'North':
-						return ((!fieldOptionNumber) || ((fieldOptionNumber === 1) || (fieldOptionNumber === 2))) ? _Utils_Tuple2(
-							A2($elm$core$Basics$modBy, 81, fieldNumber - 9),
-							fieldOptionNumber + 6) : _Utils_Tuple2(fieldNumber, fieldOptionNumber - 3);
-					case 'South':
-						return ((fieldOptionNumber === 6) || ((fieldOptionNumber === 7) || (fieldOptionNumber === 8))) ? _Utils_Tuple2(
-							A2($elm$core$Basics$modBy, 81, fieldNumber + 9),
-							fieldOptionNumber - 6) : _Utils_Tuple2(fieldNumber, fieldOptionNumber + 3);
-					case 'East':
-						return ((fieldOptionNumber === 2) || ((fieldOptionNumber === 5) || (fieldOptionNumber === 8))) ? _Utils_Tuple2(
-							(!A2($elm$core$Basics$modBy, 9, fieldNumber + 1)) ? (fieldNumber - 8) : A2($elm$core$Basics$modBy, 81, fieldNumber + 1),
-							fieldOptionNumber - 2) : _Utils_Tuple2(fieldNumber, fieldOptionNumber + 1);
-					default:
-						return ((!fieldOptionNumber) || ((fieldOptionNumber === 3) || (fieldOptionNumber === 6))) ? _Utils_Tuple2(
-							(A2($elm$core$Basics$modBy, 9, fieldNumber - 1) === 8) ? (fieldNumber + 8) : A2($elm$core$Basics$modBy, 81, fieldNumber - 1),
-							fieldOptionNumber + 2) : _Utils_Tuple2(fieldNumber, fieldOptionNumber - 1);
-				}
-			}();
-			var fieldNumber1 = _v1.a;
-			var fieldOptionNumber1 = _v1.b;
-			var _v3 = A2($author$project$SudokuModel$modelToField, fields, fieldNumber1);
-			if (_v3.$ === 'Frozen') {
-				var $temp$_v0 = _Utils_Tuple2(fieldNumber1, fieldOptionNumber1),
-					$temp$fields = fields,
-					$temp$direction = direction;
-				_v0 = $temp$_v0;
-				fields = $temp$fields;
-				direction = $temp$direction;
-				continue moveField;
+			if (n <= 0) {
+				return result;
 			} else {
-				return _Utils_Tuple2(fieldNumber1, fieldOptionNumber1);
+				var $temp$result = A2($elm$core$List$cons, value, result),
+					$temp$n = n - 1,
+					$temp$value = value;
+				result = $temp$result;
+				n = $temp$n;
+				value = $temp$value;
+				continue repeatHelp;
 			}
 		}
 	});
-var $author$project$Sudoku$moveFocus = F3(
-	function (focus, direction, fields) {
-		var _v0 = function () {
-			var _v1 = _Utils_Tuple2(focus, direction);
-			switch (_v1.a.$) {
-				case 'FocusEdit':
-					switch (_v1.b.$) {
-						case 'North':
-							var fieldNumber = _v1.a.a;
-							var _v2 = _v1.b;
-							return A3(
-								$author$project$Sudoku$moveField,
-								_Utils_Tuple2(fieldNumber, 0),
-								fields,
-								$author$project$Sudoku$North);
-						case 'South':
-							var fieldNumber = _v1.a.a;
-							var _v3 = _v1.b;
-							return A3(
-								$author$project$Sudoku$moveField,
-								_Utils_Tuple2(fieldNumber, 6),
-								fields,
-								$author$project$Sudoku$South);
-						case 'West':
-							var fieldNumber = _v1.a.a;
-							var _v4 = _v1.b;
-							return A3(
-								$author$project$Sudoku$moveField,
-								_Utils_Tuple2(fieldNumber, 0),
-								fields,
-								$author$project$Sudoku$West);
-						default:
-							var fieldNumber = _v1.a.a;
-							var _v5 = _v1.b;
-							return A3(
-								$author$project$Sudoku$moveField,
-								_Utils_Tuple2(fieldNumber, 2),
-								fields,
-								$author$project$Sudoku$East);
-					}
-				case 'FocusOptions':
-					var _v6 = _v1.a;
-					var fieldNumber = _v6.a;
-					var fieldOptionNumber = _v6.b;
-					var dir = _v1.b;
-					return A3(
-						$author$project$Sudoku$moveField,
-						_Utils_Tuple2(fieldNumber, fieldOptionNumber),
-						fields,
-						dir);
-				default:
-					var _v7 = _v1.a;
-					var dir = _v1.b;
-					return _Utils_Tuple2(0, 0);
-			}
-		}();
-		var fieldNumber1 = _v0.a;
-		var fieldOptionNumber1 = _v0.b;
-		return A2(
-			$author$project$SudokuModel$fieldNumberToFocus,
-			fields,
-			_Utils_Tuple2(fieldNumber1, fieldOptionNumber1));
+var $elm$core$List$repeat = F2(
+	function (n, value) {
+		return A3($elm$core$List$repeatHelp, _List_Nil, n, value);
 	});
-var $author$project$SudokuFaults$fieldToEffected = F2(
-	function (fieldNumber, check) {
-		switch (check) {
-			case 'column':
-				var topMostOfColumn = A2($elm$core$Basics$modBy, 9, fieldNumber);
-				return A2(
-					$elm$core$Array$initialize,
-					9,
-					function (i) {
-						return topMostOfColumn + (i * 9);
-					});
-			case 'row':
-				var leftMostOfRow = ((fieldNumber / 9) | 0) * 9;
-				return A2(
-					$elm$core$Array$initialize,
-					9,
-					function (i) {
-						return leftMostOfRow + i;
-					});
-			case 'block':
-				var topMostOfLeftColumn = A2($elm$core$Basics$modBy, 9, ((fieldNumber / 3) | 0) * 3);
-				var leftMostOfTopRow = ((fieldNumber / 27) | 0) * 27;
-				var topLeftMostOfBlock = leftMostOfTopRow + topMostOfLeftColumn;
-				return A2(
-					$elm$core$Array$initialize,
-					9,
-					function (i) {
-						return (topLeftMostOfBlock + A2($elm$core$Basics$modBy, 3, i)) + (((i / 3) | 0) * 9);
-					});
-			default:
-				return $elm$core$Array$empty;
-		}
-	});
-var $author$project$SudokuFaults$fieldToValue = F2(
-	function (fields, fieldNumber) {
-		var _v0 = A2($elm$core$Array$get, fieldNumber, fields);
-		_v0$2:
+var $elm$core$List$takeReverse = F3(
+	function (n, list, kept) {
+		takeReverse:
 		while (true) {
-			if (_v0.$ === 'Just') {
-				switch (_v0.a.$) {
-					case 'Edit':
-						if (_v0.a.a.$ === 'Just') {
-							var value = _v0.a.a.a;
-							return $elm$core$Maybe$Just(value);
+			if (n <= 0) {
+				return kept;
+			} else {
+				if (!list.b) {
+					return kept;
+				} else {
+					var x = list.a;
+					var xs = list.b;
+					var $temp$n = n - 1,
+						$temp$list = xs,
+						$temp$kept = A2($elm$core$List$cons, x, kept);
+					n = $temp$n;
+					list = $temp$list;
+					kept = $temp$kept;
+					continue takeReverse;
+				}
+			}
+		}
+	});
+var $elm$core$List$takeTailRec = F2(
+	function (n, list) {
+		return $elm$core$List$reverse(
+			A3($elm$core$List$takeReverse, n, list, _List_Nil));
+	});
+var $elm$core$List$takeFast = F3(
+	function (ctr, n, list) {
+		if (n <= 0) {
+			return _List_Nil;
+		} else {
+			var _v0 = _Utils_Tuple2(n, list);
+			_v0$1:
+			while (true) {
+				_v0$5:
+				while (true) {
+					if (!_v0.b.b) {
+						return list;
+					} else {
+						if (_v0.b.b.b) {
+							switch (_v0.a) {
+								case 1:
+									break _v0$1;
+								case 2:
+									var _v2 = _v0.b;
+									var x = _v2.a;
+									var _v3 = _v2.b;
+									var y = _v3.a;
+									return _List_fromArray(
+										[x, y]);
+								case 3:
+									if (_v0.b.b.b.b) {
+										var _v4 = _v0.b;
+										var x = _v4.a;
+										var _v5 = _v4.b;
+										var y = _v5.a;
+										var _v6 = _v5.b;
+										var z = _v6.a;
+										return _List_fromArray(
+											[x, y, z]);
+									} else {
+										break _v0$5;
+									}
+								default:
+									if (_v0.b.b.b.b && _v0.b.b.b.b.b) {
+										var _v7 = _v0.b;
+										var x = _v7.a;
+										var _v8 = _v7.b;
+										var y = _v8.a;
+										var _v9 = _v8.b;
+										var z = _v9.a;
+										var _v10 = _v9.b;
+										var w = _v10.a;
+										var tl = _v10.b;
+										return (ctr > 1000) ? A2(
+											$elm$core$List$cons,
+											x,
+											A2(
+												$elm$core$List$cons,
+												y,
+												A2(
+													$elm$core$List$cons,
+													z,
+													A2(
+														$elm$core$List$cons,
+														w,
+														A2($elm$core$List$takeTailRec, n - 4, tl))))) : A2(
+											$elm$core$List$cons,
+											x,
+											A2(
+												$elm$core$List$cons,
+												y,
+												A2(
+													$elm$core$List$cons,
+													z,
+													A2(
+														$elm$core$List$cons,
+														w,
+														A3($elm$core$List$takeFast, ctr + 1, n - 4, tl)))));
+									} else {
+										break _v0$5;
+									}
+							}
 						} else {
-							break _v0$2;
+							if (_v0.a === 1) {
+								break _v0$1;
+							} else {
+								break _v0$5;
+							}
 						}
-					case 'Frozen':
-						var value = _v0.a.a;
-						return $elm$core$Maybe$Just(value);
-					default:
-						break _v0$2;
+					}
 				}
-			} else {
-				break _v0$2;
+				return list;
 			}
+			var _v1 = _v0.b;
+			var x = _v1.a;
+			return _List_fromArray(
+				[x]);
 		}
-		return $elm$core$Maybe$Nothing;
+	});
+var $elm$core$List$take = F2(
+	function (n, list) {
+		return A3($elm$core$List$takeFast, 0, n, list);
+	});
+var $elm$core$Elm$JsArray$appendN = _JsArray_appendN;
+var $elm$core$Elm$JsArray$slice = _JsArray_slice;
+var $elm$core$Array$appendHelpBuilder = F2(
+	function (tail, builder) {
+		var tailLen = $elm$core$Elm$JsArray$length(tail);
+		var notAppended = ($elm$core$Array$branchFactor - $elm$core$Elm$JsArray$length(builder.tail)) - tailLen;
+		var appended = A3($elm$core$Elm$JsArray$appendN, $elm$core$Array$branchFactor, builder.tail, tail);
+		return (notAppended < 0) ? {
+			nodeList: A2(
+				$elm$core$List$cons,
+				$elm$core$Array$Leaf(appended),
+				builder.nodeList),
+			nodeListSize: builder.nodeListSize + 1,
+			tail: A3($elm$core$Elm$JsArray$slice, notAppended, tailLen, tail)
+		} : ((!notAppended) ? {
+			nodeList: A2(
+				$elm$core$List$cons,
+				$elm$core$Array$Leaf(appended),
+				builder.nodeList),
+			nodeListSize: builder.nodeListSize + 1,
+			tail: $elm$core$Elm$JsArray$empty
+		} : {nodeList: builder.nodeList, nodeListSize: builder.nodeListSize, tail: appended});
 	});
 var $elm$core$Elm$JsArray$push = _JsArray_push;
 var $elm$core$Elm$JsArray$singleton = _JsArray_singleton;
@@ -7128,6 +7158,178 @@ var $elm$core$Array$unsafeReplaceTail = F2(
 			return A4($elm$core$Array$Array_elm_builtin, newArrayLen, startShift, tree, newTail);
 		}
 	});
+var $elm$core$Array$appendHelpTree = F2(
+	function (toAppend, array) {
+		var len = array.a;
+		var tree = array.c;
+		var tail = array.d;
+		var itemsToAppend = $elm$core$Elm$JsArray$length(toAppend);
+		var notAppended = ($elm$core$Array$branchFactor - $elm$core$Elm$JsArray$length(tail)) - itemsToAppend;
+		var appended = A3($elm$core$Elm$JsArray$appendN, $elm$core$Array$branchFactor, tail, toAppend);
+		var newArray = A2($elm$core$Array$unsafeReplaceTail, appended, array);
+		if (notAppended < 0) {
+			var nextTail = A3($elm$core$Elm$JsArray$slice, notAppended, itemsToAppend, toAppend);
+			return A2($elm$core$Array$unsafeReplaceTail, nextTail, newArray);
+		} else {
+			return newArray;
+		}
+	});
+var $elm$core$Elm$JsArray$foldl = _JsArray_foldl;
+var $elm$core$Array$builderFromArray = function (_v0) {
+	var len = _v0.a;
+	var tree = _v0.c;
+	var tail = _v0.d;
+	var helper = F2(
+		function (node, acc) {
+			if (node.$ === 'SubTree') {
+				var subTree = node.a;
+				return A3($elm$core$Elm$JsArray$foldl, helper, acc, subTree);
+			} else {
+				return A2($elm$core$List$cons, node, acc);
+			}
+		});
+	return {
+		nodeList: A3($elm$core$Elm$JsArray$foldl, helper, _List_Nil, tree),
+		nodeListSize: (len / $elm$core$Array$branchFactor) | 0,
+		tail: tail
+	};
+};
+var $elm$core$Array$append = F2(
+	function (a, _v0) {
+		var aTail = a.d;
+		var bLen = _v0.a;
+		var bTree = _v0.c;
+		var bTail = _v0.d;
+		if (_Utils_cmp(bLen, $elm$core$Array$branchFactor * 4) < 1) {
+			var foldHelper = F2(
+				function (node, array) {
+					if (node.$ === 'SubTree') {
+						var tree = node.a;
+						return A3($elm$core$Elm$JsArray$foldl, foldHelper, array, tree);
+					} else {
+						var leaf = node.a;
+						return A2($elm$core$Array$appendHelpTree, leaf, array);
+					}
+				});
+			return A2(
+				$elm$core$Array$appendHelpTree,
+				bTail,
+				A3($elm$core$Elm$JsArray$foldl, foldHelper, a, bTree));
+		} else {
+			var foldHelper = F2(
+				function (node, builder) {
+					if (node.$ === 'SubTree') {
+						var tree = node.a;
+						return A3($elm$core$Elm$JsArray$foldl, foldHelper, builder, tree);
+					} else {
+						var leaf = node.a;
+						return A2($elm$core$Array$appendHelpBuilder, leaf, builder);
+					}
+				});
+			return A2(
+				$elm$core$Array$builderToArray,
+				true,
+				A2(
+					$elm$core$Array$appendHelpBuilder,
+					bTail,
+					A3(
+						$elm$core$Elm$JsArray$foldl,
+						foldHelper,
+						$elm$core$Array$builderFromArray(a),
+						bTree)));
+		}
+	});
+var $elm$core$Basics$modBy = _Basics_modBy;
+var $author$project$SudokuFaults$fieldToEffected = F2(
+	function (fieldNumber, dimension) {
+		switch (dimension) {
+			case 'column':
+				var topMostOfColumn = A2($elm$core$Basics$modBy, 9, fieldNumber);
+				return A2(
+					$elm$core$Array$initialize,
+					9,
+					function (i) {
+						return topMostOfColumn + (i * 9);
+					});
+			case 'row':
+				var leftMostOfRow = ((fieldNumber / 9) | 0) * 9;
+				return A2(
+					$elm$core$Array$initialize,
+					9,
+					function (i) {
+						return leftMostOfRow + i;
+					});
+			case 'block':
+				var topMostOfLeftColumn = A2($elm$core$Basics$modBy, 9, ((fieldNumber / 3) | 0) * 3);
+				var leftMostOfTopRow = ((fieldNumber / 27) | 0) * 27;
+				var topLeftMostOfBlock = leftMostOfTopRow + topMostOfLeftColumn;
+				return A2(
+					$elm$core$Array$initialize,
+					9,
+					function (i) {
+						return (topLeftMostOfBlock + A2($elm$core$Basics$modBy, 3, i)) + (((i / 3) | 0) * 9);
+					});
+			default:
+				return $elm$core$Array$empty;
+		}
+	});
+var $elm$core$Array$filter = F2(
+	function (isGood, array) {
+		return $elm$core$Array$fromList(
+			A3(
+				$elm$core$Array$foldr,
+				F2(
+					function (x, xs) {
+						return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+					}),
+				_List_Nil,
+				array));
+	});
+var $elm$core$Basics$neq = _Utils_notEqual;
+var $author$project$SudokuFaults$fieldToAllEffected = function (fieldNumber) {
+	return A3(
+		$elm$core$Dict$foldl,
+		F3(
+			function (dimension, _v0, fields) {
+				return A2(
+					$elm$core$Array$append,
+					fields,
+					A2(
+						$elm$core$Array$filter,
+						function (f) {
+							return !_Utils_eq(f, fieldNumber);
+						},
+						A2($author$project$SudokuFaults$fieldToEffected, fieldNumber, dimension)));
+			}),
+		$elm$core$Array$empty,
+		$author$project$SudokuFaults$initFaults);
+};
+var $author$project$SudokuFaults$fieldToValue = F2(
+	function (fields, fieldNumber) {
+		var _v0 = A2($elm$core$Array$get, fieldNumber, fields);
+		_v0$2:
+		while (true) {
+			if (_v0.$ === 'Just') {
+				switch (_v0.a.$) {
+					case 'Edit':
+						if (_v0.a.a.$ === 'Just') {
+							var value = _v0.a.a.a;
+							return $elm$core$Maybe$Just(value);
+						} else {
+							break _v0$2;
+						}
+					case 'Frozen':
+						var value = _v0.a.a;
+						return $elm$core$Maybe$Just(value);
+					default:
+						break _v0$2;
+				}
+			} else {
+				break _v0$2;
+			}
+		}
+		return $elm$core$Maybe$Nothing;
+	});
 var $elm$core$Array$push = F2(
 	function (a, array) {
 		var tail = array.d;
@@ -7159,7 +7361,6 @@ var $author$project$SudokuFaults$fieldToValueDictionary = F3(
 			return valueDictionary;
 		}
 	});
-var $elm$core$Elm$JsArray$foldl = _JsArray_foldl;
 var $elm$core$Array$foldl = F3(
 	function (func, baseCase, _v0) {
 		var tree = _v0.c;
@@ -7188,6 +7389,220 @@ var $author$project$SudokuFaults$fieldsToValueDictionary = F2(
 			$elm$core$Dict$empty,
 			fieldNumbers);
 	});
+var $elm$core$Dict$member = F2(
+	function (key, dict) {
+		var _v0 = A2($elm$core$Dict$get, key, dict);
+		if (_v0.$ === 'Just') {
+			return true;
+		} else {
+			return false;
+		}
+	});
+var $elm$core$Basics$not = _Basics_not;
+var $author$project$SudokuFaults$valueOkayOrNot = F3(
+	function (fields, fieldNumber, value) {
+		return !function (valueDict) {
+			return A2($elm$core$Dict$member, value, valueDict);
+		}(
+			A2(
+				$author$project$SudokuFaults$fieldsToValueDictionary,
+				fields,
+				$author$project$SudokuFaults$fieldToAllEffected(fieldNumber)));
+	});
+var $author$project$Sudoku$generateOptions = F2(
+	function (fields, fieldNumber) {
+		var options = A2(
+			$elm$core$List$filter,
+			A2($author$project$SudokuFaults$valueOkayOrNot, fields, fieldNumber),
+			A2($elm$core$List$range, 1, 9));
+		if (!options.b) {
+			return $author$project$SudokuModel$Edit($elm$core$Maybe$Nothing);
+		} else {
+			if (!options.b.b) {
+				var i = options.a;
+				return $author$project$SudokuModel$Edit(
+					$elm$core$Maybe$Just(i));
+			} else {
+				var ii = options;
+				return $author$project$SudokuModel$Options(
+					$elm$core$Array$fromList(
+						A2(
+							$elm$core$List$take,
+							9,
+							function (maybeImaybeI) {
+								return A2(
+									$elm$core$List$append,
+									maybeImaybeI,
+									A2($elm$core$List$repeat, 7, $elm$core$Maybe$Nothing));
+							}(
+								A2(
+									$elm$core$List$map,
+									function (i) {
+										return $elm$core$Maybe$Just(i);
+									},
+									ii)))));
+			}
+		}
+	});
+var $author$project$Sudoku$maybeJoin = function (maybeMaybeA) {
+	if ((maybeMaybeA.$ === 'Just') && (maybeMaybeA.a.$ === 'Just')) {
+		var value = maybeMaybeA.a.a;
+		return $elm$core$Maybe$Just(value);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $author$project$Sudoku$getOption = F2(
+	function (field, options) {
+		return $author$project$Sudoku$maybeJoin(
+			A2($elm$core$Array$get, field, options));
+	});
+var $elm$core$Array$repeat = F2(
+	function (n, e) {
+		return A2(
+			$elm$core$Array$initialize,
+			n,
+			function (_v0) {
+				return e;
+			});
+	});
+var $author$project$Sudoku$initOptions = function (maybeValue) {
+	if (maybeValue.$ === 'Just') {
+		var value = maybeValue.a;
+		return A3(
+			$elm$core$Array$set,
+			0,
+			$elm$core$Maybe$Just(value),
+			A2($elm$core$Array$repeat, 9, $elm$core$Maybe$Nothing));
+	} else {
+		return A2($elm$core$Array$repeat, 9, $elm$core$Maybe$Nothing);
+	}
+};
+var $author$project$Sudoku$moveField = F2(
+	function (_v0, direction) {
+		var fieldNumber = _v0.a;
+		var fieldOptionNumber = _v0.b;
+		switch (direction.$) {
+			case 'North':
+				return ((!fieldOptionNumber) || ((fieldOptionNumber === 1) || (fieldOptionNumber === 2))) ? _Utils_Tuple2(
+					A2($elm$core$Basics$modBy, 81, fieldNumber - 9),
+					fieldOptionNumber + 6) : _Utils_Tuple2(fieldNumber, fieldOptionNumber - 3);
+			case 'South':
+				return ((fieldOptionNumber === 6) || ((fieldOptionNumber === 7) || (fieldOptionNumber === 8))) ? _Utils_Tuple2(
+					A2($elm$core$Basics$modBy, 81, fieldNumber + 9),
+					fieldOptionNumber - 6) : _Utils_Tuple2(fieldNumber, fieldOptionNumber + 3);
+			case 'East':
+				return ((fieldOptionNumber === 2) || ((fieldOptionNumber === 5) || (fieldOptionNumber === 8))) ? _Utils_Tuple2(
+					(!A2($elm$core$Basics$modBy, 9, fieldNumber + 1)) ? (fieldNumber - 8) : A2($elm$core$Basics$modBy, 81, fieldNumber + 1),
+					fieldOptionNumber - 2) : _Utils_Tuple2(fieldNumber, fieldOptionNumber + 1);
+			default:
+				return ((!fieldOptionNumber) || ((fieldOptionNumber === 3) || (fieldOptionNumber === 6))) ? _Utils_Tuple2(
+					(A2($elm$core$Basics$modBy, 9, fieldNumber - 1) === 8) ? (fieldNumber + 8) : A2($elm$core$Basics$modBy, 81, fieldNumber - 1),
+					fieldOptionNumber + 2) : _Utils_Tuple2(fieldNumber, fieldOptionNumber - 1);
+		}
+	});
+var $author$project$Sudoku$moveFocus = F3(
+	function (focus, direction, fields) {
+		var _v0 = function () {
+			var _v1 = _Utils_Tuple2(focus, direction);
+			switch (_v1.a.$) {
+				case 'FocusEdit':
+					switch (_v1.b.$) {
+						case 'North':
+							var fieldNumber = _v1.a.a;
+							var _v2 = _v1.b;
+							return A2(
+								$author$project$Sudoku$moveField,
+								_Utils_Tuple2(fieldNumber, 0),
+								$author$project$Sudoku$North);
+						case 'South':
+							var fieldNumber = _v1.a.a;
+							var _v3 = _v1.b;
+							return A2(
+								$author$project$Sudoku$moveField,
+								_Utils_Tuple2(fieldNumber, 6),
+								$author$project$Sudoku$South);
+						case 'West':
+							var fieldNumber = _v1.a.a;
+							var _v4 = _v1.b;
+							return A2(
+								$author$project$Sudoku$moveField,
+								_Utils_Tuple2(fieldNumber, 0),
+								$author$project$Sudoku$West);
+						default:
+							var fieldNumber = _v1.a.a;
+							var _v5 = _v1.b;
+							return A2(
+								$author$project$Sudoku$moveField,
+								_Utils_Tuple2(fieldNumber, 2),
+								$author$project$Sudoku$East);
+					}
+				case 'FocusFrozen':
+					switch (_v1.b.$) {
+						case 'North':
+							var fieldNumber = _v1.a.a;
+							var _v6 = _v1.b;
+							return A2(
+								$author$project$Sudoku$moveField,
+								_Utils_Tuple2(fieldNumber, 0),
+								$author$project$Sudoku$North);
+						case 'South':
+							var fieldNumber = _v1.a.a;
+							var _v7 = _v1.b;
+							return A2(
+								$author$project$Sudoku$moveField,
+								_Utils_Tuple2(fieldNumber, 6),
+								$author$project$Sudoku$South);
+						case 'West':
+							var fieldNumber = _v1.a.a;
+							var _v8 = _v1.b;
+							return A2(
+								$author$project$Sudoku$moveField,
+								_Utils_Tuple2(fieldNumber, 0),
+								$author$project$Sudoku$West);
+						default:
+							var fieldNumber = _v1.a.a;
+							var _v9 = _v1.b;
+							return A2(
+								$author$project$Sudoku$moveField,
+								_Utils_Tuple2(fieldNumber, 2),
+								$author$project$Sudoku$East);
+					}
+				case 'FocusOptions':
+					var _v10 = _v1.a;
+					var fieldNumber = _v10.a;
+					var fieldOptionNumber = _v10.b;
+					var dir = _v1.b;
+					return A2(
+						$author$project$Sudoku$moveField,
+						_Utils_Tuple2(fieldNumber, fieldOptionNumber),
+						dir);
+				default:
+					var _v11 = _v1.a;
+					var dir = _v1.b;
+					return _Utils_Tuple2(0, 0);
+			}
+		}();
+		var fieldNumber1 = _v0.a;
+		var fieldOptionNumber1 = _v0.b;
+		return A2(
+			$author$project$SudokuModel$fieldNumberToFocus,
+			fields,
+			_Utils_Tuple2(fieldNumber1, fieldOptionNumber1));
+	});
+var $elm$core$Array$isEmpty = function (_v0) {
+	var len = _v0.a;
+	return !len;
+};
+var $author$project$Sudoku$optionsIsEmpty = function (options) {
+	return $elm$core$Array$isEmpty(
+		A2(
+			$elm$core$Array$filter,
+			function (option) {
+				return !_Utils_eq(option, $elm$core$Maybe$Nothing);
+			},
+			options));
+};
 var $elm$core$Dict$map = F2(
 	function (func, dict) {
 		if (dict.$ === 'RBEmpty_elm_builtin') {
@@ -7212,6 +7627,15 @@ var $elm$core$Array$length = function (_v0) {
 	return len;
 };
 var $author$project$SudokuFaults$optionNumbers = A2($elm$core$Array$initialize, 9, $elm$core$Basics$identity);
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
 var $author$project$SudokuFaults$valueDictionaryOptionToFault = F5(
 	function (valueDictionary, fieldNumber, options, optionNumber, faults) {
 		var _v0 = A2($elm$core$Array$get, optionNumber, options);
@@ -7317,17 +7741,6 @@ var $author$project$Sudoku$setField = F3(
 	function (fieldNumber, fields, field) {
 		return A3($elm$core$Array$set, fieldNumber, field, fields);
 	});
-var $elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
-	});
 var $author$project$Sudoku$setOption = F3(
 	function (field, value, options) {
 		var _v0 = A2(
@@ -7357,7 +7770,7 @@ var $author$project$Sudoku$update = F3(
 			'focusField',
 			A2($author$project$SudokuModel$focusToField, model.fields, model.focus));
 		var _v0 = _Utils_Tuple3(msg, model.focus, focusField);
-		_v0$10:
+		_v0$20:
 		while (true) {
 			switch (_v0.a.$) {
 				case 'ValueChanged':
@@ -7376,6 +7789,7 @@ var $author$project$Sudoku$update = F3(
 								model: _Utils_update(
 									model,
 									{
+										buttonClicked: $elm$core$Maybe$Nothing,
 										faults: A3($author$project$SudokuFaults$recomputeFaults, fields, fieldNumber, model.faults),
 										fields: fields
 									}),
@@ -7399,16 +7813,17 @@ var $author$project$Sudoku$update = F3(
 									model: _Utils_update(
 										model,
 										{
+											buttonClicked: $elm$core$Maybe$Nothing,
 											faults: A3($author$project$SudokuFaults$recomputeFaults, fields, fieldNumber, model.faults),
 											fields: fields
 										}),
 									session: session
 								};
 							} else {
-								break _v0$10;
+								break _v0$20;
 							}
 						default:
-							break _v0$10;
+							break _v0$20;
 					}
 				case 'ValueCleared':
 					switch (_v0.b.$) {
@@ -7425,6 +7840,7 @@ var $author$project$Sudoku$update = F3(
 								model: _Utils_update(
 									model,
 									{
+										buttonClicked: $elm$core$Maybe$Nothing,
 										faults: A3($author$project$SudokuFaults$recomputeFaults, fields, fieldNumber, model.faults),
 										fields: fields
 									}),
@@ -7448,46 +7864,108 @@ var $author$project$Sudoku$update = F3(
 									model: _Utils_update(
 										model,
 										{
+											buttonClicked: $elm$core$Maybe$Nothing,
 											faults: A3($author$project$SudokuFaults$recomputeFaults, fields, fieldNumber, model.faults),
 											fields: fields
 										}),
 									session: session
 								};
 							} else {
-								break _v0$10;
+								break _v0$20;
 							}
 						default:
-							break _v0$10;
+							break _v0$20;
 					}
 				case 'FocusChanged':
-					var fieldNumber = _v0.a.a;
-					return {
-						cmd: $elm$core$Platform$Cmd$none,
-						model: _Utils_update(
-							model,
-							{
-								focus: $author$project$SudokuModel$FocusEdit(fieldNumber)
-							}),
-						session: session
-					};
+					if (((_v0.b.$ === 'FocusOptions') && (_v0.c.$ === 'Just')) && (_v0.c.a.$ === 'Options')) {
+						var fieldNumber = _v0.a.a;
+						var _v5 = _v0.b;
+						var fieldNumberOld = _v5.a;
+						var options = _v0.c.a.a;
+						var fields = $author$project$Sudoku$optionsIsEmpty(options) ? A3(
+							$author$project$Sudoku$setField,
+							fieldNumberOld,
+							model.fields,
+							$author$project$SudokuModel$Edit($elm$core$Maybe$Nothing)) : model.fields;
+						return {
+							cmd: $elm$core$Platform$Cmd$none,
+							model: _Utils_update(
+								model,
+								{
+									buttonClicked: $elm$core$Maybe$Nothing,
+									fields: fields,
+									focus: A2(
+										$author$project$SudokuModel$fieldNumberToFocus,
+										model.fields,
+										_Utils_Tuple2(fieldNumber, 0))
+								}),
+							session: session
+						};
+					} else {
+						var fieldNumber = _v0.a.a;
+						return {
+							cmd: $elm$core$Platform$Cmd$none,
+							model: _Utils_update(
+								model,
+								{
+									buttonClicked: $elm$core$Maybe$Nothing,
+									focus: A2(
+										$author$project$SudokuModel$fieldNumberToFocus,
+										model.fields,
+										_Utils_Tuple2(fieldNumber, 0))
+								}),
+							session: session
+						};
+					}
 				case 'MovedFocus':
-					var dir = _v0.a.a;
-					var focus = _v0.b;
-					return {
-						cmd: $elm$core$Platform$Cmd$none,
-						model: _Utils_update(
-							model,
-							{
-								focus: A3($author$project$Sudoku$moveFocus, focus, dir, model.fields)
-							}),
-						session: session
-					};
+					if (((_v0.b.$ === 'FocusOptions') && (_v0.c.$ === 'Just')) && (_v0.c.a.$ === 'Options')) {
+						var dir = _v0.a.a;
+						var _v6 = _v0.b;
+						var fieldNumberOld = _v6.a;
+						var fieldNumberOptionOld = _v6.b;
+						var options = _v0.c.a.a;
+						var focus = A2($author$project$SudokuModel$FocusOptions, fieldNumberOld, fieldNumberOptionOld);
+						var _v7 = A2(
+							$author$project$Sudoku$moveField,
+							_Utils_Tuple2(fieldNumberOld, fieldNumberOptionOld),
+							dir);
+						var fieldNumber = _v7.a;
+						var fields = ($author$project$Sudoku$optionsIsEmpty(options) && (!_Utils_eq(fieldNumber, fieldNumberOld))) ? A3(
+							$author$project$Sudoku$setField,
+							fieldNumberOld,
+							model.fields,
+							$author$project$SudokuModel$Edit($elm$core$Maybe$Nothing)) : model.fields;
+						return {
+							cmd: $elm$core$Platform$Cmd$none,
+							model: _Utils_update(
+								model,
+								{
+									buttonClicked: $elm$core$Maybe$Nothing,
+									fields: fields,
+									focus: A3($author$project$Sudoku$moveFocus, focus, dir, fields)
+								}),
+							session: session
+						};
+					} else {
+						var dir = _v0.a.a;
+						var focus = _v0.b;
+						return {
+							cmd: $elm$core$Platform$Cmd$none,
+							model: _Utils_update(
+								model,
+								{
+									buttonClicked: $elm$core$Maybe$Nothing,
+									focus: A3($author$project$Sudoku$moveFocus, focus, dir, model.fields)
+								}),
+							session: session
+						};
+					}
 				case 'OptionsToggled':
 					if (_v0.c.$ === 'Just') {
 						switch (_v0.b.$) {
 							case 'FocusEdit':
 								if (_v0.c.a.$ === 'Edit') {
-									var _v5 = _v0.a;
+									var _v8 = _v0.a;
 									var fieldNumber = _v0.b.a;
 									var maybeValue = _v0.c.a.a;
 									var fields = A3(
@@ -7501,21 +7979,22 @@ var $author$project$Sudoku$update = F3(
 										model: _Utils_update(
 											model,
 											{
+												buttonClicked: $elm$core$Maybe$Nothing,
 												faults: A3($author$project$SudokuFaults$recomputeFaults, fields, fieldNumber, model.faults),
 												fields: fields,
-												focus: A2($author$project$SudokuModel$FocusOptions, fieldNumber, 1)
+												focus: A2($author$project$SudokuModel$FocusOptions, fieldNumber, 0)
 											}),
 										session: session
 									};
 								} else {
-									break _v0$10;
+									break _v0$20;
 								}
 							case 'FocusOptions':
 								if (_v0.c.a.$ === 'Options') {
-									var _v6 = _v0.a;
-									var _v7 = _v0.b;
-									var fieldNumber = _v7.a;
-									var fieldOptionNumber = _v7.b;
+									var _v9 = _v0.a;
+									var _v10 = _v0.b;
+									var fieldNumber = _v10.a;
+									var fieldOptionNumber = _v10.b;
 									var options = _v0.c.a.a;
 									var fields = A3(
 										$author$project$Sudoku$setField,
@@ -7528,6 +8007,7 @@ var $author$project$Sudoku$update = F3(
 										model: _Utils_update(
 											model,
 											{
+												buttonClicked: $elm$core$Maybe$Nothing,
 												faults: A3($author$project$SudokuFaults$recomputeFaults, fields, fieldNumber, model.faults),
 												fields: fields,
 												focus: $author$project$SudokuModel$FocusEdit(fieldNumber)
@@ -7535,23 +8015,24 @@ var $author$project$Sudoku$update = F3(
 										session: session
 									};
 								} else {
-									break _v0$10;
+									break _v0$20;
 								}
 							default:
-								break _v0$10;
+								break _v0$20;
 						}
 					} else {
-						break _v0$10;
+						break _v0$20;
 					}
 				case 'OptionFocusChanged':
-					var _v8 = _v0.a;
-					var fieldNumber = _v8.a;
-					var optionFieldNumber = _v8.b;
+					var _v11 = _v0.a;
+					var fieldNumber = _v11.a;
+					var optionFieldNumber = _v11.b;
 					return {
 						cmd: $elm$core$Platform$Cmd$none,
 						model: _Utils_update(
 							model,
 							{
+								buttonClicked: $elm$core$Maybe$Nothing,
 								focus: A2($author$project$SudokuModel$FocusOptions, fieldNumber, optionFieldNumber)
 							}),
 						session: session
@@ -7565,6 +8046,7 @@ var $author$project$Sudoku$update = F3(
 							model: _Utils_update(
 								model,
 								{
+									buttonClicked: $elm$core$Maybe$Nothing,
 									faults: $author$project$SudokuFaults$initFaults,
 									fields: $elm$core$Array$fromList(
 										A2(
@@ -7588,8 +8070,149 @@ var $author$project$Sudoku$update = F3(
 					} else {
 						return {cmd: $elm$core$Platform$Cmd$none, model: model, session: session};
 					}
+				case 'HighLighted':
+					if (_v0.c.$ === 'Just') {
+						switch (_v0.c.a.$) {
+							case 'Edit':
+								var _v14 = _v0.a;
+								var maybeValue = _v0.c.a.a;
+								return _Utils_eq(model.highlight, maybeValue) ? {
+									cmd: $elm$core$Platform$Cmd$none,
+									model: _Utils_update(
+										model,
+										{buttonClicked: $elm$core$Maybe$Nothing, highlight: $elm$core$Maybe$Nothing}),
+									session: session
+								} : {
+									cmd: $elm$core$Platform$Cmd$none,
+									model: _Utils_update(
+										model,
+										{buttonClicked: $elm$core$Maybe$Nothing, highlight: maybeValue}),
+									session: session
+								};
+							case 'Frozen':
+								var _v15 = _v0.a;
+								var value = _v0.c.a.a;
+								return _Utils_eq(
+									model.highlight,
+									$elm$core$Maybe$Just(value)) ? {
+									cmd: $elm$core$Platform$Cmd$none,
+									model: _Utils_update(
+										model,
+										{buttonClicked: $elm$core$Maybe$Nothing, highlight: $elm$core$Maybe$Nothing}),
+									session: session
+								} : {
+									cmd: $elm$core$Platform$Cmd$none,
+									model: _Utils_update(
+										model,
+										{
+											buttonClicked: $elm$core$Maybe$Nothing,
+											highlight: $elm$core$Maybe$Just(value)
+										}),
+									session: session
+								};
+							default:
+								break _v0$20;
+						}
+					} else {
+						break _v0$20;
+					}
+				case 'Possibilities':
+					switch (_v0.b.$) {
+						case 'FocusEdit':
+							var _v16 = _v0.a;
+							var fieldNumber = _v0.b.a;
+							var fields = A3(
+								$author$project$Sudoku$setField,
+								fieldNumber,
+								model.fields,
+								A2($author$project$Sudoku$generateOptions, model.fields, fieldNumber));
+							return {
+								cmd: $elm$core$Platform$Cmd$none,
+								model: _Utils_update(
+									model,
+									{
+										buttonClicked: $elm$core$Maybe$Nothing,
+										faults: A3($author$project$SudokuFaults$recomputeFaults, fields, fieldNumber, model.faults),
+										fields: fields,
+										focus: A2(
+											$author$project$SudokuModel$fieldNumberToFocus,
+											fields,
+											_Utils_Tuple2(fieldNumber, 0))
+									}),
+								session: session
+							};
+						case 'FocusOptions':
+							var _v17 = _v0.a;
+							var _v18 = _v0.b;
+							var fieldNumber = _v18.a;
+							var fields = A3(
+								$author$project$Sudoku$setField,
+								fieldNumber,
+								model.fields,
+								A2($author$project$Sudoku$generateOptions, model.fields, fieldNumber));
+							return {
+								cmd: $elm$core$Platform$Cmd$none,
+								model: _Utils_update(
+									model,
+									{
+										buttonClicked: $elm$core$Maybe$Nothing,
+										faults: A3($author$project$SudokuFaults$recomputeFaults, fields, fieldNumber, model.faults),
+										fields: fields,
+										focus: A2(
+											$author$project$SudokuModel$fieldNumberToFocus,
+											fields,
+											_Utils_Tuple2(fieldNumber, 0))
+									}),
+								session: session
+							};
+						default:
+							break _v0$20;
+					}
+				case 'ButtonClear1':
+					var _v19 = _v0.a;
+					return {
+						cmd: $elm$core$Platform$Cmd$none,
+						model: _Utils_update(
+							model,
+							{
+								buttonClicked: $elm$core$Maybe$Just($author$project$SudokuModel$ButtonClear)
+							}),
+						session: session
+					};
+				case 'ButtonClear2':
+					var _v20 = _v0.a;
+					return {
+						cmd: $elm$core$Platform$Cmd$none,
+						model: _Utils_update(
+							model,
+							{
+								buttonClicked: $elm$core$Maybe$Nothing,
+								faults: $author$project$SudokuFaults$initFaults,
+								fields: $author$project$Sudoku$clearFields(model.fields),
+								focus: $author$project$SudokuModel$FocusBlurred,
+								highlight: $elm$core$Maybe$Nothing
+							}),
+						session: session
+					};
+				case 'ButtonNew1':
+					var _v21 = _v0.a;
+					return {
+						cmd: $elm$core$Platform$Cmd$none,
+						model: _Utils_update(
+							model,
+							{
+								buttonClicked: $elm$core$Maybe$Just($author$project$SudokuModel$ButtonNew)
+							}),
+						session: session
+					};
+				case 'ButtonNew2':
+					var _v22 = _v0.a;
+					var _v23 = $author$project$Sudoku$init(session);
+					var model1 = _v23.a;
+					var cmd = _v23.b;
+					return {cmd: cmd, model: model1, session: session};
 				default:
-					break _v0$10;
+					break _v0$20;
 			}
 		}
 		return {cmd: $elm$core$Platform$Cmd$none, model: model, session: session};
@@ -7655,14 +8278,764 @@ var $author$project$SudokuCDN$stylesheet = A3(
 			$elm$html$Html$Attributes$href('src/resources/sudoku.css')
 		]),
 	_List_Nil);
+var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
+var $elm$html$Html$div = _VirtualDom_node('div');
+var $author$project$Sudoku$ButtonClear1 = {$: 'ButtonClear1'};
+var $author$project$Sudoku$ButtonNew1 = {$: 'ButtonNew1'};
+var $author$project$Sudoku$ButtonNew2 = {$: 'ButtonNew2'};
+var $rundis$elm_bootstrap$Bootstrap$Internal$Button$Attrs = function (a) {
+	return {$: 'Attrs', a: a};
+};
+var $rundis$elm_bootstrap$Bootstrap$Button$attrs = function (attrs_) {
+	return $rundis$elm_bootstrap$Bootstrap$Internal$Button$Attrs(attrs_);
+};
+var $elm$html$Html$button = _VirtualDom_node('button');
+var $elm$core$Maybe$andThen = F2(
+	function (callback, maybeValue) {
+		if (maybeValue.$ === 'Just') {
+			var value = maybeValue.a;
+			return callback(value);
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $rundis$elm_bootstrap$Bootstrap$Internal$Button$applyModifier = F2(
+	function (modifier, options) {
+		switch (modifier.$) {
+			case 'Size':
+				var size = modifier.a;
+				return _Utils_update(
+					options,
+					{
+						size: $elm$core$Maybe$Just(size)
+					});
+			case 'Coloring':
+				var coloring = modifier.a;
+				return _Utils_update(
+					options,
+					{
+						coloring: $elm$core$Maybe$Just(coloring)
+					});
+			case 'Block':
+				return _Utils_update(
+					options,
+					{block: true});
+			case 'Disabled':
+				var val = modifier.a;
+				return _Utils_update(
+					options,
+					{disabled: val});
+			default:
+				var attrs = modifier.a;
+				return _Utils_update(
+					options,
+					{
+						attributes: _Utils_ap(options.attributes, attrs)
+					});
+		}
+	});
+var $elm$core$Tuple$second = function (_v0) {
+	var y = _v0.b;
+	return y;
+};
+var $elm$html$Html$Attributes$classList = function (classes) {
+	return $elm$html$Html$Attributes$class(
+		A2(
+			$elm$core$String$join,
+			' ',
+			A2(
+				$elm$core$List$map,
+				$elm$core$Tuple$first,
+				A2($elm$core$List$filter, $elm$core$Tuple$second, classes))));
+};
+var $rundis$elm_bootstrap$Bootstrap$Internal$Button$defaultOptions = {attributes: _List_Nil, block: false, coloring: $elm$core$Maybe$Nothing, disabled: false, size: $elm$core$Maybe$Nothing};
+var $elm$json$Json$Encode$bool = _Json_wrap;
+var $elm$html$Html$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$bool(bool));
+	});
+var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
+var $rundis$elm_bootstrap$Bootstrap$Internal$Button$roleClass = function (role) {
+	switch (role.$) {
+		case 'Primary':
+			return 'primary';
+		case 'Secondary':
+			return 'secondary';
+		case 'Success':
+			return 'success';
+		case 'Info':
+			return 'info';
+		case 'Warning':
+			return 'warning';
+		case 'Danger':
+			return 'danger';
+		case 'Dark':
+			return 'dark';
+		case 'Light':
+			return 'light';
+		default:
+			return 'link';
+	}
+};
+var $rundis$elm_bootstrap$Bootstrap$General$Internal$screenSizeOption = function (size) {
+	switch (size.$) {
+		case 'XS':
+			return $elm$core$Maybe$Nothing;
+		case 'SM':
+			return $elm$core$Maybe$Just('sm');
+		case 'MD':
+			return $elm$core$Maybe$Just('md');
+		case 'LG':
+			return $elm$core$Maybe$Just('lg');
+		default:
+			return $elm$core$Maybe$Just('xl');
+	}
+};
+var $rundis$elm_bootstrap$Bootstrap$Internal$Button$buttonAttributes = function (modifiers) {
+	var options = A3($elm$core$List$foldl, $rundis$elm_bootstrap$Bootstrap$Internal$Button$applyModifier, $rundis$elm_bootstrap$Bootstrap$Internal$Button$defaultOptions, modifiers);
+	return _Utils_ap(
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$classList(
+				_List_fromArray(
+					[
+						_Utils_Tuple2('btn', true),
+						_Utils_Tuple2('btn-block', options.block),
+						_Utils_Tuple2('disabled', options.disabled)
+					])),
+				$elm$html$Html$Attributes$disabled(options.disabled)
+			]),
+		_Utils_ap(
+			function () {
+				var _v0 = A2($elm$core$Maybe$andThen, $rundis$elm_bootstrap$Bootstrap$General$Internal$screenSizeOption, options.size);
+				if (_v0.$ === 'Just') {
+					var s = _v0.a;
+					return _List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('btn-' + s)
+						]);
+				} else {
+					return _List_Nil;
+				}
+			}(),
+			_Utils_ap(
+				function () {
+					var _v1 = options.coloring;
+					if (_v1.$ === 'Just') {
+						if (_v1.a.$ === 'Roled') {
+							var role = _v1.a.a;
+							return _List_fromArray(
+								[
+									$elm$html$Html$Attributes$class(
+									'btn-' + $rundis$elm_bootstrap$Bootstrap$Internal$Button$roleClass(role))
+								]);
+						} else {
+							var role = _v1.a.a;
+							return _List_fromArray(
+								[
+									$elm$html$Html$Attributes$class(
+									'btn-outline-' + $rundis$elm_bootstrap$Bootstrap$Internal$Button$roleClass(role))
+								]);
+						}
+					} else {
+						return _List_Nil;
+					}
+				}(),
+				options.attributes)));
+};
+var $rundis$elm_bootstrap$Bootstrap$Button$button = F2(
+	function (options, children) {
+		return A2(
+			$elm$html$Html$button,
+			$rundis$elm_bootstrap$Bootstrap$Internal$Button$buttonAttributes(options),
+			children);
+	});
+var $rundis$elm_bootstrap$Bootstrap$Form$Fieldset$Config = function (a) {
+	return {$: 'Config', a: a};
+};
+var $rundis$elm_bootstrap$Bootstrap$Form$Fieldset$mapConfig = F2(
+	function (mapper, _v0) {
+		var configRec = _v0.a;
+		return $rundis$elm_bootstrap$Bootstrap$Form$Fieldset$Config(
+			mapper(configRec));
+	});
+var $rundis$elm_bootstrap$Bootstrap$Form$Fieldset$children = function (children_) {
+	return $rundis$elm_bootstrap$Bootstrap$Form$Fieldset$mapConfig(
+		function (conf) {
+			return _Utils_update(
+				conf,
+				{children: children_});
+		});
+};
+var $rundis$elm_bootstrap$Bootstrap$Form$Fieldset$config = $rundis$elm_bootstrap$Bootstrap$Form$Fieldset$Config(
+	{
+		children: _List_Nil,
+		legend: $elm$core$Maybe$Nothing,
+		options: {attributes: _List_Nil, disabled: false, isGroup: false}
+	});
+var $rundis$elm_bootstrap$Bootstrap$Form$Radio$Custom = {$: 'Custom'};
+var $rundis$elm_bootstrap$Bootstrap$Form$Radio$Radio = function (a) {
+	return {$: 'Radio', a: a};
+};
+var $rundis$elm_bootstrap$Bootstrap$Form$Radio$createAdvanced = F2(
+	function (options, label_) {
+		return $rundis$elm_bootstrap$Bootstrap$Form$Radio$Radio(
+			{label: label_, options: options});
+	});
+var $rundis$elm_bootstrap$Bootstrap$Form$Radio$Label = function (a) {
+	return {$: 'Label', a: a};
+};
+var $rundis$elm_bootstrap$Bootstrap$Form$Radio$label = F2(
+	function (attributes, children) {
+		return $rundis$elm_bootstrap$Bootstrap$Form$Radio$Label(
+			{attributes: attributes, children: children});
+	});
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $rundis$elm_bootstrap$Bootstrap$Form$Radio$create = F2(
+	function (options, label_) {
+		return A2(
+			$rundis$elm_bootstrap$Bootstrap$Form$Radio$createAdvanced,
+			options,
+			A2(
+				$rundis$elm_bootstrap$Bootstrap$Form$Radio$label,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text(label_)
+					])));
+	});
+var $rundis$elm_bootstrap$Bootstrap$Form$Radio$createCustom = function (options) {
+	return $rundis$elm_bootstrap$Bootstrap$Form$Radio$create(
+		A2($elm$core$List$cons, $rundis$elm_bootstrap$Bootstrap$Form$Radio$Custom, options));
+};
+var $rundis$elm_bootstrap$Bootstrap$Form$applyModifier = F2(
+	function (modifier, options) {
+		var value = modifier.a;
+		return _Utils_update(
+			options,
+			{
+				attributes: _Utils_ap(options.attributes, value)
+			});
+	});
+var $rundis$elm_bootstrap$Bootstrap$Form$defaultOptions = {attributes: _List_Nil};
+var $rundis$elm_bootstrap$Bootstrap$Form$toAttributes = function (modifiers) {
+	var options = A3($elm$core$List$foldl, $rundis$elm_bootstrap$Bootstrap$Form$applyModifier, $rundis$elm_bootstrap$Bootstrap$Form$defaultOptions, modifiers);
+	return _Utils_ap(
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('form-group')
+			]),
+		options.attributes);
+};
+var $rundis$elm_bootstrap$Bootstrap$Form$group = F2(
+	function (options, children) {
+		return A2(
+			$elm$html$Html$div,
+			$rundis$elm_bootstrap$Bootstrap$Form$toAttributes(options),
+			children);
+	});
+var $rundis$elm_bootstrap$Bootstrap$Form$Radio$Id = function (a) {
+	return {$: 'Id', a: a};
+};
+var $rundis$elm_bootstrap$Bootstrap$Form$Radio$id = function (theId) {
+	return $rundis$elm_bootstrap$Bootstrap$Form$Radio$Id(theId);
+};
+var $rundis$elm_bootstrap$Bootstrap$Form$Radio$Inline = {$: 'Inline'};
+var $rundis$elm_bootstrap$Bootstrap$Form$Radio$inline = $rundis$elm_bootstrap$Bootstrap$Form$Radio$Inline;
+var $elm$html$Html$label = _VirtualDom_node('label');
+var $rundis$elm_bootstrap$Bootstrap$Form$label = F2(
+	function (attributes, children) {
+		return A2(
+			$elm$html$Html$label,
+			A2(
+				$elm$core$List$cons,
+				$elm$html$Html$Attributes$class('form-control-label'),
+				attributes),
+			children);
+	});
+var $elm$virtual_dom$VirtualDom$MayPreventDefault = function (a) {
+	return {$: 'MayPreventDefault', a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$preventDefaultOn = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$MayPreventDefault(decoder));
+	});
+var $rundis$elm_bootstrap$Bootstrap$Button$onClick = function (message) {
+	return $rundis$elm_bootstrap$Bootstrap$Button$attrs(
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$Events$preventDefaultOn,
+				'click',
+				$elm$json$Json$Decode$succeed(
+					_Utils_Tuple2(message, true)))
+			]));
+};
+var $rundis$elm_bootstrap$Bootstrap$Form$Radio$addOption = F2(
+	function (opt, _v0) {
+		var radio_ = _v0.a;
+		var options = radio_.options;
+		return $rundis$elm_bootstrap$Bootstrap$Form$Radio$Radio(
+			_Utils_update(
+				radio_,
+				{
+					options: A2($elm$core$List$cons, opt, options)
+				}));
+	});
+var $elm$core$Basics$composeL = F3(
+	function (g, f, x) {
+		return g(
+			f(x));
+	});
+var $rundis$elm_bootstrap$Bootstrap$Form$Radio$Name = function (a) {
+	return {$: 'Name', a: a};
+};
+var $rundis$elm_bootstrap$Bootstrap$Form$Radio$name = function (name_) {
+	return $rundis$elm_bootstrap$Bootstrap$Form$Radio$Name(name_);
+};
+var $rundis$elm_bootstrap$Bootstrap$Form$Radio$applyModifier = F2(
+	function (modifier, options) {
+		switch (modifier.$) {
+			case 'Id':
+				var val = modifier.a;
+				return _Utils_update(
+					options,
+					{
+						id: $elm$core$Maybe$Just(val)
+					});
+			case 'Checked':
+				var val = modifier.a;
+				return _Utils_update(
+					options,
+					{checked: val});
+			case 'Name':
+				var val = modifier.a;
+				return _Utils_update(
+					options,
+					{
+						name: $elm$core$Maybe$Just(val)
+					});
+			case 'Inline':
+				return _Utils_update(
+					options,
+					{inline: true});
+			case 'OnClick':
+				var toMsg = modifier.a;
+				return _Utils_update(
+					options,
+					{
+						onClick: $elm$core$Maybe$Just(toMsg)
+					});
+			case 'Custom':
+				return _Utils_update(
+					options,
+					{custom: true});
+			case 'Disabled':
+				var val = modifier.a;
+				return _Utils_update(
+					options,
+					{disabled: val});
+			case 'Validation':
+				var validation = modifier.a;
+				return _Utils_update(
+					options,
+					{
+						validation: $elm$core$Maybe$Just(validation)
+					});
+			default:
+				var attrs_ = modifier.a;
+				return _Utils_update(
+					options,
+					{
+						attributes: _Utils_ap(options.attributes, attrs_)
+					});
+		}
+	});
+var $rundis$elm_bootstrap$Bootstrap$Form$Radio$defaultOptions = {attributes: _List_Nil, checked: false, custom: false, disabled: false, id: $elm$core$Maybe$Nothing, inline: false, name: $elm$core$Maybe$Nothing, onClick: $elm$core$Maybe$Nothing, validation: $elm$core$Maybe$Nothing};
+var $elm$html$Html$Attributes$for = $elm$html$Html$Attributes$stringProperty('htmlFor');
+var $elm$html$Html$input = _VirtualDom_node('input');
+var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
+var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
+var $elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return $elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $elm$html$Html$Attributes$name = $elm$html$Html$Attributes$stringProperty('name');
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
+var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
+var $rundis$elm_bootstrap$Bootstrap$Form$Radio$toAttributes = function (options) {
+	return _Utils_ap(
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$classList(
+				_List_fromArray(
+					[
+						_Utils_Tuple2('form-check-input', !options.custom),
+						_Utils_Tuple2('custom-control-input', options.custom)
+					])),
+				$elm$html$Html$Attributes$type_('radio'),
+				$elm$html$Html$Attributes$disabled(options.disabled),
+				$elm$html$Html$Attributes$checked(options.checked)
+			]),
+		_Utils_ap(
+			A2(
+				$elm$core$List$filterMap,
+				$elm$core$Basics$identity,
+				_List_fromArray(
+					[
+						A2($elm$core$Maybe$map, $elm$html$Html$Events$onClick, options.onClick),
+						A2($elm$core$Maybe$map, $elm$html$Html$Attributes$name, options.name),
+						A2($elm$core$Maybe$map, $elm$html$Html$Attributes$id, options.id)
+					])),
+			options.attributes));
+};
+var $rundis$elm_bootstrap$Bootstrap$Form$Radio$view = function (_v0) {
+	var radio_ = _v0.a;
+	var opts = A3($elm$core$List$foldl, $rundis$elm_bootstrap$Bootstrap$Form$Radio$applyModifier, $rundis$elm_bootstrap$Bootstrap$Form$Radio$defaultOptions, radio_.options);
+	var _v1 = radio_.label;
+	var label_ = _v1.a;
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$classList(
+				_List_fromArray(
+					[
+						_Utils_Tuple2('form-check', !opts.custom),
+						_Utils_Tuple2('form-check-inline', (!opts.custom) && opts.inline),
+						_Utils_Tuple2('custom-control', opts.custom),
+						_Utils_Tuple2('custom-radio', opts.custom),
+						_Utils_Tuple2('custom-control-inline', opts.inline && opts.custom)
+					]))
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$input,
+				$rundis$elm_bootstrap$Bootstrap$Form$Radio$toAttributes(opts),
+				_List_Nil),
+				A2(
+				$elm$html$Html$label,
+				_Utils_ap(
+					label_.attributes,
+					_Utils_ap(
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$classList(
+								_List_fromArray(
+									[
+										_Utils_Tuple2('form-check-label', !opts.custom),
+										_Utils_Tuple2('custom-control-label', opts.custom)
+									]))
+							]),
+						function () {
+							var _v2 = opts.id;
+							if (_v2.$ === 'Just') {
+								var v = _v2.a;
+								return _List_fromArray(
+									[
+										$elm$html$Html$Attributes$for(v)
+									]);
+							} else {
+								return _List_Nil;
+							}
+						}())),
+				label_.children)
+			]));
+};
+var $rundis$elm_bootstrap$Bootstrap$Form$Radio$radioList = F2(
+	function (groupName, radios) {
+		return A2(
+			$elm$core$List$map,
+			A2(
+				$elm$core$Basics$composeL,
+				$rundis$elm_bootstrap$Bootstrap$Form$Radio$view,
+				$rundis$elm_bootstrap$Bootstrap$Form$Radio$addOption(
+					$rundis$elm_bootstrap$Bootstrap$Form$Radio$name(groupName))),
+			radios);
+	});
+var $elm$html$Html$fieldset = _VirtualDom_node('fieldset');
+var $rundis$elm_bootstrap$Bootstrap$Form$Fieldset$view = function (_v0) {
+	var rec = _v0.a;
+	var options = rec.options;
+	return A2(
+		$elm$html$Html$fieldset,
+		_Utils_ap(
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$classList(
+					_List_fromArray(
+						[
+							_Utils_Tuple2('form-group', options.isGroup)
+						])),
+					$elm$html$Html$Attributes$disabled(options.disabled)
+				]),
+			options.attributes),
+		function (xs) {
+			return A2($elm$core$List$append, xs, rec.children);
+		}(
+			A2(
+				$elm$core$Maybe$withDefault,
+				_List_Nil,
+				A2(
+					$elm$core$Maybe$map,
+					function (e) {
+						return _List_fromArray(
+							[e]);
+					},
+					rec.legend))));
+};
+var $author$project$Sudoku$viewButtons = function (buttonClicked) {
+	if (buttonClicked.$ === 'Nothing') {
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('center-buttons')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$rundis$elm_bootstrap$Bootstrap$Button$button,
+					_List_fromArray(
+						[
+							$rundis$elm_bootstrap$Bootstrap$Button$attrs(
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('button')
+								])),
+							$rundis$elm_bootstrap$Bootstrap$Button$onClick($author$project$Sudoku$ButtonNew1)
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('New Quiz')
+						])),
+					A2(
+					$rundis$elm_bootstrap$Bootstrap$Button$button,
+					_List_fromArray(
+						[
+							$rundis$elm_bootstrap$Bootstrap$Button$attrs(
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('button')
+								])),
+							$rundis$elm_bootstrap$Bootstrap$Button$onClick($author$project$Sudoku$ButtonClear1)
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Clear')
+						]))
+				]));
+	} else {
+		if (buttonClicked.a.$ === 'ButtonNew') {
+			var _v1 = buttonClicked.a;
+			return A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('center-buttons')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$rundis$elm_bootstrap$Bootstrap$Button$button,
+						_List_fromArray(
+							[
+								$rundis$elm_bootstrap$Bootstrap$Button$attrs(
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('button')
+									])),
+								$rundis$elm_bootstrap$Bootstrap$Button$onClick($author$project$Sudoku$ButtonNew2)
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('New Quiz')
+							])),
+						A2(
+						$rundis$elm_bootstrap$Bootstrap$Form$group,
+						_List_Nil,
+						_List_fromArray(
+							[
+								A2(
+								$rundis$elm_bootstrap$Bootstrap$Form$label,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Custom radios')
+									])),
+								$rundis$elm_bootstrap$Bootstrap$Form$Fieldset$view(
+								A2(
+									$rundis$elm_bootstrap$Bootstrap$Form$Fieldset$children,
+									A2(
+										$rundis$elm_bootstrap$Bootstrap$Form$Radio$radioList,
+										'customradiogroup',
+										_List_fromArray(
+											[
+												A2(
+												$rundis$elm_bootstrap$Bootstrap$Form$Radio$createCustom,
+												_List_fromArray(
+													[
+														$rundis$elm_bootstrap$Bootstrap$Form$Radio$id('rdi1'),
+														$rundis$elm_bootstrap$Bootstrap$Form$Radio$inline
+													]),
+												'Radio 1'),
+												A2(
+												$rundis$elm_bootstrap$Bootstrap$Form$Radio$createCustom,
+												_List_fromArray(
+													[
+														$rundis$elm_bootstrap$Bootstrap$Form$Radio$id('rdi2'),
+														$rundis$elm_bootstrap$Bootstrap$Form$Radio$inline
+													]),
+												'Radio 2'),
+												A2(
+												$rundis$elm_bootstrap$Bootstrap$Form$Radio$createCustom,
+												_List_fromArray(
+													[
+														$rundis$elm_bootstrap$Bootstrap$Form$Radio$id('rdi3'),
+														$rundis$elm_bootstrap$Bootstrap$Form$Radio$inline
+													]),
+												'Radio 3')
+											])),
+									$rundis$elm_bootstrap$Bootstrap$Form$Fieldset$config))
+							]))
+					]));
+		} else {
+			var _v2 = buttonClicked.a;
+			return A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('center-buttons')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$rundis$elm_bootstrap$Bootstrap$Button$button,
+						_List_fromArray(
+							[
+								$rundis$elm_bootstrap$Bootstrap$Button$attrs(
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('button')
+									])),
+								$rundis$elm_bootstrap$Bootstrap$Button$onClick($author$project$Sudoku$ButtonNew1)
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('New Quiz')
+							])),
+						A2(
+						$rundis$elm_bootstrap$Bootstrap$Button$button,
+						_List_fromArray(
+							[
+								$rundis$elm_bootstrap$Bootstrap$Button$attrs(
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('button')
+									])),
+								$rundis$elm_bootstrap$Bootstrap$Button$onClick($author$project$Sudoku$ButtonClear1)
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Clear')
+							]))
+					]));
+		}
+	}
+};
+var $author$project$Sudoku$viewExplainItem = function (items) {
+	return A2($elm$html$Html$div, _List_Nil, items);
+};
+var $elm$html$Html$strong = _VirtualDom_node('strong');
+var $author$project$Sudoku$viewExplainStrong = function (item) {
+	return A2(
+		$elm$html$Html$strong,
+		_List_Nil,
+		_List_fromArray(
+			[
+				$elm$html$Html$text(item)
+			]));
+};
+var $author$project$Sudoku$viewExplainText = function (description) {
+	return $elm$html$Html$text(description);
+};
+var $author$project$Sudoku$viewExplanations = A2(
+	$elm$html$Html$div,
+	_List_fromArray(
+		[
+			$elm$html$Html$Attributes$class('center-explainations')
+		]),
+	_List_fromArray(
+		[
+			A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('alert alert-warning alert-dismissible fade show')
+				]),
+			_List_fromArray(
+				[
+					$author$project$Sudoku$viewExplainItem(
+					_List_fromArray(
+						[
+							$author$project$Sudoku$viewExplainStrong('navigate'),
+							$author$project$Sudoku$viewExplainText(' - use the arrow keys to navigate through the grid.')
+						])),
+					$author$project$Sudoku$viewExplainItem(
+					_List_fromArray(
+						[
+							$author$project$Sudoku$viewExplainStrong('edit'),
+							$author$project$Sudoku$viewExplainText(' - a number, backspace, space, delete changes the value in a cell.')
+						])),
+					$author$project$Sudoku$viewExplainItem(
+					_List_fromArray(
+						[
+							$author$project$Sudoku$viewExplainText('toggle '),
+							$author$project$Sudoku$viewExplainStrong('options'),
+							$author$project$Sudoku$viewExplainText(' with the letter \'o\', '),
+							$author$project$Sudoku$viewExplainStrong('highlight'),
+							$author$project$Sudoku$viewExplainText(' the current value with \'h\', show all '),
+							$author$project$Sudoku$viewExplainStrong('possible'),
+							$author$project$Sudoku$viewExplainText(' values with \'p\'.')
+						]))
+				]))
+		]));
 var $rundis$elm_bootstrap$Bootstrap$Table$TableAttr = function (a) {
 	return {$: 'TableAttr', a: a};
 };
 var $rundis$elm_bootstrap$Bootstrap$Table$attr = function (attr_) {
 	return $rundis$elm_bootstrap$Bootstrap$Table$TableAttr(attr_);
 };
-var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
-var $elm$html$Html$div = _VirtualDom_node('div');
 var $rundis$elm_bootstrap$Bootstrap$Table$Inversed = {$: 'Inversed'};
 var $elm$core$List$any = F2(
 	function (isOkay, list) {
@@ -7843,15 +9216,6 @@ var $rundis$elm_bootstrap$Bootstrap$Table$maybeMapInversedTHead = F2(
 					rows: A2($elm$core$List$map, $rundis$elm_bootstrap$Bootstrap$Table$mapInversedRow, thead_.rows)
 				}) : thead_);
 	});
-var $elm$core$Maybe$andThen = F2(
-	function (callback, maybeValue) {
-		if (maybeValue.$ === 'Just') {
-			var value = maybeValue.a;
-			return callback(value);
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
-	});
 var $elm$core$List$head = function (list) {
 	if (list.b) {
 		var x = list.a;
@@ -7859,30 +9223,6 @@ var $elm$core$List$head = function (list) {
 		return $elm$core$Maybe$Just(x);
 	} else {
 		return $elm$core$Maybe$Nothing;
-	}
-};
-var $elm$core$Maybe$map = F2(
-	function (f, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return $elm$core$Maybe$Just(
-				f(value));
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
-	});
-var $rundis$elm_bootstrap$Bootstrap$General$Internal$screenSizeOption = function (size) {
-	switch (size.$) {
-		case 'XS':
-			return $elm$core$Maybe$Nothing;
-		case 'SM':
-			return $elm$core$Maybe$Just('sm');
-		case 'MD':
-			return $elm$core$Maybe$Just('md');
-		case 'LG':
-			return $elm$core$Maybe$Just('lg');
-		default:
-			return $elm$core$Maybe$Just('xl');
 	}
 };
 var $rundis$elm_bootstrap$Bootstrap$Table$maybeWrapResponsive = F2(
@@ -7918,7 +9258,6 @@ var $rundis$elm_bootstrap$Bootstrap$Table$maybeWrapResponsive = F2(
 			_List_fromArray(
 				[table_])) : table_;
 	});
-var $elm$core$Basics$not = _Basics_not;
 var $rundis$elm_bootstrap$Bootstrap$Table$CellAttr = function (a) {
 	return {$: 'CellAttr', a: a};
 };
@@ -8269,6 +9608,9 @@ var $author$project$SudokuModel$focusOnField = F2(
 			case 'FocusEdit':
 				var focusFieldNumber = focus.a;
 				return _Utils_eq(focusFieldNumber, fieldNumber) ? $author$project$SudokuModel$FocusEdit(focusFieldNumber) : $author$project$SudokuModel$FocusBlurred;
+			case 'FocusFrozen':
+				var focusFieldNumber = focus.a;
+				return _Utils_eq(focusFieldNumber, fieldNumber) ? $author$project$SudokuModel$FocusFrozen(focusFieldNumber) : $author$project$SudokuModel$FocusBlurred;
 			default:
 				var focusFieldNumber = focus.a;
 				var focusFieldOptionNumber = focus.b;
@@ -8292,30 +9634,31 @@ var $author$project$SudokuFaults$getFault = F2(
 			false,
 			faults);
 	});
-var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
-};
-var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
-var $elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$Normal(decoder));
+var $author$project$SudokuModel$isHighlighted = F2(
+	function (highlight, value) {
+		if (highlight.$ === 'Nothing') {
+			return false;
+		} else {
+			var highlightValue = highlight.a;
+			return _Utils_eq(highlightValue, value);
+		}
 	});
-var $elm$html$Html$Events$onClick = function (msg) {
-	return A2(
-		$elm$html$Html$Events$on,
-		'click',
-		$elm$json$Json$Decode$succeed(msg));
-};
+var $author$project$Sudoku$getHighlight = F3(
+	function (highlight, value, postfix) {
+		return A2($author$project$SudokuModel$isHighlighted, highlight, value) ? (' highlight-' + postfix) : '';
+	});
+var $author$project$SudokuModel$modelToField = F2(
+	function (fields, field) {
+		return A2(
+			$elm$core$Maybe$withDefault,
+			$author$project$SudokuModel$Frozen(0),
+			A2($elm$core$Array$get, field, fields));
+	});
 var $rundis$elm_bootstrap$Bootstrap$Table$td = F2(
 	function (options, children) {
 		return $rundis$elm_bootstrap$Bootstrap$Table$Td(
 			{children: children, options: options});
 	});
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $author$project$Sudoku$OptionFocusChanged = F2(
 	function (a, b) {
 		return {$: 'OptionFocusChanged', a: a, b: b};
@@ -8432,38 +9775,69 @@ var $author$project$Sudoku$viewOptions = F4(
 	});
 var $author$project$Sudoku$viewCell = F3(
 	function (model, fieldNumber, borders) {
-		var fieldFaultCss = A2($author$project$SudokuFaults$getFault, fieldNumber, model.faults) ? ' fault' : '';
-		var _v0 = _Utils_Tuple2(
+		var _v0 = A2($author$project$SudokuFaults$getFault, fieldNumber, model.faults) ? _Utils_Tuple2(' fault-edit', ' fault-frozen') : _Utils_Tuple2('', '');
+		var faultEdit = _v0.a;
+		var faultFrozen = _v0.b;
+		var _v1 = _Utils_Tuple2(
 			A2($author$project$SudokuModel$modelToField, model.fields, fieldNumber),
 			A2($author$project$SudokuModel$focusOnField, model.focus, fieldNumber));
-		_v0$7:
+		_v1$8:
 		while (true) {
-			switch (_v0.a.$) {
+			switch (_v1.a.$) {
 				case 'Frozen':
-					var value = _v0.a.a;
-					return A2(
-						$rundis$elm_bootstrap$Bootstrap$Table$td,
-						_List_fromArray(
-							[
-								$rundis$elm_bootstrap$Bootstrap$Table$cellAttr(
-								$elm$html$Html$Attributes$class(borders + (' frozen' + fieldFaultCss)))
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text(
-								$elm$core$String$fromInt(value))
-							]));
+					switch (_v1.b.$) {
+						case 'FocusFrozen':
+							var value = _v1.a.a;
+							return A2(
+								$rundis$elm_bootstrap$Bootstrap$Table$td,
+								_List_fromArray(
+									[
+										$rundis$elm_bootstrap$Bootstrap$Table$cellAttr(
+										$elm$html$Html$Attributes$class(
+											borders + (' focus-frozen' + (faultFrozen + A3($author$project$Sudoku$getHighlight, model.highlight, value, 'frozen'))))),
+										$rundis$elm_bootstrap$Bootstrap$Table$cellAttr(
+										$elm$html$Html$Events$onClick(
+											$author$project$Sudoku$FocusChanged(fieldNumber)))
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text(
+										$elm$core$String$fromInt(value))
+									]));
+						case 'FocusBlurred':
+							var value = _v1.a.a;
+							var _v2 = _v1.b;
+							return A2(
+								$rundis$elm_bootstrap$Bootstrap$Table$td,
+								_List_fromArray(
+									[
+										$rundis$elm_bootstrap$Bootstrap$Table$cellAttr(
+										$elm$html$Html$Attributes$class(
+											borders + (' frozen' + (faultFrozen + A3($author$project$Sudoku$getHighlight, model.highlight, value, 'frozen'))))),
+										$rundis$elm_bootstrap$Bootstrap$Table$cellAttr(
+										$elm$html$Html$Events$onClick(
+											$author$project$Sudoku$FocusChanged(fieldNumber)))
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text(
+										$elm$core$String$fromInt(value))
+									]));
+						default:
+							break _v1$8;
+					}
 				case 'Edit':
-					if (_v0.a.a.$ === 'Just') {
-						switch (_v0.b.$) {
+					if (_v1.a.a.$ === 'Just') {
+						switch (_v1.b.$) {
 							case 'FocusEdit':
-								var value = _v0.a.a.a;
+								var value = _v1.a.a.a;
 								return A2(
 									$rundis$elm_bootstrap$Bootstrap$Table$td,
 									_List_fromArray(
 										[
 											$rundis$elm_bootstrap$Bootstrap$Table$cellAttr(
-											$elm$html$Html$Attributes$class(borders + (' focus' + fieldFaultCss)))
+											$elm$html$Html$Attributes$class(
+												borders + (' focus-edit' + (faultEdit + A3($author$project$Sudoku$getHighlight, model.highlight, value, 'edit')))))
 										]),
 									_List_fromArray(
 										[
@@ -8471,14 +9845,15 @@ var $author$project$Sudoku$viewCell = F3(
 											$elm$core$String$fromInt(value))
 										]));
 							case 'FocusBlurred':
-								var value = _v0.a.a.a;
-								var _v2 = _v0.b;
+								var value = _v1.a.a.a;
+								var _v4 = _v1.b;
 								return A2(
 									$rundis$elm_bootstrap$Bootstrap$Table$td,
 									_List_fromArray(
 										[
 											$rundis$elm_bootstrap$Bootstrap$Table$cellAttr(
-											$elm$html$Html$Attributes$class(borders + (' sudoku' + fieldFaultCss))),
+											$elm$html$Html$Attributes$class(
+												borders + (' edit' + (faultEdit + A3($author$project$Sudoku$getHighlight, model.highlight, value, 'edit'))))),
 											$rundis$elm_bootstrap$Bootstrap$Table$cellAttr(
 											$elm$html$Html$Events$onClick(
 												$author$project$Sudoku$FocusChanged(fieldNumber)))
@@ -8489,32 +9864,32 @@ var $author$project$Sudoku$viewCell = F3(
 											$elm$core$String$fromInt(value))
 										]));
 							default:
-								break _v0$7;
+								break _v1$8;
 						}
 					} else {
-						switch (_v0.b.$) {
+						switch (_v1.b.$) {
 							case 'FocusEdit':
-								var _v1 = _v0.a.a;
+								var _v3 = _v1.a.a;
 								return A2(
 									$rundis$elm_bootstrap$Bootstrap$Table$td,
 									_List_fromArray(
 										[
 											$rundis$elm_bootstrap$Bootstrap$Table$cellAttr(
-											$elm$html$Html$Attributes$class(borders + (' focus' + fieldFaultCss)))
+											$elm$html$Html$Attributes$class(borders + (' focus-edit' + faultEdit)))
 										]),
 									_List_fromArray(
 										[
 											$elm$html$Html$text(' ')
 										]));
 							case 'FocusBlurred':
-								var _v3 = _v0.a.a;
-								var _v4 = _v0.b;
+								var _v5 = _v1.a.a;
+								var _v6 = _v1.b;
 								return A2(
 									$rundis$elm_bootstrap$Bootstrap$Table$td,
 									_List_fromArray(
 										[
 											$rundis$elm_bootstrap$Bootstrap$Table$cellAttr(
-											$elm$html$Html$Attributes$class(borders + (' sudoku' + fieldFaultCss))),
+											$elm$html$Html$Attributes$class(borders + (' edit' + faultEdit))),
 											$rundis$elm_bootstrap$Bootstrap$Table$cellAttr(
 											$elm$html$Html$Events$onClick(
 												$author$project$Sudoku$FocusChanged(fieldNumber)))
@@ -8524,15 +9899,15 @@ var $author$project$Sudoku$viewCell = F3(
 											$elm$html$Html$text(' ')
 										]));
 							default:
-								break _v0$7;
+								break _v1$8;
 						}
 					}
 				default:
-					switch (_v0.b.$) {
+					switch (_v1.b.$) {
 						case 'FocusOptions':
-							var options = _v0.a.a;
-							var _v5 = _v0.b;
-							var focusFieldOptionNumber = _v5.b;
+							var options = _v1.a.a;
+							var _v7 = _v1.b;
+							var focusFieldOptionNumber = _v7.b;
 							return A2(
 								$rundis$elm_bootstrap$Bootstrap$Table$td,
 								_List_fromArray(
@@ -8550,8 +9925,8 @@ var $author$project$Sudoku$viewCell = F3(
 										$elm$core$Maybe$Just(focusFieldOptionNumber))
 									]));
 						case 'FocusBlurred':
-							var options = _v0.a.a;
-							var _v6 = _v0.b;
+							var options = _v1.a.a;
+							var _v8 = _v1.b;
 							return A2(
 								$rundis$elm_bootstrap$Bootstrap$Table$td,
 								_List_fromArray(
@@ -8564,7 +9939,7 @@ var $author$project$Sudoku$viewCell = F3(
 										A4($author$project$Sudoku$viewOptions, model, fieldNumber, options, $elm$core$Maybe$Nothing)
 									]));
 						default:
-							break _v0$7;
+							break _v1$8;
 					}
 			}
 		}
@@ -8610,12 +9985,12 @@ var $author$project$Sudoku$viewRows = function (model) {
 			A3($author$project$Sudoku$viewRow, model, 8, 'borderbottom')
 		]);
 };
-var $author$project$Sudoku$view = function (model) {
+var $author$project$Sudoku$viewSudoku = function (model) {
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$class('center')
+				$elm$html$Html$Attributes$class('center-sudoku')
 			]),
 		_List_fromArray(
 			[
@@ -8632,6 +10007,20 @@ var $author$project$Sudoku$view = function (model) {
 						$author$project$Sudoku$viewRows(model)),
 					thead: A2($rundis$elm_bootstrap$Bootstrap$Table$thead, _List_Nil, _List_Nil)
 				})
+			]));
+};
+var $author$project$Sudoku$view = function (model) {
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('center')
+			]),
+		_List_fromArray(
+			[
+				$author$project$Sudoku$viewExplanations,
+				$author$project$Sudoku$viewSudoku(model),
+				$author$project$Sudoku$viewButtons(model.buttonClicked)
 			]));
 };
 var $author$project$Main$view = function (model) {

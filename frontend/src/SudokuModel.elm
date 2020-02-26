@@ -20,7 +20,14 @@ type alias Model =
         fields : Array Field
         , focus : Focus
         , faults : Dict String ( Dict ( Int, Int ) Bool )        -- String is here column, row or block, 
-    }                                                            -- ( Int, 0 ) for Edit en Frozen fields and ( Int, Int ) for Options
+                                                                 -- ( Int, 0 ) for Edit en Frozen fields and ( Int, Int ) for Options
+        , highlight : Maybe Int
+        , buttonClicked : Maybe ButtonClicked
+    }
+
+type ButtonClicked =
+    ButtonNew
+    | ButtonClear
 
 type Field =
     Edit (Maybe Int)
@@ -31,6 +38,7 @@ type Field =
 type Focus =
     FocusBlurred
     | FocusEdit Int
+    | FocusFrozen Int
     | FocusOptions Int Int
 
 
@@ -65,6 +73,9 @@ focusToField fields focus =
         FocusEdit fieldFocus ->
             Array.get fieldFocus fields
 
+        FocusFrozen fieldFocus ->
+            Array.get fieldFocus fields
+
         FocusOptions fieldFocus _ -> 
             Array.get fieldFocus fields
 
@@ -74,7 +85,10 @@ fieldNumberToFocus fields ( fieldNumber, fieldOptionNumber ) =
     case Array.get fieldNumber fields of
         Just (Edit _) ->
             FocusEdit fieldNumber
-        
+
+        Just (Frozen _) ->
+            FocusFrozen fieldNumber
+
         Just (Options _) ->
             FocusOptions fieldNumber fieldOptionNumber
 
@@ -88,6 +102,9 @@ focusToFieldOption focus =
             Nothing
         
         FocusEdit _ ->
+            Nothing
+
+        FocusFrozen _ ->
             Nothing
 
         FocusOptions _ fieldOption -> 
@@ -106,9 +123,23 @@ focusOnField focus fieldNumber =
             else
                 FocusBlurred
 
-        FocusOptions focusFieldNumber focusFieldOptionNumber -> 
+        FocusFrozen focusFieldNumber ->
+            if (focusFieldNumber == fieldNumber) then
+                FocusFrozen focusFieldNumber
+            else
+                FocusBlurred
+
+        FocusOptions focusFieldNumber focusFieldOptionNumber ->
             if (focusFieldNumber == fieldNumber) then
                 FocusOptions focusFieldNumber focusFieldOptionNumber
             else
                 FocusBlurred
 
+isHighlighted : Maybe Int -> Int -> Bool
+isHighlighted highlight value =
+    case highlight of
+        Nothing ->
+            False
+
+        Just highlightValue ->
+            highlightValue == value

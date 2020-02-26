@@ -3,7 +3,7 @@ module Domain.InitFlags exposing (..)
 import Json.Decode as Decode exposing (..)
 import Json.Decode.Pipeline exposing (..)
 
-type alias InitFlags = 
+type alias InitFlags =
     {
         sudoku_api_base_url : String
         , thisBaseUrlString : String
