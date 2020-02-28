@@ -1,4 +1,4 @@
-module SudokuFaults exposing (initFaults, recomputeFaults, getFault, getOptionFault, valueOkayOrNot)
+module SudokuFaults exposing (initFaults, recomputeFaults, getFault, getOptionFault, valueOkayOrNot, noFaultsDetected)
 
 import SudokuModel exposing (..)
 
@@ -16,6 +16,7 @@ valueOkayOrNot fields fieldNumber value =
         |> fieldsToValueDictionary fields                       -- fieldsToValueDictionary : Array Field -> Array Int -> Dict Int ( Array Int )
         |> (\valueDict -> Dict.member value valueDict )
         |> not
+
 
 recomputeFaults : Array Field -> Int -> Dict String (Dict (Int, Int) Bool) -> Dict String (Dict (Int, Int) Bool) 
 recomputeFaults fields fieldNumber faults =
@@ -119,25 +120,38 @@ valueDictionaryToFaults : Array Field -> Dict Int ( Array Int ) -> Int -> Dict (
 valueDictionaryToFaults fields valueDictionary fieldNumber faults =
     case Array.get fieldNumber fields of
         Just (Edit Nothing) ->
-            Dict.remove (fieldNumber, 0) faults
+            removeFieldAndOptions faults fieldNumber
         
         Just (Edit (Just value)) ->
             if ( ( Dict.get value valueDictionary |> Maybe.withDefault Array.empty |> Array.length ) > 1 ) then
                 Dict.insert (fieldNumber, 0) True faults
             else
-                Dict.remove (fieldNumber, 0) faults
+                removeFieldAndOptions faults fieldNumber
 
         Just (Frozen value) ->
             if ( ( Dict.get value valueDictionary |> Maybe.withDefault Array.empty |> Array.length ) > 1 ) then
                 Dict.insert (fieldNumber, 0) True faults
             else
-                Dict.remove (fieldNumber, 0) faults
+                removeFieldAndOptions faults fieldNumber
 
         Just (Options options) ->
             Array.foldl (valueDictionaryOptionToFault valueDictionary fieldNumber options) faults optionNumbers
 
         _ ->
             faults
+
+removeFieldAndOptions : Dict (Int, Int) Bool -> Int -> Dict (Int, Int) Bool
+removeFieldAndOptions faults fieldNumber =
+    Dict.remove (fieldNumber, 0) faults
+    |> Dict.remove (fieldNumber, 1)
+    |> Dict.remove (fieldNumber, 2)
+    |> Dict.remove (fieldNumber, 3)
+    |> Dict.remove (fieldNumber, 4)
+    |> Dict.remove (fieldNumber, 5)
+    |> Dict.remove (fieldNumber, 6)
+    |> Dict.remove (fieldNumber, 7)
+    |> Dict.remove (fieldNumber, 8)
+    |> Dict.remove (fieldNumber, 9)
 
 
 optionNumbers : Array Int
@@ -177,3 +191,18 @@ getOptionFault fieldNumber optionNumber faults =
         )
         False
         faults
+
+
+noFaultsDetected : Dict String (Dict (Int, Int) Bool) -> Bool
+noFaultsDetected faults =
+    let
+        faults1 = Debug.log "faults" faults
+    in
+        Debug.log "noFaultsDetected"
+        (    Dict.foldl
+                (\dimension dict okay ->
+                    okay && ( Dict.isEmpty dict)
+                )
+                True
+                faults1
+        )

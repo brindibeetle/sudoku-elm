@@ -19,7 +19,7 @@ type alias SudokuQuiz =
 getRandomSudokuQuiz : (WebData SudokuQuiz -> msg) -> Session ->  Cmd msg
 getRandomSudokuQuiz msg session =
     let
-        requestUrl = Debug.log "requestUrl" (getSudokuApiBaseUrl session)
+        requestUrl = getSudokuApiBaseUrl session
     in
         Http.get
             { url = requestUrl

@@ -1,5 +1,6 @@
 module Sudoku exposing (..)
 
+import Dict exposing (Dict)
 import SudokuModel exposing (..)
 import SudokuFaults exposing (..)
 import Domain.SudokuQuiz exposing (..)
@@ -11,7 +12,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Session exposing (..)
 import Bootstrap.Form as Form
-import Bootstrap.Table as Table
+import Bootstrap.Table as Table exposing (CellOption)
 import Bootstrap.Button as Button
 import Bootstrap.Form.Radio as Radio
 import Bootstrap.Form.Fieldset as Fieldset
@@ -24,7 +25,7 @@ init session =
     (
         { fields = 
             String.toList sudokuExample 
-            |> List.map charToCijfer 
+            |> List.map charToCijfer
             |> List.map 
                 ( \maybeInt -> 
                     case maybeInt of
@@ -37,10 +38,8 @@ init session =
         , focus = FocusBlurred
         , faults = initFaults
         , highlight = Nothing
-        , buttonClicked = Nothing
         }
         , getRandomSudokuQuiz SudokuQuizReceived session )
-
 
 
 -- ####
@@ -50,15 +49,19 @@ init session =
 
 view : Model -> Html Msg
 view model =
-    div [ class  "center" ]
-        [ viewExplanations
-         , viewSudoku model
-         , viewButtons model.buttonClicked
-        ]
+    let
+        isSolved = solved model.fields model.faults
+    in
+        div [ class  "center" ]
+            [ viewExplanations
+             , viewSudoku model isSolved
+             , viewMessage isSolved
+             , viewButtons
+            ]
 
 viewExplanations : Html Msg
 viewExplanations =
-    div [ class "center-explainations"]
+    div [ class "center-explanations"]
         [ div [ class "alert alert-warning alert-dismissible fade show" ]
             [ viewExplainItem [ viewExplainStrong ("navigate"), viewExplainText ( " - use the arrow keys to navigate through the grid." ) ]
             , viewExplainItem [ viewExplainStrong ("edit"), viewExplainText ( " - a number, backspace, space, delete changes the value in a cell." ) ]
@@ -67,9 +70,10 @@ viewExplanations =
                 , viewExplainStrong ("options")
                 , viewExplainText (" with the letter 'o', ")
                 , viewExplainStrong ("highlight")
-                , viewExplainText(" the current value with 'h', show all ")
-                , viewExplainStrong ("possible")
-                , viewExplainText(" values with 'p'.")
+                , viewExplainText(" the current value with 'h'.")
+                --, show all ")
+                --, viewExplainStrong ("possible")
+                --, viewExplainText(" values with 'p'.")
                 ]
             ]
         ]
@@ -86,117 +90,106 @@ viewExplainItem : List(Html Msg) -> Html Msg
 viewExplainItem items =
     div [] items
 
-viewButtons : Maybe ButtonClicked -> Html Msg
-viewButtons buttonClicked =
-    case buttonClicked of
-        Nothing ->
-            div [ class "center-buttons"]
-                [ Button.button [ Button.attrs [ class "button" ], Button.onClick ButtonNew1 ] [ text "New Quiz" ]
-                , Button.button [ Button.attrs [ class "button" ], Button.onClick ButtonClear1 ] [ text "Clear" ]
-                ]
-
-        Just ButtonNew ->
-            div [ class "center-buttons"]
-                [ Button.button [ Button.attrs [ class "button" ], Button.onClick ButtonNew2 ] [ text "New Quiz" ]
-                , Form.group []
-                    [ Form.label [] [ text "Custom radios" ]
-                    , Fieldset.config
-                        |> Fieldset.children
-                            ( Radio.radioList "customradiogroup"
-                                [ Radio.createCustom [ Radio.id "rdi1", Radio.inline ] "Radio 1"
-                                , Radio.createCustom [ Radio.id "rdi2", Radio.inline ] "Radio 2"
-                                , Radio.createCustom [ Radio.id "rdi3", Radio.inline ] "Radio 3"
-                                ]
-                            )
-                        |> Fieldset.view
-                    ]
-                ]
-
-        Just ButtonClear ->
-            div [ class "center-buttons"]
-                [ Button.button [ Button.attrs [ class "button" ], Button.onClick ButtonNew1 ] [ text "New Quiz" ]
-                , Button.button [ Button.attrs [ class "button" ], Button.onClick ButtonClear1 ] [ text "Clear" ]
-                ]
+viewMessage : Bool -> Html Msg
+viewMessage isSolved =
+    if isSolved then
+        div [ class "center-message" ]
+            [ text "Congratulations! Try a new one?" ]
+    else
+        div [ class "center-message" ]
+            [ text "" ]
 
 
-viewSudoku : Model -> Html Msg
-viewSudoku model =
+viewButtons : Html Msg
+viewButtons =
+        div [ class "center-buttons" ]
+            [ Button.button [ Button.attrs [ class "button" ], Button.onClick ButtonNew ] [ text "New Quiz" ]
+            , Button.button [ Button.attrs [ class "button" ], Button.onClick ButtonClear ] [ text "Clear" ]
+            ]
+
+
+viewSudoku : Model -> Bool -> Html Msg
+viewSudoku model isSolved =
     div [ class "center-sudoku"]
         [ Table.table
             { options = [ Table.attr ( class "table table-bordered sudoku" ) ]
             , thead = Table.thead [] []
-            , tbody = Table.tbody [] ( viewRows model )
+            , tbody = Table.tbody [] ( viewRows model isSolved )
             }
         ]
 
-viewRows : Model -> List (Table.Row Msg)
-viewRows model =
+viewRows : Model -> Bool -> List (Table.Row Msg)
+viewRows model isSolved =
     [
-        viewRow model 0 "bordertop"
-        , viewRow model 1 ""
-        , viewRow model 2 "borderbottom"
-        , viewRow model 3 "bordertop"
-        , viewRow model 4 ""
-        , viewRow model 5 "borderbottom"
-        , viewRow model 6 "bordertop"
-        , viewRow model 7 ""
-        , viewRow model 8 "borderbottom"
+        viewRow model 0 "bordertop" isSolved
+        , viewRow model 1 "" isSolved
+        , viewRow model 2 "borderbottom" isSolved
+        , viewRow model 3 "bordertop" isSolved
+        , viewRow model 4 "" isSolved
+        , viewRow model 5 "borderbottom" isSolved
+        , viewRow model 6 "bordertop" isSolved
+        , viewRow model 7 "" isSolved
+        , viewRow model 8 "borderbottom" isSolved
     ]
 
-viewRow : Model -> Int -> String -> Table.Row Msg
-viewRow model row borders =
+viewRow : Model -> Int -> String -> Bool -> Table.Row Msg
+viewRow model row borders isSolved =
     let
         field0 = row * 9
     in
         Table.tr [] 
         [ 
-            viewCell model field0 (borders ++ " borderleft")
-            , viewCell model (field0 + 1) borders 
-            , viewCell model (field0 + 2) (borders ++ " borderright")
-            , viewCell model (field0 + 3) (borders ++ " borderleft")
-            , viewCell model (field0 + 4) borders
-            , viewCell model (field0 + 5) (borders ++ " borderright")
-            , viewCell model (field0 + 6) (borders ++ " borderleft")
-            , viewCell model (field0 + 7) borders
-            , viewCell model (field0 + 8) (borders ++ " borderright")
+            viewCell model field0 (borders ++ " borderleft") isSolved
+            , viewCell model (field0 + 1) borders isSolved
+            , viewCell model (field0 + 2) (borders ++ " borderright") isSolved
+            , viewCell model (field0 + 3) (borders ++ " borderleft") isSolved
+            , viewCell model (field0 + 4) borders isSolved
+            , viewCell model (field0 + 5) (borders ++ " borderright") isSolved
+            , viewCell model (field0 + 6) (borders ++ " borderleft") isSolved
+            , viewCell model (field0 + 7) borders isSolved
+            , viewCell model (field0 + 8) (borders ++ " borderright") isSolved
         ]
 
 
-viewCell : Model -> Int -> String -> Table.Cell Msg
-viewCell model fieldNumber borders =
+viewCell : Model -> Int -> String -> Bool -> Table.Cell Msg
+viewCell model fieldNumber borders isSolved =
     let
+        field = modelToField model.fields fieldNumber
+        focus = focusOnField model.focus fieldNumber
+        fault = getFault fieldNumber model.faults
+        cssArgs = { css = borders, field = field, isFocus = (focus /= FocusBlurred), isFault = fault, isSolved = isSolved }
         (faultEdit, faultFrozen) = if getFault fieldNumber model.faults then (" fault-edit"," fault-frozen") else ("", "")
     in
-        case ( modelToField model.fields fieldNumber, focusOnField model.focus fieldNumber ) of
+        case ( field, focus ) of
         -- focusOnField returns FocusBlurred if focus NOT ON FIELD
             ( Frozen value, FocusFrozen _ ) ->
                 Table.td 
-                    [ Table.cellAttr (class (borders ++ " focus-frozen" ++ faultFrozen ++ (getHighlight model.highlight value "frozen") )), Table.cellAttr( onClick ( FocusChanged fieldNumber )) ]
+                    [ getCssClasses cssArgs (isHighlighted model.highlight value) value, Table.cellAttr( onClick ( FocusChanged fieldNumber )) ]
                     [ value |> String.fromInt |> text ]
 
             ( Frozen value, FocusBlurred ) ->
                 Table.td
-                    [ Table.cellAttr (class (borders ++ " frozen" ++ faultFrozen ++ (getHighlight model.highlight value "frozen") )), Table.cellAttr( onClick ( FocusChanged fieldNumber )) ]
+                    [ getCssClasses cssArgs (isHighlighted model.highlight value) value, Table.cellAttr( onClick ( FocusChanged fieldNumber )) ]
                     [ value |> String.fromInt |> text ]
 
             ( Edit (Just value), FocusEdit _ ) ->
                 Table.td 
-                    [ Table.cellAttr (class (borders ++ " focus-edit" ++ faultEdit ++ (getHighlight model.highlight value "edit") )) ]
+                    [ getCssClasses cssArgs (isHighlighted model.highlight value) value ]
                     [ value |> String.fromInt |> text ]
 
             ( Edit Nothing, FocusEdit _ ) ->
                 Table.td
-                    [ Table.cellAttr (class (borders ++ " focus-edit" ++ faultEdit )) ]
+                    [ getCssClasses cssArgs False 0 ]
                     [ text " " ]
 
             ( Edit (Just value), FocusBlurred ) ->
                 Table.td 
-                    [ Table.cellAttr (class (borders ++ " edit" ++ faultEdit ++ (getHighlight model.highlight value "edit") )), Table.cellAttr( onClick ( FocusChanged fieldNumber )) ]
+                    [ getCssClasses cssArgs (isHighlighted model.highlight value) value, Table.cellAttr( onClick ( FocusChanged fieldNumber )) ]
                     [ value |> String.fromInt |> text ]
 
             ( Edit Nothing, FocusBlurred ) ->
-                Table.td 
-                    [ Table.cellAttr (class (borders ++ " edit" ++ faultEdit )), Table.cellAttr( onClick ( FocusChanged fieldNumber )) ]
+                Table.td
+                    [ getCssClasses cssArgs False 0, Table.cellAttr( onClick ( FocusChanged fieldNumber )) ]
                     [ text " " ]
 
             ( Options options, FocusOptions _ focusFieldOptionNumber ) ->
@@ -213,6 +206,33 @@ viewCell model fieldNumber borders =
                 Table.td
                     [ Table.cellDanger ]
                     [ text "Something is wrong here "]
+
+
+getCssClasses : { css : String, field : Field, isFocus : Bool, isFault : Bool, isSolved : Bool } -> Bool -> Int -> CellOption Msg
+getCssClasses { css, field, isFocus, isFault, isSolved } isHighlight value =
+    let
+        postfix =
+            case field of
+                Frozen _ ->
+                    "frozen"
+                Edit _ ->
+                    "edit"
+                Options _ ->
+                    "options"
+        solvedAnimation = if isSolved then
+            "animation" ++ String.fromInt value
+            else
+            ""
+    in
+        Table.cellAttr ( class
+            (css ++ " "
+            ++ postfix
+            ++ ( if isFocus then " focus-" ++ postfix else ""  )
+            ++ ( if isFault then " fault-" ++ postfix else "" )
+            ++ ( if isHighlight then " highlight-" ++ postfix else "" )
+            ++ " " ++ solvedAnimation
+            ))
+
 
 viewOptions : Model -> Int -> Array (Maybe Int) -> Maybe Int -> Html Msg
 viewOptions model fieldNumber options optionFocus =
@@ -397,6 +417,7 @@ clearFields : Array Field -> Array Field
 clearFields fields =
     Array.map clearField fields
 
+
 clearField : Field -> Field
 clearField field =
     case field of
@@ -406,6 +427,13 @@ clearField field =
             Edit Nothing
         Frozen _ ->
             field
+
+
+solved : Array Field -> Dict String (Dict (Int, Int) Bool) -> Bool
+solved fields faults =
+    fieldsFilledOut fields && noFaultsDetected faults
+    --|| True
+
 -- ####
 -- ####   MOVE
 -- #### 
@@ -501,18 +529,14 @@ type Msg =
     | SudokuQuizReceived (WebData SudokuQuiz)
     | HighLighted
     | Possibilities
-    | ButtonNew1
-    | ButtonNew2
-    | ButtonClear1
-    | ButtonClear2
+    | ButtonNew
+    | ButtonClear
 
 
 update : Msg -> Model -> Session -> { model : Model, session : Session, cmd : Cmd Msg } 
 update msg model session =
     let
-        msg1 = Debug.log "msg" msg
-        msg2 = Debug.log "model.focus" model.focus
-        focusField = Debug.log "focusField" (focusToField model.fields model.focus)
+        focusField = focusToField model.fields model.focus
         -- focusOptionField = focusToFieldOption model.focus
     in
         case ( msg, model.focus, focusField ) of
@@ -524,7 +548,6 @@ update msg model session =
                         { model 
                         | fields = fields
                         , faults = recomputeFaults fields fieldNumber model.faults
-                        , buttonClicked = Nothing
                         }
                     , session = session
                     , cmd = Cmd.none
@@ -539,7 +562,6 @@ update msg model session =
                         { model 
                         | fields = fields
                         , faults = recomputeFaults fields fieldNumber model.faults
-                        , buttonClicked = Nothing
                         -- , focus = Just (modBy 81 (field + 1))
                         }
                     , session = session
@@ -554,7 +576,6 @@ update msg model session =
                         { model 
                         | fields = fields
                         , faults = recomputeFaults fields fieldNumber model.faults
-                        , buttonClicked = Nothing
                         }
                     , session = session
                     , cmd = Cmd.none
@@ -568,7 +589,6 @@ update msg model session =
                         { model 
                         | fields = fields
                         , faults = recomputeFaults fields fieldNumber model.faults
-                        , buttonClicked = Nothing
                         }
                     , session = session
                     , cmd = Cmd.none
@@ -587,7 +607,6 @@ update msg model session =
                         { model
                         | fields = fields
                         , focus = fieldNumberToFocus model.fields (fieldNumber, 0)
-                        , buttonClicked = Nothing
                         }
                     , session = session
                     , cmd = Cmd.none
@@ -597,7 +616,6 @@ update msg model session =
                 { model =
                     { model
                     | focus = fieldNumberToFocus model.fields (fieldNumber, 0)
-                    , buttonClicked = Nothing
                     }
                 , session = session
                 , cmd = Cmd.none
@@ -618,7 +636,6 @@ update msg model session =
                         { model
                         | fields = fields
                         , focus = moveFocus focus dir fields
-                        , buttonClicked = Nothing
                         }
                     , session = session
                     , cmd = Cmd.none
@@ -628,7 +645,6 @@ update msg model session =
                 { model =
                     { model
                     | focus = moveFocus focus dir model.fields
-                    , buttonClicked = Nothing
                     }
                 , session = session
                 , cmd = Cmd.none
@@ -643,7 +659,6 @@ update msg model session =
                         | fields = fields
                         , faults = recomputeFaults fields fieldNumber model.faults
                         , focus = FocusOptions fieldNumber 0
-                        , buttonClicked = Nothing
                         }
                     , session = session
                     , cmd = Cmd.none
@@ -658,7 +673,6 @@ update msg model session =
                         | fields = fields
                         , faults = recomputeFaults fields fieldNumber model.faults
                         , focus = FocusEdit fieldNumber
-                        , buttonClicked = Nothing
                         }
                     , session = session
                     , cmd = Cmd.none
@@ -668,7 +682,6 @@ update msg model session =
                 { model = 
                     { model 
                     | focus = FocusOptions fieldNumber optionFieldNumber
-                    , buttonClicked = Nothing
                     }
                 , session = session
                 , cmd = Cmd.none
@@ -706,7 +719,6 @@ update msg model session =
                                 |> Array.fromList
                             , focus = FocusBlurred
                             , faults = initFaults
-                            , buttonClicked = Nothing
                             }
                             , session = session, cmd = Cmd.none }
                         
@@ -718,7 +730,6 @@ update msg model session =
                     { model =
                         { model
                         | highlight = Nothing
-                        , buttonClicked = Nothing
                         }
                         , session = session, cmd = Cmd.none
                     }
@@ -726,7 +737,6 @@ update msg model session =
                     { model =
                         { model
                         | highlight = maybeValue
-                        , buttonClicked = Nothing
                         }
                         , session = session, cmd = Cmd.none
                     }
@@ -736,7 +746,6 @@ update msg model session =
                     { model =
                         { model
                         | highlight = Nothing
-                        , buttonClicked = Nothing
                         }
                         , session = session, cmd = Cmd.none
                     }
@@ -744,7 +753,6 @@ update msg model session =
                     { model =
                         { model
                         | highlight = Just value
-                        , buttonClicked = Nothing
                         }
                         , session = session, cmd = Cmd.none
                     }
@@ -758,7 +766,6 @@ update msg model session =
                         | fields = fields
                         , faults = recomputeFaults fields fieldNumber model.faults
                         , focus = fieldNumberToFocus fields (fieldNumber, 0)
-                        , buttonClicked = Nothing
                         }
                     , session = session
                     , cmd = Cmd.none
@@ -773,45 +780,24 @@ update msg model session =
                         | fields = fields
                         , faults = recomputeFaults fields fieldNumber model.faults
                         , focus = fieldNumberToFocus fields (fieldNumber, 0)
-                        , buttonClicked = Nothing
                         }
                     , session = session
                     , cmd = Cmd.none
                     }
 
-            ( ButtonClear1, _, _ ) ->
-                { model =
-                    { model
-                    | buttonClicked = Just ButtonClear
-                    }
-                    , session = session
-                    , cmd = Cmd.none
-                    }
-
-            ( ButtonClear2, _, _ ) ->
+            ( ButtonClear, _, _ ) ->
                 { model =
                     { model
                     | fields = clearFields model.fields
                     , focus = FocusBlurred
                     , highlight = Nothing
                     , faults = initFaults
-                    , buttonClicked = Nothing
-
                     }
                     , session = session
                     , cmd = Cmd.none
                     }
 
-            ( ButtonNew1, _, _ ) ->
-                { model =
-                    { model
-                    | buttonClicked = Just ButtonNew
-                    }
-                , session = session
-                , cmd = Cmd.none
-                }
-
-            ( ButtonNew2, _, _ ) ->
+            ( ButtonNew, _, _ ) ->
                 let
                     ( model1, cmd ) = init session
                 in
@@ -881,8 +867,8 @@ toKeyChar char =
         'o' -> OptionsToggled
         'h' -> HighLighted
         'H' -> HighLighted
-        'p' -> Possibilities
-        'P' -> Possibilities
+        --'p' -> Possibilities
+        --'P' -> Possibilities
         _ -> MsgNone
 
 

@@ -22,12 +22,8 @@ type alias Model =
         , faults : Dict String ( Dict ( Int, Int ) Bool )        -- String is here column, row or block, 
                                                                  -- ( Int, 0 ) for Edit en Frozen fields and ( Int, Int ) for Options
         , highlight : Maybe Int
-        , buttonClicked : Maybe ButtonClicked
     }
 
-type ButtonClicked =
-    ButtonNew
-    | ButtonClear
 
 type Field =
     Edit (Maybe Int)
@@ -135,6 +131,7 @@ focusOnField focus fieldNumber =
             else
                 FocusBlurred
 
+
 isHighlighted : Maybe Int -> Int -> Bool
 isHighlighted highlight value =
     case highlight of
@@ -143,3 +140,23 @@ isHighlighted highlight value =
 
         Just highlightValue ->
             highlightValue == value
+
+
+fieldsFilledOut : Array Field -> Bool
+fieldsFilledOut fields =
+    Array.foldl fieldFilledOut True fields
+
+
+fieldFilledOut : Field -> Bool -> Bool
+fieldFilledOut field filled =
+    filled
+    &&
+    case field of
+        Edit Nothing ->
+            False
+        Edit (Just _) ->
+            True
+        Frozen _ ->
+            True
+        Options _ ->
+            False
