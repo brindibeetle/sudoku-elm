@@ -8576,574 +8576,6 @@ var $author$project$Sudoku$viewMessage = function (isSolved) {
 				$elm$html$Html$text('')
 			]));
 };
-var $rundis$elm_bootstrap$Bootstrap$Table$TableAttr = function (a) {
-	return {$: 'TableAttr', a: a};
-};
-var $rundis$elm_bootstrap$Bootstrap$Table$attr = function (attr_) {
-	return $rundis$elm_bootstrap$Bootstrap$Table$TableAttr(attr_);
-};
-var $rundis$elm_bootstrap$Bootstrap$Table$Inversed = {$: 'Inversed'};
-var $elm$core$List$any = F2(
-	function (isOkay, list) {
-		any:
-		while (true) {
-			if (!list.b) {
-				return false;
-			} else {
-				var x = list.a;
-				var xs = list.b;
-				if (isOkay(x)) {
-					return true;
-				} else {
-					var $temp$isOkay = isOkay,
-						$temp$list = xs;
-					isOkay = $temp$isOkay;
-					list = $temp$list;
-					continue any;
-				}
-			}
-		}
-	});
-var $rundis$elm_bootstrap$Bootstrap$Table$isResponsive = function (option) {
-	if (option.$ === 'Responsive') {
-		return true;
-	} else {
-		return false;
-	}
-};
-var $rundis$elm_bootstrap$Bootstrap$Table$KeyedTBody = function (a) {
-	return {$: 'KeyedTBody', a: a};
-};
-var $rundis$elm_bootstrap$Bootstrap$Table$TBody = function (a) {
-	return {$: 'TBody', a: a};
-};
-var $rundis$elm_bootstrap$Bootstrap$Table$InversedRow = function (a) {
-	return {$: 'InversedRow', a: a};
-};
-var $rundis$elm_bootstrap$Bootstrap$Table$KeyedRow = function (a) {
-	return {$: 'KeyedRow', a: a};
-};
-var $rundis$elm_bootstrap$Bootstrap$Table$Row = function (a) {
-	return {$: 'Row', a: a};
-};
-var $rundis$elm_bootstrap$Bootstrap$Table$InversedCell = function (a) {
-	return {$: 'InversedCell', a: a};
-};
-var $rundis$elm_bootstrap$Bootstrap$Table$Td = function (a) {
-	return {$: 'Td', a: a};
-};
-var $rundis$elm_bootstrap$Bootstrap$Table$Th = function (a) {
-	return {$: 'Th', a: a};
-};
-var $rundis$elm_bootstrap$Bootstrap$Table$mapInversedCell = function (cell) {
-	var inverseOptions = function (options) {
-		return A2(
-			$elm$core$List$map,
-			function (opt) {
-				if (opt.$ === 'RoledCell') {
-					var role = opt.a;
-					return $rundis$elm_bootstrap$Bootstrap$Table$InversedCell(role);
-				} else {
-					return opt;
-				}
-			},
-			options);
-	};
-	if (cell.$ === 'Th') {
-		var cellCfg = cell.a;
-		return $rundis$elm_bootstrap$Bootstrap$Table$Th(
-			_Utils_update(
-				cellCfg,
-				{
-					options: inverseOptions(cellCfg.options)
-				}));
-	} else {
-		var cellCfg = cell.a;
-		return $rundis$elm_bootstrap$Bootstrap$Table$Td(
-			_Utils_update(
-				cellCfg,
-				{
-					options: inverseOptions(cellCfg.options)
-				}));
-	}
-};
-var $rundis$elm_bootstrap$Bootstrap$Table$mapInversedRow = function (row) {
-	var inversedOptions = function (options) {
-		return A2(
-			$elm$core$List$map,
-			function (opt) {
-				if (opt.$ === 'RoledRow') {
-					var role = opt.a;
-					return $rundis$elm_bootstrap$Bootstrap$Table$InversedRow(role);
-				} else {
-					return opt;
-				}
-			},
-			options);
-	};
-	if (row.$ === 'Row') {
-		var options = row.a.options;
-		var cells = row.a.cells;
-		return $rundis$elm_bootstrap$Bootstrap$Table$Row(
-			{
-				cells: A2($elm$core$List$map, $rundis$elm_bootstrap$Bootstrap$Table$mapInversedCell, cells),
-				options: inversedOptions(options)
-			});
-	} else {
-		var options = row.a.options;
-		var cells = row.a.cells;
-		return $rundis$elm_bootstrap$Bootstrap$Table$KeyedRow(
-			{
-				cells: A2(
-					$elm$core$List$map,
-					function (_v1) {
-						var key = _v1.a;
-						var cell = _v1.b;
-						return _Utils_Tuple2(
-							key,
-							$rundis$elm_bootstrap$Bootstrap$Table$mapInversedCell(cell));
-					},
-					cells),
-				options: inversedOptions(options)
-			});
-	}
-};
-var $rundis$elm_bootstrap$Bootstrap$Table$maybeMapInversedTBody = F2(
-	function (isTableInversed, tbody_) {
-		var _v0 = _Utils_Tuple2(isTableInversed, tbody_);
-		if (!_v0.a) {
-			return tbody_;
-		} else {
-			if (_v0.b.$ === 'TBody') {
-				var body = _v0.b.a;
-				return $rundis$elm_bootstrap$Bootstrap$Table$TBody(
-					_Utils_update(
-						body,
-						{
-							rows: A2($elm$core$List$map, $rundis$elm_bootstrap$Bootstrap$Table$mapInversedRow, body.rows)
-						}));
-			} else {
-				var keyedBody = _v0.b.a;
-				return $rundis$elm_bootstrap$Bootstrap$Table$KeyedTBody(
-					_Utils_update(
-						keyedBody,
-						{
-							rows: A2(
-								$elm$core$List$map,
-								function (_v1) {
-									var key = _v1.a;
-									var row = _v1.b;
-									return _Utils_Tuple2(
-										key,
-										$rundis$elm_bootstrap$Bootstrap$Table$mapInversedRow(row));
-								},
-								keyedBody.rows)
-						}));
-			}
-		}
-	});
-var $rundis$elm_bootstrap$Bootstrap$Table$InversedHead = {$: 'InversedHead'};
-var $rundis$elm_bootstrap$Bootstrap$Table$THead = function (a) {
-	return {$: 'THead', a: a};
-};
-var $rundis$elm_bootstrap$Bootstrap$Table$maybeMapInversedTHead = F2(
-	function (isTableInversed, _v0) {
-		var thead_ = _v0.a;
-		var isHeadInversed = A2(
-			$elm$core$List$any,
-			function (opt) {
-				return _Utils_eq(opt, $rundis$elm_bootstrap$Bootstrap$Table$InversedHead);
-			},
-			thead_.options);
-		return $rundis$elm_bootstrap$Bootstrap$Table$THead(
-			(isTableInversed || isHeadInversed) ? _Utils_update(
-				thead_,
-				{
-					rows: A2($elm$core$List$map, $rundis$elm_bootstrap$Bootstrap$Table$mapInversedRow, thead_.rows)
-				}) : thead_);
-	});
-var $elm$core$List$head = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(x);
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
-var $elm$core$Maybe$map = F2(
-	function (f, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return $elm$core$Maybe$Just(
-				f(value));
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
-	});
-var $rundis$elm_bootstrap$Bootstrap$Table$maybeWrapResponsive = F2(
-	function (options, table_) {
-		var responsiveClass = $elm$html$Html$Attributes$class(
-			'table-responsive' + A2(
-				$elm$core$Maybe$withDefault,
-				'',
-				A2(
-					$elm$core$Maybe$map,
-					function (v) {
-						return '-' + v;
-					},
-					A2(
-						$elm$core$Maybe$andThen,
-						$rundis$elm_bootstrap$Bootstrap$General$Internal$screenSizeOption,
-						A2(
-							$elm$core$Maybe$andThen,
-							function (opt) {
-								if (opt.$ === 'Responsive') {
-									var val = opt.a;
-									return val;
-								} else {
-									return $elm$core$Maybe$Nothing;
-								}
-							},
-							$elm$core$List$head(
-								A2($elm$core$List$filter, $rundis$elm_bootstrap$Bootstrap$Table$isResponsive, options)))))));
-		return A2($elm$core$List$any, $rundis$elm_bootstrap$Bootstrap$Table$isResponsive, options) ? A2(
-			$elm$html$Html$div,
-			_List_fromArray(
-				[responsiveClass]),
-			_List_fromArray(
-				[table_])) : table_;
-	});
-var $rundis$elm_bootstrap$Bootstrap$Table$CellAttr = function (a) {
-	return {$: 'CellAttr', a: a};
-};
-var $rundis$elm_bootstrap$Bootstrap$Table$cellAttr = function (attr_) {
-	return $rundis$elm_bootstrap$Bootstrap$Table$CellAttr(attr_);
-};
-var $elm$html$Html$Attributes$scope = $elm$html$Html$Attributes$stringProperty('scope');
-var $rundis$elm_bootstrap$Bootstrap$Table$addScopeIfTh = function (cell) {
-	if (cell.$ === 'Th') {
-		var cellConfig = cell.a;
-		return $rundis$elm_bootstrap$Bootstrap$Table$Th(
-			_Utils_update(
-				cellConfig,
-				{
-					options: A2(
-						$elm$core$List$cons,
-						$rundis$elm_bootstrap$Bootstrap$Table$cellAttr(
-							$elm$html$Html$Attributes$scope('row')),
-						cellConfig.options)
-				}));
-	} else {
-		return cell;
-	}
-};
-var $rundis$elm_bootstrap$Bootstrap$Table$maybeAddScopeToFirstCell = function (row) {
-	if (row.$ === 'Row') {
-		var options = row.a.options;
-		var cells = row.a.cells;
-		if (!cells.b) {
-			return row;
-		} else {
-			var first = cells.a;
-			var rest = cells.b;
-			return $rundis$elm_bootstrap$Bootstrap$Table$Row(
-				{
-					cells: A2(
-						$elm$core$List$cons,
-						$rundis$elm_bootstrap$Bootstrap$Table$addScopeIfTh(first),
-						rest),
-					options: options
-				});
-		}
-	} else {
-		var options = row.a.options;
-		var cells = row.a.cells;
-		if (!cells.b) {
-			return row;
-		} else {
-			var _v3 = cells.a;
-			var firstKey = _v3.a;
-			var first = _v3.b;
-			var rest = cells.b;
-			return $rundis$elm_bootstrap$Bootstrap$Table$KeyedRow(
-				{
-					cells: A2(
-						$elm$core$List$cons,
-						_Utils_Tuple2(
-							firstKey,
-							$rundis$elm_bootstrap$Bootstrap$Table$addScopeIfTh(first)),
-						rest),
-					options: options
-				});
-		}
-	}
-};
-var $elm$virtual_dom$VirtualDom$keyedNode = function (tag) {
-	return _VirtualDom_keyedNode(
-		_VirtualDom_noScript(tag));
-};
-var $elm$html$Html$Keyed$node = $elm$virtual_dom$VirtualDom$keyedNode;
-var $rundis$elm_bootstrap$Bootstrap$Internal$Role$toClass = F2(
-	function (prefix, role) {
-		return $elm$html$Html$Attributes$class(
-			prefix + ('-' + function () {
-				switch (role.$) {
-					case 'Primary':
-						return 'primary';
-					case 'Secondary':
-						return 'secondary';
-					case 'Success':
-						return 'success';
-					case 'Info':
-						return 'info';
-					case 'Warning':
-						return 'warning';
-					case 'Danger':
-						return 'danger';
-					case 'Light':
-						return 'light';
-					default:
-						return 'dark';
-				}
-			}()));
-	});
-var $rundis$elm_bootstrap$Bootstrap$Table$cellAttribute = function (option) {
-	switch (option.$) {
-		case 'RoledCell':
-			if (option.a.$ === 'Roled') {
-				var role = option.a.a;
-				return A2($rundis$elm_bootstrap$Bootstrap$Internal$Role$toClass, 'table', role);
-			} else {
-				var _v1 = option.a;
-				return $elm$html$Html$Attributes$class('table-active');
-			}
-		case 'InversedCell':
-			if (option.a.$ === 'Roled') {
-				var role = option.a.a;
-				return A2($rundis$elm_bootstrap$Bootstrap$Internal$Role$toClass, 'bg-', role);
-			} else {
-				var _v2 = option.a;
-				return $elm$html$Html$Attributes$class('bg-active');
-			}
-		default:
-			var attr_ = option.a;
-			return attr_;
-	}
-};
-var $rundis$elm_bootstrap$Bootstrap$Table$cellAttributes = function (options) {
-	return A2($elm$core$List$map, $rundis$elm_bootstrap$Bootstrap$Table$cellAttribute, options);
-};
-var $elm$html$Html$td = _VirtualDom_node('td');
-var $elm$html$Html$th = _VirtualDom_node('th');
-var $rundis$elm_bootstrap$Bootstrap$Table$renderCell = function (cell) {
-	if (cell.$ === 'Td') {
-		var options = cell.a.options;
-		var children = cell.a.children;
-		return A2(
-			$elm$html$Html$td,
-			$rundis$elm_bootstrap$Bootstrap$Table$cellAttributes(options),
-			children);
-	} else {
-		var options = cell.a.options;
-		var children = cell.a.children;
-		return A2(
-			$elm$html$Html$th,
-			$rundis$elm_bootstrap$Bootstrap$Table$cellAttributes(options),
-			children);
-	}
-};
-var $rundis$elm_bootstrap$Bootstrap$Table$rowClass = function (option) {
-	switch (option.$) {
-		case 'RoledRow':
-			if (option.a.$ === 'Roled') {
-				var role_ = option.a.a;
-				return A2($rundis$elm_bootstrap$Bootstrap$Internal$Role$toClass, 'table', role_);
-			} else {
-				var _v1 = option.a;
-				return $elm$html$Html$Attributes$class('table-active');
-			}
-		case 'InversedRow':
-			if (option.a.$ === 'Roled') {
-				var role_ = option.a.a;
-				return A2($rundis$elm_bootstrap$Bootstrap$Internal$Role$toClass, 'bg', role_);
-			} else {
-				var _v2 = option.a;
-				return $elm$html$Html$Attributes$class('bg-active');
-			}
-		default:
-			var attr_ = option.a;
-			return attr_;
-	}
-};
-var $rundis$elm_bootstrap$Bootstrap$Table$rowAttributes = function (options) {
-	return A2($elm$core$List$map, $rundis$elm_bootstrap$Bootstrap$Table$rowClass, options);
-};
-var $elm$html$Html$tr = _VirtualDom_node('tr');
-var $rundis$elm_bootstrap$Bootstrap$Table$renderRow = function (row) {
-	if (row.$ === 'Row') {
-		var options = row.a.options;
-		var cells = row.a.cells;
-		return A2(
-			$elm$html$Html$tr,
-			$rundis$elm_bootstrap$Bootstrap$Table$rowAttributes(options),
-			A2($elm$core$List$map, $rundis$elm_bootstrap$Bootstrap$Table$renderCell, cells));
-	} else {
-		var options = row.a.options;
-		var cells = row.a.cells;
-		return A3(
-			$elm$html$Html$Keyed$node,
-			'tr',
-			$rundis$elm_bootstrap$Bootstrap$Table$rowAttributes(options),
-			A2(
-				$elm$core$List$map,
-				function (_v1) {
-					var key = _v1.a;
-					var cell = _v1.b;
-					return _Utils_Tuple2(
-						key,
-						$rundis$elm_bootstrap$Bootstrap$Table$renderCell(cell));
-				},
-				cells));
-	}
-};
-var $elm$html$Html$tbody = _VirtualDom_node('tbody');
-var $rundis$elm_bootstrap$Bootstrap$Table$renderTBody = function (body) {
-	if (body.$ === 'TBody') {
-		var attributes = body.a.attributes;
-		var rows = body.a.rows;
-		return A2(
-			$elm$html$Html$tbody,
-			attributes,
-			A2(
-				$elm$core$List$map,
-				function (row) {
-					return $rundis$elm_bootstrap$Bootstrap$Table$renderRow(
-						$rundis$elm_bootstrap$Bootstrap$Table$maybeAddScopeToFirstCell(row));
-				},
-				rows));
-	} else {
-		var attributes = body.a.attributes;
-		var rows = body.a.rows;
-		return A3(
-			$elm$html$Html$Keyed$node,
-			'tbody',
-			attributes,
-			A2(
-				$elm$core$List$map,
-				function (_v1) {
-					var key = _v1.a;
-					var row = _v1.b;
-					return _Utils_Tuple2(
-						key,
-						$rundis$elm_bootstrap$Bootstrap$Table$renderRow(
-							$rundis$elm_bootstrap$Bootstrap$Table$maybeAddScopeToFirstCell(row)));
-				},
-				rows));
-	}
-};
-var $elm$html$Html$thead = _VirtualDom_node('thead');
-var $rundis$elm_bootstrap$Bootstrap$Table$theadAttribute = function (option) {
-	switch (option.$) {
-		case 'InversedHead':
-			return $elm$html$Html$Attributes$class('thead-dark');
-		case 'DefaultHead':
-			return $elm$html$Html$Attributes$class('thead-default');
-		default:
-			var attr_ = option.a;
-			return attr_;
-	}
-};
-var $rundis$elm_bootstrap$Bootstrap$Table$theadAttributes = function (options) {
-	return A2($elm$core$List$map, $rundis$elm_bootstrap$Bootstrap$Table$theadAttribute, options);
-};
-var $rundis$elm_bootstrap$Bootstrap$Table$renderTHead = function (_v0) {
-	var options = _v0.a.options;
-	var rows = _v0.a.rows;
-	return A2(
-		$elm$html$Html$thead,
-		$rundis$elm_bootstrap$Bootstrap$Table$theadAttributes(options),
-		A2($elm$core$List$map, $rundis$elm_bootstrap$Bootstrap$Table$renderRow, rows));
-};
-var $elm$html$Html$table = _VirtualDom_node('table');
-var $rundis$elm_bootstrap$Bootstrap$Table$tableClass = function (option) {
-	switch (option.$) {
-		case 'Inversed':
-			return $elm$core$Maybe$Just(
-				$elm$html$Html$Attributes$class('table-dark'));
-		case 'Striped':
-			return $elm$core$Maybe$Just(
-				$elm$html$Html$Attributes$class('table-striped'));
-		case 'Bordered':
-			return $elm$core$Maybe$Just(
-				$elm$html$Html$Attributes$class('table-bordered'));
-		case 'Hover':
-			return $elm$core$Maybe$Just(
-				$elm$html$Html$Attributes$class('table-hover'));
-		case 'Small':
-			return $elm$core$Maybe$Just(
-				$elm$html$Html$Attributes$class('table-sm'));
-		case 'Responsive':
-			return $elm$core$Maybe$Nothing;
-		case 'Reflow':
-			return $elm$core$Maybe$Just(
-				$elm$html$Html$Attributes$class('table-reflow'));
-		default:
-			var attr_ = option.a;
-			return $elm$core$Maybe$Just(attr_);
-	}
-};
-var $rundis$elm_bootstrap$Bootstrap$Table$tableAttributes = function (options) {
-	return A2(
-		$elm$core$List$cons,
-		$elm$html$Html$Attributes$class('table'),
-		A2(
-			$elm$core$List$filterMap,
-			$elm$core$Basics$identity,
-			A2($elm$core$List$map, $rundis$elm_bootstrap$Bootstrap$Table$tableClass, options)));
-};
-var $rundis$elm_bootstrap$Bootstrap$Table$table = function (rec) {
-	var isInversed = A2(
-		$elm$core$List$any,
-		function (opt) {
-			return _Utils_eq(opt, $rundis$elm_bootstrap$Bootstrap$Table$Inversed);
-		},
-		rec.options);
-	var classOptions = A2(
-		$elm$core$List$filter,
-		function (opt) {
-			return !$rundis$elm_bootstrap$Bootstrap$Table$isResponsive(opt);
-		},
-		rec.options);
-	return A2(
-		$rundis$elm_bootstrap$Bootstrap$Table$maybeWrapResponsive,
-		rec.options,
-		A2(
-			$elm$html$Html$table,
-			$rundis$elm_bootstrap$Bootstrap$Table$tableAttributes(classOptions),
-			_List_fromArray(
-				[
-					$rundis$elm_bootstrap$Bootstrap$Table$renderTHead(
-					A2($rundis$elm_bootstrap$Bootstrap$Table$maybeMapInversedTHead, isInversed, rec.thead)),
-					$rundis$elm_bootstrap$Bootstrap$Table$renderTBody(
-					A2($rundis$elm_bootstrap$Bootstrap$Table$maybeMapInversedTBody, isInversed, rec.tbody))
-				])));
-};
-var $rundis$elm_bootstrap$Bootstrap$Table$tbody = F2(
-	function (attributes, rows) {
-		return $rundis$elm_bootstrap$Bootstrap$Table$TBody(
-			{attributes: attributes, rows: rows});
-	});
-var $rundis$elm_bootstrap$Bootstrap$Table$thead = F2(
-	function (options, rows) {
-		return $rundis$elm_bootstrap$Bootstrap$Table$THead(
-			{options: options, rows: rows});
-	});
-var $rundis$elm_bootstrap$Bootstrap$Table$tr = F2(
-	function (options, cells) {
-		return $rundis$elm_bootstrap$Bootstrap$Table$Row(
-			{cells: cells, options: options});
-	});
 var $author$project$Sudoku$FocusChanged = function (a) {
 	return {$: 'FocusChanged', a: a};
 };
@@ -9157,27 +8589,29 @@ var $author$project$SudokuModel$focusOnField = F2(
 			return _Utils_eq(focusFieldNumber, fieldNumber) ? A2($author$project$SudokuModel$Focus, focusFieldNumber, focusFieldOptionNumber) : $author$project$SudokuModel$FocusBlurred;
 		}
 	});
-var $author$project$Sudoku$getCssClasses = F3(
+var $author$project$Sudoku$getBorders = function (fieldNumber) {
+	var row = (fieldNumber / 9) | 0;
+	var column = A2($elm$core$Basics$modBy, 9, fieldNumber);
+	return ((!A2($elm$core$Basics$modBy, 3, row)) ? 'fat-border-top' : ((A2($elm$core$Basics$modBy, 3, row) === 2) ? 'fat-border-bottom' : 'normal-border-vertical')) + (' ' + ((!A2($elm$core$Basics$modBy, 3, column)) ? 'fat-border-left' : ((A2($elm$core$Basics$modBy, 3, column) === 2) ? 'fat-border-right' : 'normal-border-horizontal')));
+};
+var $author$project$Sudoku$getCellClasses = F3(
 	function (_v0, isHighlight, value) {
 		var css = _v0.css;
 		var field = _v0.field;
 		var isFocus = _v0.isFocus;
 		var isFault = _v0.isFault;
 		var isSolved = _v0.isSolved;
-		var solvedAnimation = isSolved ? ('animation' + $elm$core$String$fromInt(value)) : '';
-		var postfix = function () {
-			switch (field.$) {
-				case 'Frozen':
-					return 'frozen';
-				case 'Edit':
-					return 'edit';
-				default:
-					return 'options';
-			}
-		}();
-		return $rundis$elm_bootstrap$Bootstrap$Table$cellAttr(
-			$elm$html$Html$Attributes$class(
-				css + (' ' + (postfix + ((isFocus ? (' focus-' + postfix) : '') + ((isFault ? (' fault-' + postfix) : '') + ((isHighlight ? (' highlight-' + postfix) : '') + (' ' + solvedAnimation))))))));
+		return $elm$html$Html$Attributes$class(
+			'cell' + (' ' + (css + (' ' + (function () {
+				switch (field.$) {
+					case 'Frozen':
+						return 'frozen';
+					case 'Edit':
+						return 'edit';
+					default:
+						return 'options';
+				}
+			}() + (' ' + ((isFocus ? 'focus' : '') + (' ' + ((isFault ? 'fault' : '') + (' ' + ((isHighlight ? 'highlight' : '') + (' ' + (isSolved ? ('animation' + $elm$core$String$fromInt(value)) : '')))))))))))));
 	});
 var $author$project$SudokuFaults$getFault = F2(
 	function (fieldNumber, faults) {
@@ -9228,14 +8662,14 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		'click',
 		$elm$json$Json$Decode$succeed(msg));
 };
-var $rundis$elm_bootstrap$Bootstrap$Table$td = F2(
-	function (options, children) {
-		return $rundis$elm_bootstrap$Bootstrap$Table$Td(
-			{children: children, options: options});
-	});
 var $author$project$Sudoku$OptionFocusChanged = F2(
 	function (a, b) {
 		return {$: 'OptionFocusChanged', a: a, b: b};
+	});
+var $author$project$Sudoku$getOptionClasses = F3(
+	function (optionNumber, isFocus, isFault) {
+		return $elm$html$Html$Attributes$class(
+			'option' + (' ' + ('option' + ($elm$core$String$fromInt(optionNumber) + ((isFocus ? ' focus' : '') + (isFault ? ' fault' : ''))))));
 	});
 var $author$project$SudokuFaults$getOptionFault = F3(
 	function (fieldNumber, optionNumber, faults) {
@@ -9254,104 +8688,58 @@ var $author$project$SudokuFaults$getOptionFault = F3(
 			false,
 			faults);
 	});
-var $elm$core$Basics$negate = function (n) {
-	return -n;
-};
 var $author$project$Sudoku$viewOption = F5(
-	function (model, fieldNumber, options, maybeOptionFocus, optionNumber) {
-		var optionFaultCss = A3($author$project$SudokuFaults$getOptionFault, fieldNumber, optionNumber, model.faults) ? ' fault' : '';
+	function (options, faults, focus, fieldNumber, optionNumber) {
 		var option = $author$project$Sudoku$maybeJoin(
 			A2($elm$core$Array$get, optionNumber, options));
 		var isFocus = _Utils_eq(
-			A2($elm$core$Maybe$withDefault, -1, maybeOptionFocus),
-			optionNumber);
-		var _v0 = _Utils_Tuple2(option, isFocus);
-		if (_v0.a.$ === 'Just') {
-			if (!_v0.b) {
-				var optionValue = _v0.a.a;
-				return A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('option' + optionFaultCss),
-							$elm$html$Html$Events$onClick(
-							A2($author$project$Sudoku$OptionFocusChanged, fieldNumber, optionNumber))
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text(
-							$elm$core$String$fromInt(optionValue))
-						]));
-			} else {
-				var optionValue = _v0.a.a;
-				return A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('option-focus' + optionFaultCss)
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text(
-							$elm$core$String$fromInt(optionValue))
-						]));
-			}
+			focus,
+			A2($author$project$SudokuModel$Focus, fieldNumber, optionNumber));
+		var isFault = A3($author$project$SudokuFaults$getOptionFault, fieldNumber, optionNumber, faults);
+		if (option.$ === 'Just') {
+			var optionValue = option.a;
+			return A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						A3($author$project$Sudoku$getOptionClasses, optionNumber, isFocus, isFault),
+						$elm$html$Html$Events$onClick(
+						A2($author$project$Sudoku$OptionFocusChanged, fieldNumber, optionNumber))
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text(
+						$elm$core$String$fromInt(optionValue))
+					]));
 		} else {
-			if (_v0.b) {
-				var _v1 = _v0.a;
-				return A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('option-focus')
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text('')
-						]));
-			} else {
-				var _v2 = _v0.a;
-				return A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('option'),
-							$elm$html$Html$Events$onClick(
-							A2($author$project$Sudoku$OptionFocusChanged, fieldNumber, optionNumber))
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text('')
-						]));
-			}
+			return A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						A3($author$project$Sudoku$getOptionClasses, optionNumber, isFocus, isFault),
+						$elm$html$Html$Events$onClick(
+						A2($author$project$Sudoku$OptionFocusChanged, fieldNumber, optionNumber))
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('')
+					]));
 		}
 	});
 var $author$project$Sudoku$viewOptions = F4(
-	function (model, fieldNumber, options, optionFocus) {
-		return A2(
-			$elm$html$Html$div,
-			_List_fromArray(
-				[
-					$elm$html$Html$Attributes$class('options')
-				]),
-			_List_fromArray(
-				[
-					A5($author$project$Sudoku$viewOption, model, fieldNumber, options, optionFocus, 0),
-					A5($author$project$Sudoku$viewOption, model, fieldNumber, options, optionFocus, 1),
-					A5($author$project$Sudoku$viewOption, model, fieldNumber, options, optionFocus, 2),
-					A5($author$project$Sudoku$viewOption, model, fieldNumber, options, optionFocus, 3),
-					A5($author$project$Sudoku$viewOption, model, fieldNumber, options, optionFocus, 4),
-					A5($author$project$Sudoku$viewOption, model, fieldNumber, options, optionFocus, 5),
-					A5($author$project$Sudoku$viewOption, model, fieldNumber, options, optionFocus, 6),
-					A5($author$project$Sudoku$viewOption, model, fieldNumber, options, optionFocus, 7),
-					A5($author$project$Sudoku$viewOption, model, fieldNumber, options, optionFocus, 8)
-				]));
+	function (options, faults, focus, fieldNumber) {
+		return $elm$core$Array$toList(
+			A2(
+				$elm$core$Array$initialize,
+				9,
+				A4($author$project$Sudoku$viewOption, options, faults, focus, fieldNumber)));
 	});
-var $author$project$Sudoku$viewCell = F4(
-	function (model, fieldNumber, borders, isSolved) {
+var $author$project$Sudoku$viewCell = F3(
+	function (model, isSolved, fieldNumber) {
 		var focus = A2($author$project$SudokuModel$focusOnField, model.focus, fieldNumber);
 		var field = A2($author$project$SudokuModel$modelToField, model.fields, fieldNumber);
 		var fault = A2($author$project$SudokuFaults$getFault, fieldNumber, model.faults);
+		var borders = $author$project$Sudoku$getBorders(fieldNumber);
 		var cssArgs = {
 			css: borders,
 			field: field,
@@ -9363,39 +8751,60 @@ var $author$project$Sudoku$viewCell = F4(
 		var faultEdit = _v0.a;
 		var faultFrozen = _v0.b;
 		var _v1 = _Utils_Tuple2(field, focus);
-		if (_v1.b.$ === 'Focus') {
-			switch (_v1.a.$) {
-				case 'Frozen':
+		switch (_v1.a.$) {
+			case 'Frozen':
+				if (_v1.b.$ === 'Focus') {
 					var value = _v1.a.a;
 					var _v2 = _v1.b;
 					return A2(
-						$rundis$elm_bootstrap$Bootstrap$Table$td,
+						$elm$html$Html$div,
 						_List_fromArray(
 							[
 								A3(
-								$author$project$Sudoku$getCssClasses,
+								$author$project$Sudoku$getCellClasses,
 								cssArgs,
 								A2($author$project$SudokuModel$isHighlighted, model.highlight, value),
 								value),
-								$rundis$elm_bootstrap$Bootstrap$Table$cellAttr(
 								$elm$html$Html$Events$onClick(
-									$author$project$Sudoku$FocusChanged(fieldNumber)))
+								$author$project$Sudoku$FocusChanged(fieldNumber))
 							]),
 						_List_fromArray(
 							[
 								$elm$html$Html$text(
 								$elm$core$String$fromInt(value))
 							]));
-				case 'Edit':
-					if (_v1.a.a.$ === 'Just') {
+				} else {
+					var value = _v1.a.a;
+					var _v3 = _v1.b;
+					return A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								A3(
+								$author$project$Sudoku$getCellClasses,
+								cssArgs,
+								A2($author$project$SudokuModel$isHighlighted, model.highlight, value),
+								value),
+								$elm$html$Html$Events$onClick(
+								$author$project$Sudoku$FocusChanged(fieldNumber))
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(
+								$elm$core$String$fromInt(value))
+							]));
+				}
+			case 'Edit':
+				if (_v1.a.a.$ === 'Just') {
+					if (_v1.b.$ === 'Focus') {
 						var value = _v1.a.a.a;
 						var _v4 = _v1.b;
 						return A2(
-							$rundis$elm_bootstrap$Bootstrap$Table$td,
+							$elm$html$Html$div,
 							_List_fromArray(
 								[
 									A3(
-									$author$project$Sudoku$getCssClasses,
+									$author$project$Sudoku$getCellClasses,
 									cssArgs,
 									A2($author$project$SudokuModel$isHighlighted, model.highlight, value),
 									value)
@@ -9406,152 +8815,76 @@ var $author$project$Sudoku$viewCell = F4(
 									$elm$core$String$fromInt(value))
 								]));
 					} else {
-						var _v5 = _v1.a.a;
-						var _v6 = _v1.b;
-						return A2(
-							$rundis$elm_bootstrap$Bootstrap$Table$td,
-							_List_fromArray(
-								[
-									A3($author$project$Sudoku$getCssClasses, cssArgs, false, 0)
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text(' ')
-								]));
-					}
-				default:
-					var options = _v1.a.a;
-					var _v10 = _v1.b;
-					var focusFieldOptionNumber = _v10.b;
-					return A2(
-						$rundis$elm_bootstrap$Bootstrap$Table$td,
-						_List_fromArray(
-							[
-								$rundis$elm_bootstrap$Bootstrap$Table$cellAttr(
-								$elm$html$Html$Attributes$class(borders + ' options focus'))
-							]),
-						_List_fromArray(
-							[
-								A4(
-								$author$project$Sudoku$viewOptions,
-								model,
-								fieldNumber,
-								options,
-								$elm$core$Maybe$Just(focusFieldOptionNumber))
-							]));
-			}
-		} else {
-			switch (_v1.a.$) {
-				case 'Frozen':
-					var value = _v1.a.a;
-					var _v3 = _v1.b;
-					return A2(
-						$rundis$elm_bootstrap$Bootstrap$Table$td,
-						_List_fromArray(
-							[
-								A3(
-								$author$project$Sudoku$getCssClasses,
-								cssArgs,
-								A2($author$project$SudokuModel$isHighlighted, model.highlight, value),
-								value),
-								$rundis$elm_bootstrap$Bootstrap$Table$cellAttr(
-								$elm$html$Html$Events$onClick(
-									$author$project$Sudoku$FocusChanged(fieldNumber)))
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text(
-								$elm$core$String$fromInt(value))
-							]));
-				case 'Edit':
-					if (_v1.a.a.$ === 'Just') {
 						var value = _v1.a.a.a;
 						var _v7 = _v1.b;
 						return A2(
-							$rundis$elm_bootstrap$Bootstrap$Table$td,
+							$elm$html$Html$div,
 							_List_fromArray(
 								[
 									A3(
-									$author$project$Sudoku$getCssClasses,
+									$author$project$Sudoku$getCellClasses,
 									cssArgs,
 									A2($author$project$SudokuModel$isHighlighted, model.highlight, value),
 									value),
-									$rundis$elm_bootstrap$Bootstrap$Table$cellAttr(
 									$elm$html$Html$Events$onClick(
-										$author$project$Sudoku$FocusChanged(fieldNumber)))
+									$author$project$Sudoku$FocusChanged(fieldNumber))
 								]),
 							_List_fromArray(
 								[
 									$elm$html$Html$text(
 									$elm$core$String$fromInt(value))
 								]));
+					}
+				} else {
+					if (_v1.b.$ === 'Focus') {
+						var _v5 = _v1.a.a;
+						var _v6 = _v1.b;
+						return A2(
+							$elm$html$Html$div,
+							_List_fromArray(
+								[
+									A3($author$project$Sudoku$getCellClasses, cssArgs, false, 0)
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text(' ')
+								]));
 					} else {
 						var _v8 = _v1.a.a;
 						var _v9 = _v1.b;
 						return A2(
-							$rundis$elm_bootstrap$Bootstrap$Table$td,
+							$elm$html$Html$div,
 							_List_fromArray(
 								[
-									A3($author$project$Sudoku$getCssClasses, cssArgs, false, 0),
-									$rundis$elm_bootstrap$Bootstrap$Table$cellAttr(
+									A3($author$project$Sudoku$getCellClasses, cssArgs, false, 0),
 									$elm$html$Html$Events$onClick(
-										$author$project$Sudoku$FocusChanged(fieldNumber)))
+									$author$project$Sudoku$FocusChanged(fieldNumber))
 								]),
 							_List_fromArray(
 								[
 									$elm$html$Html$text(' ')
 								]));
 					}
-				default:
-					var options = _v1.a.a;
-					var _v11 = _v1.b;
-					return A2(
-						$rundis$elm_bootstrap$Bootstrap$Table$td,
-						_List_fromArray(
-							[
-								$rundis$elm_bootstrap$Bootstrap$Table$cellAttr(
-								$elm$html$Html$Attributes$class(borders + ' options'))
-							]),
-						_List_fromArray(
-							[
-								A4($author$project$Sudoku$viewOptions, model, fieldNumber, options, $elm$core$Maybe$Nothing)
-							]));
-			}
+				}
+			default:
+				var options = _v1.a.a;
+				var focus1 = _v1.b;
+				return A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class(borders + ' options')
+						]),
+					A4($author$project$Sudoku$viewOptions, options, model.faults, focus1, fieldNumber));
 		}
 	});
-var $author$project$Sudoku$viewRow = F4(
-	function (model, row, borders, isSolved) {
-		var field0 = row * 9;
-		return A2(
-			$rundis$elm_bootstrap$Bootstrap$Table$tr,
-			_List_Nil,
-			_List_fromArray(
-				[
-					A4($author$project$Sudoku$viewCell, model, field0, borders + ' borderleft', isSolved),
-					A4($author$project$Sudoku$viewCell, model, field0 + 1, borders, isSolved),
-					A4($author$project$Sudoku$viewCell, model, field0 + 2, borders + ' borderright', isSolved),
-					A4($author$project$Sudoku$viewCell, model, field0 + 3, borders + ' borderleft', isSolved),
-					A4($author$project$Sudoku$viewCell, model, field0 + 4, borders, isSolved),
-					A4($author$project$Sudoku$viewCell, model, field0 + 5, borders + ' borderright', isSolved),
-					A4($author$project$Sudoku$viewCell, model, field0 + 6, borders + ' borderleft', isSolved),
-					A4($author$project$Sudoku$viewCell, model, field0 + 7, borders, isSolved),
-					A4($author$project$Sudoku$viewCell, model, field0 + 8, borders + ' borderright', isSolved)
-				]));
-	});
-var $author$project$Sudoku$viewRows = F2(
+var $author$project$Sudoku$viewCells = F2(
 	function (model, isSolved) {
-		return _List_fromArray(
-			[
-				A4($author$project$Sudoku$viewRow, model, 0, 'bordertop', isSolved),
-				A4($author$project$Sudoku$viewRow, model, 1, '', isSolved),
-				A4($author$project$Sudoku$viewRow, model, 2, 'borderbottom', isSolved),
-				A4($author$project$Sudoku$viewRow, model, 3, 'bordertop', isSolved),
-				A4($author$project$Sudoku$viewRow, model, 4, '', isSolved),
-				A4($author$project$Sudoku$viewRow, model, 5, 'borderbottom', isSolved),
-				A4($author$project$Sudoku$viewRow, model, 6, 'bordertop', isSolved),
-				A4($author$project$Sudoku$viewRow, model, 7, '', isSolved),
-				A4($author$project$Sudoku$viewRow, model, 8, 'borderbottom', isSolved)
-			]);
+		return $elm$core$Array$toList(
+			A2(
+				$elm$core$Array$initialize,
+				81,
+				A2($author$project$Sudoku$viewCell, model, isSolved)));
 	});
 var $author$project$Sudoku$viewSudoku = F2(
 	function (model, isSolved) {
@@ -9563,19 +8896,13 @@ var $author$project$Sudoku$viewSudoku = F2(
 				]),
 			_List_fromArray(
 				[
-					$rundis$elm_bootstrap$Bootstrap$Table$table(
-					{
-						options: _List_fromArray(
-							[
-								$rundis$elm_bootstrap$Bootstrap$Table$attr(
-								$elm$html$Html$Attributes$class('table table-bordered sudoku'))
-							]),
-						tbody: A2(
-							$rundis$elm_bootstrap$Bootstrap$Table$tbody,
-							_List_Nil,
-							A2($author$project$Sudoku$viewRows, model, isSolved)),
-						thead: A2($rundis$elm_bootstrap$Bootstrap$Table$thead, _List_Nil, _List_Nil)
-					})
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('sudoku')
+						]),
+					A2($author$project$Sudoku$viewCells, model, isSolved))
 				]));
 	});
 var $author$project$Sudoku$view = function (model) {

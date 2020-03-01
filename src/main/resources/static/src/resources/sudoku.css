@@ -37,98 +37,120 @@ div.center-sudoku{
       margin-left:-222px;
     }
 }
-td.edit {
+
+div.sudoku {
+  display: grid;
+  width: 450px;
+  height: 460px;
+  grid-template-columns: repeat(27, [col] 1fr) ;
+  grid-template-rows:  repeat(27, [row] auto) ;
+  text-align: center;
+}
+
+div.cell {
+  grid-column: span 3;
+  grid-row: span 3;
   border: 1px solid black;
-  width: 50px;
-  height: 50px;
   text-align: center;
   font-size: large;
 }
-td.focus-edit {
-  border: 1px solid black;
+div.edit {
+  font-weight: normal;
+}
+div.frozen {
+  font-weight: bold;
+}
+div.focus {
   background-color: var(--color-background-info);
-  width: 50px;
-  height: 50px;
-  text-align: center;
-  font-size: large;
 }
-td.frozen {
-  border: 1px solid black;
-  width: 50px;
-  height: 50px;
-  text-align: center;
-  font-size: large;
-  font-weight: bold;
-}
-td.focus-frozen {
-  border: 1px solid black;
-  background-color: var(--color-background-light);
-  width: 50px;
-  height: 50px;
-  text-align: center;
-  font-size: large;
-  font-weight: bold;
-}
-td.fault-edit {
+div.fault {
   color: var(--color-fault);
 }
-td.fault-frozen {
-  color: var(--color-fault-dark);
-}
-td.highlight-edit {
+div.highlight {
   background-color: var(--color-background-info);
 }
-td.highlight-frozen {
-  background-color: var(--color-background-info);
-}
-td.options {
-  border: 1px solid black;
+
+div.fat-border-left {
+  border-left: 2px solid black;
   width: 50px;
-  height: 50px;
-  padding: 0px;
+}
+div.fat-border-right {
+  border-right: 2px solid black;
+  width: 50px;
+}
+div.normal-border-horizontal {
+  width: 50px;
+}
+div.fat-border-top {
+  border-top: 2px solid black;
+  line-height: 50px;
+}
+div.fat-border-bottom {
+  border-bottom: 2px solid black;
+  line-height: 50px;
+}
+div.normal-border-vertical {
+  line-height: 50px;
 }
 
-td.borderleft {
-  border-left: 3px solid black;
-  width: 48px;
-}
-td.borderright {
-  border-right: 3px solid black;
-  width: 48px;
-}
-td.bordertop {
-  border-top: 3px solid black;
-  height: 48px;
-}
-td.borderbottom {
-  border-bottom: 3px solid black;
-  height: 48px;
-}
-
-td.edit:hover {
+div.edit:hover {
     background-color: var(--color-background-light);
 }
-td.frozen:hover {
+div.frozen:hover {
     background-color: var(--color-background-lighter);
 }
 
-table.sudoku {
-  table-layout:fixed;
-  width: 60px;
-}
 
 div.options {
+  border: 1px solid black;
   display: grid;
-  height: 50px;
-  grid-template-columns: 33.3% 33.4% 33.3%;
-  grid-template-rows:  33.3% 33.4% 33.3%;
-  text-align: center;
+  grid-column: span 3;
+  grid-row: span 3;
+  grid-template-columns: repeat (3, 1fr);
+  grid-template-rows: repeat (3, auto);
 }
 
 div.option {
   font-size: small;
-  line-height: 12px;
+  line-height: 13px;
+  text-align: center;
 }
+div.option0 {
+  grid-column: 1;
+  grid-row: 1;
+}
+div.option1 {
+  grid-column: 2;
+  grid-row: 1;
+}
+div.option2 {
+  grid-column: 3;
+  grid-row: 1;
+}
+div.option3 {
+  grid-column: 1;
+  grid-row: 2;
+}
+div.option4 {
+  grid-column: 2;
+  grid-row: 2;
+}
+div.option5 {
+  grid-column: 3;
+  grid-row: 2;
+}
+div.option6 {
+   grid-column: 1;
+   grid-row: 3;
+ }
+ div.option7 {
+   grid-column: 2;
+   grid-row: 3;
+ }
+ div.option8 {
+   grid-column: 3;
+   grid-row: 3;
+ }
 div.option-focus {
   font-size: small;
   background-color: var(--color-background-info);
@@ -192,55 +214,55 @@ div.center-message {
   color: var(--color-text);
 }
 
-td.animation1 {
+div.animation1 {
   animation-name: animation1;
   animation-duration: 0.5s;
   animation-delay: 0s;
   animation-iteration-count: infinite;
 }
-td.animation2 {
+div.animation2 {
   animation-name: animation2;
   animation-duration: 0.5s;
   animation-delay: 1s;
   animation-iteration-count: infinite;
 }
-td.animation3 {
+div.animation3 {
   animation-name: animation3;
   animation-duration: 0.5s;
   animation-delay: 2s;
   animation-iteration-count: infinite;
 }
-td.animation4 {
+div.animation4 {
   animation-name: animation4;
   animation-duration: 0.5s;
   animation-delay: 3s;
   animation-iteration-count: infinite;
 }
-td.animation5 {
+div.animation5 {
   animation-name: animation5;
   animation-duration: 0.5s;
   animation-delay: 4s;
   animation-iteration-count: infinite;
 }
-td.animation6 {
+div.animation6 {
   animation-name: animation6;
   animation-duration: 0.5s;
   animation-delay: 5s;
   animation-iteration-count: infinite;
 }
-td.animation7 {
+div.animation7 {
   animation-name: animation7;
   animation-duration: 0.5s;
   animation-delay: 6s;
   animation-iteration-count: infinite;
 }
-td.animation8 {
+div.animation8 {
   animation-name: animation8;
   animation-duration: 0.5s;
   animation-delay: 7s;
   animation-iteration-count: infinite;
 }
-td.animation9 {
+div.animation9 {
   animation-name: animation9;
   animation-duration: 0.5s;
   animation-delay: 8s;

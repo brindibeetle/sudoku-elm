@@ -111,49 +111,20 @@ viewButtons =
 viewSudoku : Model -> Bool -> Html Msg
 viewSudoku model isSolved =
     div [ class "center-sudoku"]
-        [ Table.table
-            { options = [ Table.attr ( class "table table-bordered sudoku" ) ]
-            , thead = Table.thead [] []
-            , tbody = Table.tbody [] ( viewRows model isSolved )
-            }
+        [ div [ class "sudoku" ]
+            (viewCells model isSolved )
         ]
 
-viewRows : Model -> Bool -> List (Table.Row Msg)
-viewRows model isSolved =
-    [
-        viewRow model 0 "bordertop" isSolved
-        , viewRow model 1 "" isSolved
-        , viewRow model 2 "borderbottom" isSolved
-        , viewRow model 3 "bordertop" isSolved
-        , viewRow model 4 "" isSolved
-        , viewRow model 5 "borderbottom" isSolved
-        , viewRow model 6 "bordertop" isSolved
-        , viewRow model 7 "" isSolved
-        , viewRow model 8 "borderbottom" isSolved
-    ]
+viewCells : Model -> Bool -> List (Html Msg)
+viewCells model isSolved =
+    Array.initialize 81 (viewCell model isSolved)
+    |> Array.toList
 
-viewRow : Model -> Int -> String -> Bool -> Table.Row Msg
-viewRow model row borders isSolved =
+
+viewCell : Model -> Bool -> Int -> Html Msg
+viewCell model isSolved fieldNumber =
     let
-        field0 = row * 9
-    in
-        Table.tr [] 
-        [ 
-            viewCell model field0 (borders ++ " borderleft") isSolved
-            , viewCell model (field0 + 1) borders isSolved
-            , viewCell model (field0 + 2) (borders ++ " borderright") isSolved
-            , viewCell model (field0 + 3) (borders ++ " borderleft") isSolved
-            , viewCell model (field0 + 4) borders isSolved
-            , viewCell model (field0 + 5) (borders ++ " borderright") isSolved
-            , viewCell model (field0 + 6) (borders ++ " borderleft") isSolved
-            , viewCell model (field0 + 7) borders isSolved
-            , viewCell model (field0 + 8) (borders ++ " borderright") isSolved
-        ]
-
-
-viewCell : Model -> Int -> String -> Bool -> Table.Cell Msg
-viewCell model fieldNumber borders isSolved =
-    let
+        borders = getBorders fieldNumber
         field = modelToField model.fields fieldNumber
         focus = focusOnField model.focus fieldNumber
         fault = getFault fieldNumber model.faults
@@ -163,117 +134,118 @@ viewCell model fieldNumber borders isSolved =
         case ( field, focus ) of
         -- focusOnField returns FocusBlurred if focus NOT ON FIELD
             ( Frozen value, Focus _ _ ) ->
-                Table.td 
-                    [ getCssClasses cssArgs (isHighlighted model.highlight value) value, Table.cellAttr( onClick ( FocusChanged fieldNumber )) ]
+                div
+                    [ getCellClasses cssArgs (isHighlighted model.highlight value) value, onClick ( FocusChanged fieldNumber ) ]
                     [ value |> String.fromInt |> text ]
 
             ( Frozen value, FocusBlurred ) ->
-                Table.td
-                    [ getCssClasses cssArgs (isHighlighted model.highlight value) value, Table.cellAttr( onClick ( FocusChanged fieldNumber )) ]
+                div
+                    [ getCellClasses cssArgs (isHighlighted model.highlight value) value, onClick ( FocusChanged fieldNumber ) ]
                     [ value |> String.fromInt |> text ]
 
             ( Edit (Just value), Focus _ _) ->
-                Table.td 
-                    [ getCssClasses cssArgs (isHighlighted model.highlight value) value ]
+                div
+                    [ getCellClasses cssArgs (isHighlighted model.highlight value) value ]
                     [ value |> String.fromInt |> text ]
 
             ( Edit Nothing, Focus _ _ ) ->
-                Table.td
-                    [ getCssClasses cssArgs False 0 ]
+                div
+                    [ getCellClasses cssArgs False 0 ]
                     [ text " " ]
 
             ( Edit (Just value), FocusBlurred ) ->
-                Table.td 
-                    [ getCssClasses cssArgs (isHighlighted model.highlight value) value, Table.cellAttr( onClick ( FocusChanged fieldNumber )) ]
+                div
+                    [ getCellClasses cssArgs (isHighlighted model.highlight value) value, onClick ( FocusChanged fieldNumber ) ]
                     [ value |> String.fromInt |> text ]
 
             ( Edit Nothing, FocusBlurred ) ->
-                Table.td
-                    [ getCssClasses cssArgs False 0, Table.cellAttr( onClick ( FocusChanged fieldNumber )) ]
+                div
+                    [ getCellClasses cssArgs False 0, onClick ( FocusChanged fieldNumber ) ]
                     [ text " " ]
 
-            ( Options options, Focus _ focusFieldOptionNumber ) ->
-                Table.td 
-                    [ Table.cellAttr (class (borders ++ " options focus" )) ] 
-                    [ viewOptions model fieldNumber options (Just focusFieldOptionNumber) ]  
-
-            ( Options options, FocusBlurred ) ->
-                Table.td 
-                    [ Table.cellAttr (class (borders ++ " options" )) ] 
-                    [ viewOptions model fieldNumber options Nothing ]
+            ( Options options, focus1 ) ->
+                div
+                    [ class (borders ++ " options" ) ]
+                    ( viewOptions options model.faults focus1 fieldNumber )
 
 
-getCssClasses : { css : String, field : Field, isFocus : Bool, isFault : Bool, isSolved : Bool } -> Bool -> Int -> CellOption Msg
-getCssClasses { css, field, isFocus, isFault, isSolved } isHighlight value =
+getBorders : Int -> String
+getBorders fieldNumber =
     let
-        postfix =
-            case field of
-                Frozen _ ->
-                    "frozen"
-                Edit _ ->
-                    "edit"
-                Options _ ->
-                    "options"
-        solvedAnimation = if isSolved then
-            "animation" ++ String.fromInt value
-            else
-            ""
+        row = fieldNumber // 9
+        column = modBy 9 fieldNumber
     in
-        Table.cellAttr ( class
-            (css ++ " "
-            ++ postfix
-            ++ ( if isFocus then " focus-" ++ postfix else ""  )
-            ++ ( if isFault then " fault-" ++ postfix else "" )
-            ++ ( if isHighlight then " highlight-" ++ postfix else "" )
-            ++ " " ++ solvedAnimation
-            ))
+        ( if modBy 3 row == 0 then
+            "fat-border-top"
+        else if modBy 3 row == 2 then
+            "fat-border-bottom"
+        else
+            "normal-border-vertical"
+         )
+        ++
+        " "
+        ++
+        ( if modBy 3 column == 0 then
+            "fat-border-left"
+        else if modBy 3 column == 2 then
+            "fat-border-right"
+        else
+            "normal-border-horizontal"
+        )
+
+getCellClasses : { css : String, field : Field, isFocus : Bool, isFault : Bool, isSolved : Bool } -> Bool -> Int ->  Attribute Msg
+getCellClasses { css, field, isFocus, isFault, isSolved } isHighlight value =
+    class
+        ( "cell"
+            ++ " " ++ css
+            ++ " "
+                ++ ( case field of
+                        Frozen _ ->
+                            "frozen"
+                        Edit _ ->
+                            "edit"
+                        Options _ ->
+                            "options"
+                    )
+            ++ " " ++ ( if isFocus then "focus" else ""  )
+            ++ " " ++ ( if isFault then "fault" else ""  )
+            ++ " " ++ ( if isHighlight then "highlight" else ""  )
+            ++ " " ++ ( if isSolved then "animation" ++ String.fromInt value else "" )
+         )
 
 
-viewOptions : Model -> Int -> Array (Maybe Int) -> Maybe Int -> Html Msg
-viewOptions model fieldNumber options optionFocus =
-    div 
-        [ class "options" ]
-        [ viewOption model fieldNumber options optionFocus 0 
-        , viewOption model fieldNumber options optionFocus 1
-        , viewOption model fieldNumber options optionFocus 2
-        , viewOption model fieldNumber options optionFocus 3
-        , viewOption model fieldNumber options optionFocus 4
-        , viewOption model fieldNumber options optionFocus 5
-        , viewOption model fieldNumber options optionFocus 6
-        , viewOption model fieldNumber options optionFocus 7
-        , viewOption model fieldNumber options optionFocus 8
-        ]
-        -- (getOptions field model.optionCijfers |> Maybe.withDefault Array.empty |> Array.toList |> List.map (viewOption model isFocus) )
+viewOptions : Array (Maybe Int) -> Faults -> Focus -> Int -> List(Html Msg)
+viewOptions options faults focus fieldNumber =
+    Array.initialize 9 (viewOption options faults focus fieldNumber )
+        |> Array.toList
+    -- (getOptions field model.optionCijfers |> Maybe.withDefault Array.empty |> Array.toList |> List.map (viewOption model isFocus) )
 
 
 -- div [ class "option" ] [ text (String.fromInt option) ]))
-viewOption : Model -> Int -> Array (Maybe Int) -> Maybe Int -> Int -> Html Msg
-viewOption model fieldNumber options maybeOptionFocus optionNumber =
+viewOption : Array (Maybe Int) -> Faults -> Focus -> Int -> Int -> Html Msg
+viewOption options faults focus fieldNumber optionNumber =
     let
         option = options |> Array.get optionNumber |> maybeJoin
-        isFocus = ( Maybe.withDefault -1 maybeOptionFocus == optionNumber )
-        optionFaultCss = if getOptionFault fieldNumber optionNumber model.faults then " fault" else ""
+        isFocus = ( focus == Focus fieldNumber optionNumber )
+        isFault = getOptionFault fieldNumber optionNumber faults
     in
-        case ( option, isFocus ) of
-           ( Just optionValue, False ) ->
-                div [ class ("option" ++ optionFaultCss), onClick ( OptionFocusChanged fieldNumber optionNumber) ] [ text (String.fromInt optionValue) ]
+        case option of
+           Just optionValue ->
+               div [ getOptionClasses optionNumber isFocus isFault, onClick ( OptionFocusChanged fieldNumber optionNumber) ] [ text (String.fromInt optionValue) ]
 
-           ( Just optionValue, True ) ->
-                div [ class ("option-focus"  ++ optionFaultCss)] [ text (String.fromInt optionValue) ]
-
-           ( Nothing, True ) ->
-                div [ class "option-focus" ] [ text "" ]
-
-           ( Nothing, False ) ->
-                div [ class "option", onClick ( OptionFocusChanged fieldNumber optionNumber) ] [ text "" ]
+           Nothing ->
+                div [ getOptionClasses optionNumber isFocus isFault, onClick ( OptionFocusChanged fieldNumber optionNumber) ] [ text "" ]
 
 
-getHighlight : Maybe Int -> Int -> String -> String
-getHighlight highlight value postfix =
-    if isHighlighted highlight value then
-        " highlight-" ++ postfix
-    else
-        ""
+getOptionClasses : Int -> Bool -> Bool -> Attribute Msg
+getOptionClasses optionNumber isFocus isFault =
+    class
+        ( "option"
+            ++ " " ++ "option" ++ String.fromInt optionNumber
+            ++ ( if isFocus then " focus" else ""  )
+            ++ ( if isFault then " fault" else ""  )
+        )
+
 
 -- ####
 -- ####   HELPER

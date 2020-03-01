@@ -1,9 +1,11 @@
-module SudokuFaults exposing (initFaults, recomputeFaults, getFault, getOptionFault, valueOkayOrNot, noFaultsDetected)
+module SudokuFaults exposing (initFaults, recomputeFaults, getFault, getOptionFault, valueOkayOrNot, noFaultsDetected, Faults)
 
 import SudokuModel exposing (..)
 
 import Array exposing (..)
 import Dict exposing (..)
+
+type alias Faults = Dict String ( Dict ( Int, Int) Bool )
 
 -- Dict String because String is an Ordered type and i dont know how to order my own type
 initFaults : Dict String ( Dict ( Int, Int) Bool )
