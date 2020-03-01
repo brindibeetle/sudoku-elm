@@ -33,9 +33,7 @@ type Field =
 
 type Focus =
     FocusBlurred
-    | FocusEdit Int
-    | FocusFrozen Int
-    | FocusOptions Int Int
+    | Focus Int Int
 
 
 sudokuExample : String
@@ -66,30 +64,13 @@ focusToField fields focus =
         FocusBlurred ->
             Nothing
         
-        FocusEdit fieldFocus ->
-            Array.get fieldFocus fields
-
-        FocusFrozen fieldFocus ->
-            Array.get fieldFocus fields
-
-        FocusOptions fieldFocus _ -> 
+        Focus fieldFocus _ ->
             Array.get fieldFocus fields
 
 
 fieldNumberToFocus : Array Field -> ( Int, Int ) -> Focus
 fieldNumberToFocus fields ( fieldNumber, fieldOptionNumber ) =
-    case Array.get fieldNumber fields of
-        Just (Edit _) ->
-            FocusEdit fieldNumber
-
-        Just (Frozen _) ->
-            FocusFrozen fieldNumber
-
-        Just (Options _) ->
-            FocusOptions fieldNumber fieldOptionNumber
-
-        _ ->
-            FocusBlurred
+    Focus fieldNumber fieldOptionNumber
 
 focusToFieldOption : Focus -> Maybe Int
 focusToFieldOption focus =
@@ -97,13 +78,10 @@ focusToFieldOption focus =
         FocusBlurred ->
             Nothing
         
-        FocusEdit _ ->
+        Focus _ 0 ->
             Nothing
 
-        FocusFrozen _ ->
-            Nothing
-
-        FocusOptions _ fieldOption -> 
+        Focus _ fieldOption ->
             Just fieldOption
 
 
@@ -113,21 +91,9 @@ focusOnField focus fieldNumber =
         FocusBlurred ->
             FocusBlurred
         
-        FocusEdit focusFieldNumber ->
+        Focus focusFieldNumber focusFieldOptionNumber ->
             if (focusFieldNumber == fieldNumber) then
-                FocusEdit focusFieldNumber
-            else
-                FocusBlurred
-
-        FocusFrozen focusFieldNumber ->
-            if (focusFieldNumber == fieldNumber) then
-                FocusFrozen focusFieldNumber
-            else
-                FocusBlurred
-
-        FocusOptions focusFieldNumber focusFieldOptionNumber ->
-            if (focusFieldNumber == fieldNumber) then
-                FocusOptions focusFieldNumber focusFieldOptionNumber
+                Focus focusFieldNumber focusFieldOptionNumber
             else
                 FocusBlurred
 

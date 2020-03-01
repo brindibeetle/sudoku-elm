@@ -162,7 +162,7 @@ viewCell model fieldNumber borders isSolved =
     in
         case ( field, focus ) of
         -- focusOnField returns FocusBlurred if focus NOT ON FIELD
-            ( Frozen value, FocusFrozen _ ) ->
+            ( Frozen value, Focus _ _ ) ->
                 Table.td 
                     [ getCssClasses cssArgs (isHighlighted model.highlight value) value, Table.cellAttr( onClick ( FocusChanged fieldNumber )) ]
                     [ value |> String.fromInt |> text ]
@@ -172,12 +172,12 @@ viewCell model fieldNumber borders isSolved =
                     [ getCssClasses cssArgs (isHighlighted model.highlight value) value, Table.cellAttr( onClick ( FocusChanged fieldNumber )) ]
                     [ value |> String.fromInt |> text ]
 
-            ( Edit (Just value), FocusEdit _ ) ->
+            ( Edit (Just value), Focus _ _) ->
                 Table.td 
                     [ getCssClasses cssArgs (isHighlighted model.highlight value) value ]
                     [ value |> String.fromInt |> text ]
 
-            ( Edit Nothing, FocusEdit _ ) ->
+            ( Edit Nothing, Focus _ _ ) ->
                 Table.td
                     [ getCssClasses cssArgs False 0 ]
                     [ text " " ]
@@ -192,7 +192,7 @@ viewCell model fieldNumber borders isSolved =
                     [ getCssClasses cssArgs False 0, Table.cellAttr( onClick ( FocusChanged fieldNumber )) ]
                     [ text " " ]
 
-            ( Options options, FocusOptions _ focusFieldOptionNumber ) ->
+            ( Options options, Focus _ focusFieldOptionNumber ) ->
                 Table.td 
                     [ Table.cellAttr (class (borders ++ " options focus" )) ] 
                     [ viewOptions model fieldNumber options (Just focusFieldOptionNumber) ]  
@@ -201,11 +201,6 @@ viewCell model fieldNumber borders isSolved =
                 Table.td 
                     [ Table.cellAttr (class (borders ++ " options" )) ] 
                     [ viewOptions model fieldNumber options Nothing ]
-
-            ( _, _) ->
-                Table.td
-                    [ Table.cellDanger ]
-                    [ text "Something is wrong here "]
 
 
 getCssClasses : { css : String, field : Field, isFocus : Bool, isFault : Bool, isSolved : Bool } -> Bool -> Int -> CellOption Msg
@@ -474,39 +469,27 @@ moveField (fieldNumber, fieldOptionNumber) direction =
             else
                 ( fieldNumber, fieldOptionNumber - 1 )
 
-moveFocus : Focus -> Direction -> Array Field -> Focus
-moveFocus focus direction fields =
+moveFocus : Field -> Focus -> Direction -> Array Field -> Focus
+moveFocus field focus direction fields =
     let
         ( fieldNumber1, fieldOptionNumber1 ) =
-            case ( focus, direction ) of
-                ( FocusEdit fieldNumber, North ) ->
-                    moveField (fieldNumber, 0 ) North
-
-                ( FocusEdit fieldNumber, South ) ->
-                    moveField (fieldNumber, 6 ) South
-
-                ( FocusEdit fieldNumber, West ) ->
-                    moveField (fieldNumber, 0 ) West
-
-                ( FocusEdit fieldNumber, East ) ->
-                    moveField (fieldNumber, 2 ) East
-
-                ( FocusFrozen fieldNumber, North ) ->
-                    moveField (fieldNumber, 0 ) North
-
-                ( FocusFrozen fieldNumber, South ) ->
-                    moveField (fieldNumber, 6 ) South
-
-                ( FocusFrozen fieldNumber, West ) ->
-                    moveField (fieldNumber, 0 ) West
-
-                ( FocusFrozen fieldNumber, East ) ->
-                    moveField (fieldNumber, 2 ) East
-
-                ( FocusOptions fieldNumber fieldOptionNumber, dir ) ->
+            case ( field, focus, direction ) of
+                ( Options _, Focus fieldNumber fieldOptionNumber, dir ) ->
                     moveField (fieldNumber, fieldOptionNumber ) dir
 
-                ( FocusBlurred, dir ) ->
+                ( _, Focus fieldNumber _, North ) ->
+                    moveField (fieldNumber, 0 ) North
+
+                ( _, Focus fieldNumber _, South ) ->
+                    moveField (fieldNumber, 6 ) South
+
+                ( _, Focus fieldNumber _, West ) ->
+                    moveField (fieldNumber, 0 ) West
+
+                ( _, Focus fieldNumber _, East ) ->
+                    moveField (fieldNumber, 2 ) East
+
+                ( _, FocusBlurred, dir ) ->
                     ( 0, 0 ) -- something went wrong seriously
     in
         fieldNumberToFocus fields (fieldNumber1, fieldOptionNumber1)
@@ -540,7 +523,7 @@ update msg model session =
         -- focusOptionField = focusToFieldOption model.focus
     in
         case ( msg, model.focus, focusField ) of
-            ( ValueChanged value, FocusEdit fieldNumber, _ ) ->
+            ( ValueChanged value, Focus fieldNumber _, Just (Edit _ )) ->
                 let
                     fields = Edit (Just value) |> setField fieldNumber model.fields
                 in
@@ -554,7 +537,7 @@ update msg model session =
                     }
 
             -- Option changed value
-            ( ValueChanged value, FocusOptions fieldNumber fieldOptionNumber, Just (Options options) ) ->
+            ( ValueChanged value, Focus fieldNumber fieldOptionNumber, Just (Options options) ) ->
                 let
                     fields = setOption fieldOptionNumber value options |> Options |> setField fieldNumber model.fields
                 in
@@ -568,7 +551,20 @@ update msg model session =
                     , cmd = Cmd.none
                     }
 
-            ( ValueCleared, FocusEdit fieldNumber, _ ) ->
+            ( ValueCleared, Focus fieldNumber fieldOptionNumber, Just(Options options) ) ->
+                let
+                    fields = clearOption fieldOptionNumber options |> Options |> setField fieldNumber model.fields
+                in
+                    { model =
+                        { model
+                        | fields = fields
+                        , faults = recomputeFaults fields fieldNumber model.faults
+                        }
+                    , session = session
+                    , cmd = Cmd.none
+                    }
+
+            ( ValueCleared, Focus fieldNumber _, _ ) ->
                 let
                     fields = Edit Nothing |> setField fieldNumber model.fields
                 in
@@ -581,20 +577,8 @@ update msg model session =
                     , cmd = Cmd.none
                     }
             
-            ( ValueCleared, FocusOptions fieldNumber fieldOptionNumber, Just(Options options) ) ->
-                let
-                    fields = clearOption fieldOptionNumber options |> Options |> setField fieldNumber model.fields
-                in
-                    { model =
-                        { model 
-                        | fields = fields
-                        , faults = recomputeFaults fields fieldNumber model.faults
-                        }
-                    , session = session
-                    , cmd = Cmd.none
-                    }
 
-            ( FocusChanged fieldNumber, FocusOptions fieldNumberOld _, Just (Options options) ) ->
+            ( FocusChanged fieldNumber, Focus fieldNumberOld _, Just (Options options) ) ->
                 --when leaving an empty Options field, change it to Editfield
                 let
                     fields =
@@ -621,36 +605,41 @@ update msg model session =
                 , cmd = Cmd.none
                 }
 
-            ( MovedFocus dir, FocusOptions fieldNumberOld fieldNumberOptionOld, Just (Options options) ) ->
+            ( MovedFocus dir, Focus fieldNumberOld fieldNumberOptionOld, Just (Options options) ) ->
                 --when leaving an empty Options field, change it to Editfield
                 let
-                    focus = FocusOptions fieldNumberOld fieldNumberOptionOld
-                    (fieldNumber, _) = moveField (fieldNumberOld, fieldNumberOptionOld) dir
+                    oldfocus = Focus fieldNumberOld fieldNumberOptionOld
+                    field = Options options
+                    focus = moveFocus field oldfocus dir model.fields
                     fields =
-                        if optionsIsEmpty options && fieldNumber /= fieldNumberOld then
-                            setField fieldNumberOld model.fields (Edit Nothing)
-                        else
-                            model.fields
+                        case focus of
+                            Focus fieldNumber _ ->
+                                if optionsIsEmpty options && fieldNumber /= fieldNumberOld then
+                                    setField fieldNumberOld model.fields (Edit Nothing)
+                                else
+                                    model.fields
+                            _ ->
+                                model.fields
                 in
                     { model =
                         { model
                         | fields = fields
-                        , focus = moveFocus focus dir fields
+                        , focus = focus
                         }
                     , session = session
                     , cmd = Cmd.none
                     }
 
-            ( MovedFocus dir, focus, _ ) ->
+            ( MovedFocus dir, focus, Just field ) ->
                 { model =
                     { model
-                    | focus = moveFocus focus dir model.fields
+                    | focus = moveFocus field focus dir model.fields
                     }
                 , session = session
                 , cmd = Cmd.none
                 }
 
-            ( OptionsToggled, FocusEdit fieldNumber, Just (Edit maybeValue) ) ->
+            ( OptionsToggled, Focus fieldNumber _, Just (Edit maybeValue) ) ->
                 let
                     fields = initOptions maybeValue |> Options |> setField fieldNumber model.fields
                 in
@@ -658,13 +647,13 @@ update msg model session =
                         { model 
                         | fields = fields
                         , faults = recomputeFaults fields fieldNumber model.faults
-                        , focus = FocusOptions fieldNumber 0
+                        , focus = Focus fieldNumber 0
                         }
                     , session = session
                     , cmd = Cmd.none
                     }
 
-            ( OptionsToggled, FocusOptions fieldNumber fieldOptionNumber, Just (Options options) ) ->
+            ( OptionsToggled, Focus fieldNumber fieldOptionNumber, Just (Options options) ) ->
                 let
                     fields = Edit (getOption fieldOptionNumber options ) |> setField fieldNumber model.fields
                 in
@@ -672,7 +661,7 @@ update msg model session =
                         { model 
                         | fields = fields
                         , faults = recomputeFaults fields fieldNumber model.faults
-                        , focus = FocusEdit fieldNumber
+                        , focus = Focus fieldNumber 0
                         }
                     , session = session
                     , cmd = Cmd.none
@@ -681,7 +670,7 @@ update msg model session =
             ( OptionFocusChanged fieldNumber optionFieldNumber, _, _ ) ->
                 { model = 
                     { model 
-                    | focus = FocusOptions fieldNumber optionFieldNumber
+                    | focus = Focus fieldNumber optionFieldNumber
                     }
                 , session = session
                 , cmd = Cmd.none
@@ -757,7 +746,7 @@ update msg model session =
                         , session = session, cmd = Cmd.none
                     }
 
-            ( Possibilities, FocusEdit fieldNumber, _ ) ->
+            ( Possibilities, Focus fieldNumber _, Just (Edit _) ) ->
                 let
                     fields = generateOptions model.fields fieldNumber |> setField fieldNumber model.fields
                 in
@@ -771,7 +760,7 @@ update msg model session =
                     , cmd = Cmd.none
                     }
 
-            ( Possibilities, FocusOptions fieldNumber _, _ ) ->
+            ( Possibilities, Focus fieldNumber _, Just (Options _) ) ->
                 let
                     fields = generateOptions model.fields fieldNumber |> setField fieldNumber model.fields
                 in

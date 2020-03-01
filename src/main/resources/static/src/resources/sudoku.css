@@ -1,7 +1,7 @@
 :root {
-    --color-background-info: hsl(46, 100%, 90%);
-    --color-background-light: hsl(46, 100%, 96%);
-    --color-background-lighter: hsl(46, 100%, 98%);
+    --color-background-info: hsl(46, 100%, 86%);
+    --color-background-light: hsl(46, 100%, 90%);
+    --color-background-lighter: hsl(46, 100%, 94%);
 
     --color-text: hsl(45, 94%, 27%);
 
@@ -9,24 +9,34 @@
     --color-fault-dark: hsl(20, 70%, 50%);
 }
 div.center-explanations{
-  position:absolute;
-  display:block;
-  width:600px;
-  left:50%;
-  margin-top:50px;
-  margin-left:-300px;
+    display: none;
 }
 div.center-sudoku{
-  position:absolute;
-  display:block;
-  height:450px;
-  width:450px;
-  left:50%;
-  top:50%;
-  margin-top:-225px;
-  margin-left:-222px;
+    width: 100%;
+    top: 50%;
 }
+@media (min-width: 600px)
+{
+    div.center-explanations{
+      position:absolute;
+      display:block;
+      width:600px;
+      left:50%;
+      margin-top:50px;
+      margin-left:-300px;
+    }
 
+    div.center-sudoku{
+      position:absolute;
+      display:block;
+      height:450px;
+      width:450px;
+      left:50%;
+      top:50%;
+      margin-top:-225px;
+      margin-left:-222px;
+    }
+}
 td.edit {
   border: 1px solid black;
   width: 50px;
@@ -105,12 +115,6 @@ td.frozen:hover {
 table.sudoku {
   table-layout:fixed;
   width: 60px;
-}
-
-
-input.editable {
-  padding: 0px;
-  width: 40px;
 }
 
 div.options {

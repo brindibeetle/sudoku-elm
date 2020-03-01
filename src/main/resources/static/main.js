@@ -6713,12 +6713,9 @@ var $author$project$Main$toModel = F3(
 			A2($author$project$Main$Sudoku, sudokuModel, session1),
 			cmd);
 	});
-var $author$project$SudokuModel$FocusEdit = function (a) {
-	return {$: 'FocusEdit', a: a};
-};
-var $author$project$SudokuModel$FocusOptions = F2(
+var $author$project$SudokuModel$Focus = F2(
 	function (a, b) {
-		return {$: 'FocusOptions', a: a, b: b};
+		return {$: 'Focus', a: a, b: b};
 	});
 var $author$project$SudokuModel$Options = function (a) {
 	return {$: 'Options', a: a};
@@ -6817,9 +6814,12 @@ var $author$project$Sudoku$clearOption = F2(
 	function (field, options) {
 		return A3($elm$core$Array$set, field, $elm$core$Maybe$Nothing, options);
 	});
-var $author$project$SudokuModel$FocusFrozen = function (a) {
-	return {$: 'FocusFrozen', a: a};
-};
+var $author$project$SudokuModel$fieldNumberToFocus = F2(
+	function (fields, _v0) {
+		var fieldNumber = _v0.a;
+		var fieldOptionNumber = _v0.b;
+		return A2($author$project$SudokuModel$Focus, fieldNumber, fieldOptionNumber);
+	});
 var $elm$core$Array$getHelp = F3(
 	function (shift, index, tree) {
 		getHelp:
@@ -6853,38 +6853,13 @@ var $elm$core$Array$get = F2(
 			A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, tail)) : $elm$core$Maybe$Just(
 			A3($elm$core$Array$getHelp, startShift, index, tree)));
 	});
-var $author$project$SudokuModel$fieldNumberToFocus = F2(
-	function (fields, _v0) {
-		var fieldNumber = _v0.a;
-		var fieldOptionNumber = _v0.b;
-		var _v1 = A2($elm$core$Array$get, fieldNumber, fields);
-		if (_v1.$ === 'Just') {
-			switch (_v1.a.$) {
-				case 'Edit':
-					return $author$project$SudokuModel$FocusEdit(fieldNumber);
-				case 'Frozen':
-					return $author$project$SudokuModel$FocusFrozen(fieldNumber);
-				default:
-					return A2($author$project$SudokuModel$FocusOptions, fieldNumber, fieldOptionNumber);
-			}
-		} else {
-			return $author$project$SudokuModel$FocusBlurred;
-		}
-	});
 var $author$project$SudokuModel$focusToField = F2(
 	function (fields, focus) {
-		switch (focus.$) {
-			case 'FocusBlurred':
-				return $elm$core$Maybe$Nothing;
-			case 'FocusEdit':
-				var fieldFocus = focus.a;
-				return A2($elm$core$Array$get, fieldFocus, fields);
-			case 'FocusFrozen':
-				var fieldFocus = focus.a;
-				return A2($elm$core$Array$get, fieldFocus, fields);
-			default:
-				var fieldFocus = focus.a;
-				return A2($elm$core$Array$get, fieldFocus, fields);
+		if (focus.$ === 'FocusBlurred') {
+			return $elm$core$Maybe$Nothing;
+		} else {
+			var fieldFocus = focus.a;
+			return A2($elm$core$Array$get, fieldFocus, fields);
 		}
 	});
 var $elm$core$List$append = F2(
@@ -7489,87 +7464,77 @@ var $author$project$Sudoku$moveField = F2(
 					fieldOptionNumber + 2) : _Utils_Tuple2(fieldNumber, fieldOptionNumber - 1);
 		}
 	});
-var $author$project$Sudoku$moveFocus = F3(
-	function (focus, direction, fields) {
+var $author$project$Sudoku$moveFocus = F4(
+	function (field, focus, direction, fields) {
 		var _v0 = function () {
-			var _v1 = _Utils_Tuple2(focus, direction);
-			switch (_v1.a.$) {
-				case 'FocusEdit':
-					switch (_v1.b.$) {
+			var _v1 = _Utils_Tuple3(field, focus, direction);
+			_v1$0:
+			while (true) {
+				if (_v1.b.$ === 'Focus') {
+					switch (_v1.c.$) {
 						case 'North':
-							var fieldNumber = _v1.a.a;
-							var _v2 = _v1.b;
-							return A2(
-								$author$project$Sudoku$moveField,
-								_Utils_Tuple2(fieldNumber, 0),
-								$author$project$Sudoku$North);
+							if (_v1.a.$ === 'Options') {
+								break _v1$0;
+							} else {
+								var _v3 = _v1.b;
+								var fieldNumber = _v3.a;
+								var _v4 = _v1.c;
+								return A2(
+									$author$project$Sudoku$moveField,
+									_Utils_Tuple2(fieldNumber, 0),
+									$author$project$Sudoku$North);
+							}
 						case 'South':
-							var fieldNumber = _v1.a.a;
-							var _v3 = _v1.b;
-							return A2(
-								$author$project$Sudoku$moveField,
-								_Utils_Tuple2(fieldNumber, 6),
-								$author$project$Sudoku$South);
+							if (_v1.a.$ === 'Options') {
+								break _v1$0;
+							} else {
+								var _v5 = _v1.b;
+								var fieldNumber = _v5.a;
+								var _v6 = _v1.c;
+								return A2(
+									$author$project$Sudoku$moveField,
+									_Utils_Tuple2(fieldNumber, 6),
+									$author$project$Sudoku$South);
+							}
 						case 'West':
-							var fieldNumber = _v1.a.a;
-							var _v4 = _v1.b;
-							return A2(
-								$author$project$Sudoku$moveField,
-								_Utils_Tuple2(fieldNumber, 0),
-								$author$project$Sudoku$West);
+							if (_v1.a.$ === 'Options') {
+								break _v1$0;
+							} else {
+								var _v7 = _v1.b;
+								var fieldNumber = _v7.a;
+								var _v8 = _v1.c;
+								return A2(
+									$author$project$Sudoku$moveField,
+									_Utils_Tuple2(fieldNumber, 0),
+									$author$project$Sudoku$West);
+							}
 						default:
-							var fieldNumber = _v1.a.a;
-							var _v5 = _v1.b;
-							return A2(
-								$author$project$Sudoku$moveField,
-								_Utils_Tuple2(fieldNumber, 2),
-								$author$project$Sudoku$East);
+							if (_v1.a.$ === 'Options') {
+								break _v1$0;
+							} else {
+								var _v9 = _v1.b;
+								var fieldNumber = _v9.a;
+								var _v10 = _v1.c;
+								return A2(
+									$author$project$Sudoku$moveField,
+									_Utils_Tuple2(fieldNumber, 2),
+									$author$project$Sudoku$East);
+							}
 					}
-				case 'FocusFrozen':
-					switch (_v1.b.$) {
-						case 'North':
-							var fieldNumber = _v1.a.a;
-							var _v6 = _v1.b;
-							return A2(
-								$author$project$Sudoku$moveField,
-								_Utils_Tuple2(fieldNumber, 0),
-								$author$project$Sudoku$North);
-						case 'South':
-							var fieldNumber = _v1.a.a;
-							var _v7 = _v1.b;
-							return A2(
-								$author$project$Sudoku$moveField,
-								_Utils_Tuple2(fieldNumber, 6),
-								$author$project$Sudoku$South);
-						case 'West':
-							var fieldNumber = _v1.a.a;
-							var _v8 = _v1.b;
-							return A2(
-								$author$project$Sudoku$moveField,
-								_Utils_Tuple2(fieldNumber, 0),
-								$author$project$Sudoku$West);
-						default:
-							var fieldNumber = _v1.a.a;
-							var _v9 = _v1.b;
-							return A2(
-								$author$project$Sudoku$moveField,
-								_Utils_Tuple2(fieldNumber, 2),
-								$author$project$Sudoku$East);
-					}
-				case 'FocusOptions':
-					var _v10 = _v1.a;
-					var fieldNumber = _v10.a;
-					var fieldOptionNumber = _v10.b;
-					var dir = _v1.b;
-					return A2(
-						$author$project$Sudoku$moveField,
-						_Utils_Tuple2(fieldNumber, fieldOptionNumber),
-						dir);
-				default:
-					var _v11 = _v1.a;
-					var dir = _v1.b;
+				} else {
+					var _v11 = _v1.b;
+					var dir = _v1.c;
 					return _Utils_Tuple2(0, 0);
+				}
 			}
+			var _v2 = _v1.b;
+			var fieldNumber = _v2.a;
+			var fieldOptionNumber = _v2.b;
+			var dir = _v1.c;
+			return A2(
+				$author$project$Sudoku$moveField,
+				_Utils_Tuple2(fieldNumber, fieldOptionNumber),
+				dir);
 		}();
 		var fieldNumber1 = _v0.a;
 		var fieldOptionNumber1 = _v0.b;
@@ -7782,32 +7747,33 @@ var $author$project$Sudoku$update = F3(
 		while (true) {
 			switch (_v0.a.$) {
 				case 'ValueChanged':
-					switch (_v0.b.$) {
-						case 'FocusEdit':
-							var value = _v0.a.a;
-							var fieldNumber = _v0.b.a;
-							var fields = A3(
-								$author$project$Sudoku$setField,
-								fieldNumber,
-								model.fields,
-								$author$project$SudokuModel$Edit(
-									$elm$core$Maybe$Just(value)));
-							return {
-								cmd: $elm$core$Platform$Cmd$none,
-								model: _Utils_update(
-									model,
-									{
-										faults: A3($author$project$SudokuFaults$recomputeFaults, fields, fieldNumber, model.faults),
-										fields: fields
-									}),
-								session: session
-							};
-						case 'FocusOptions':
-							if ((_v0.c.$ === 'Just') && (_v0.c.a.$ === 'Options')) {
+					if ((_v0.b.$ === 'Focus') && (_v0.c.$ === 'Just')) {
+						switch (_v0.c.a.$) {
+							case 'Edit':
 								var value = _v0.a.a;
 								var _v1 = _v0.b;
 								var fieldNumber = _v1.a;
-								var fieldOptionNumber = _v1.b;
+								var fields = A3(
+									$author$project$Sudoku$setField,
+									fieldNumber,
+									model.fields,
+									$author$project$SudokuModel$Edit(
+										$elm$core$Maybe$Just(value)));
+								return {
+									cmd: $elm$core$Platform$Cmd$none,
+									model: _Utils_update(
+										model,
+										{
+											faults: A3($author$project$SudokuFaults$recomputeFaults, fields, fieldNumber, model.faults),
+											fields: fields
+										}),
+									session: session
+								};
+							case 'Options':
+								var value = _v0.a.a;
+								var _v2 = _v0.b;
+								var fieldNumber = _v2.a;
+								var fieldOptionNumber = _v2.b;
 								var options = _v0.c.a.a;
 								var fields = A3(
 									$author$project$Sudoku$setField,
@@ -7825,17 +7791,40 @@ var $author$project$Sudoku$update = F3(
 										}),
 									session: session
 								};
-							} else {
+							default:
 								break _v0$18;
-							}
-						default:
-							break _v0$18;
+						}
+					} else {
+						break _v0$18;
 					}
 				case 'ValueCleared':
-					switch (_v0.b.$) {
-						case 'FocusEdit':
-							var _v2 = _v0.a;
-							var fieldNumber = _v0.b.a;
+					if (_v0.b.$ === 'Focus') {
+						if ((_v0.c.$ === 'Just') && (_v0.c.a.$ === 'Options')) {
+							var _v3 = _v0.a;
+							var _v4 = _v0.b;
+							var fieldNumber = _v4.a;
+							var fieldOptionNumber = _v4.b;
+							var options = _v0.c.a.a;
+							var fields = A3(
+								$author$project$Sudoku$setField,
+								fieldNumber,
+								model.fields,
+								$author$project$SudokuModel$Options(
+									A2($author$project$Sudoku$clearOption, fieldOptionNumber, options)));
+							return {
+								cmd: $elm$core$Platform$Cmd$none,
+								model: _Utils_update(
+									model,
+									{
+										faults: A3($author$project$SudokuFaults$recomputeFaults, fields, fieldNumber, model.faults),
+										fields: fields
+									}),
+								session: session
+							};
+						} else {
+							var _v5 = _v0.a;
+							var _v6 = _v0.b;
+							var fieldNumber = _v6.a;
 							var fields = A3(
 								$author$project$Sudoku$setField,
 								fieldNumber,
@@ -7851,40 +7840,15 @@ var $author$project$Sudoku$update = F3(
 									}),
 								session: session
 							};
-						case 'FocusOptions':
-							if ((_v0.c.$ === 'Just') && (_v0.c.a.$ === 'Options')) {
-								var _v3 = _v0.a;
-								var _v4 = _v0.b;
-								var fieldNumber = _v4.a;
-								var fieldOptionNumber = _v4.b;
-								var options = _v0.c.a.a;
-								var fields = A3(
-									$author$project$Sudoku$setField,
-									fieldNumber,
-									model.fields,
-									$author$project$SudokuModel$Options(
-										A2($author$project$Sudoku$clearOption, fieldOptionNumber, options)));
-								return {
-									cmd: $elm$core$Platform$Cmd$none,
-									model: _Utils_update(
-										model,
-										{
-											faults: A3($author$project$SudokuFaults$recomputeFaults, fields, fieldNumber, model.faults),
-											fields: fields
-										}),
-									session: session
-								};
-							} else {
-								break _v0$18;
-							}
-						default:
-							break _v0$18;
+						}
+					} else {
+						break _v0$18;
 					}
 				case 'FocusChanged':
-					if (((_v0.b.$ === 'FocusOptions') && (_v0.c.$ === 'Just')) && (_v0.c.a.$ === 'Options')) {
+					if (((_v0.b.$ === 'Focus') && (_v0.c.$ === 'Just')) && (_v0.c.a.$ === 'Options')) {
 						var fieldNumber = _v0.a.a;
-						var _v5 = _v0.b;
-						var fieldNumberOld = _v5.a;
+						var _v7 = _v0.b;
+						var fieldNumberOld = _v7.a;
 						var options = _v0.c.a.a;
 						var fields = $author$project$Sudoku$optionsIsEmpty(options) ? A3(
 							$author$project$Sudoku$setField,
@@ -7920,101 +7884,100 @@ var $author$project$Sudoku$update = F3(
 						};
 					}
 				case 'MovedFocus':
-					if (((_v0.b.$ === 'FocusOptions') && (_v0.c.$ === 'Just')) && (_v0.c.a.$ === 'Options')) {
-						var dir = _v0.a.a;
-						var _v6 = _v0.b;
-						var fieldNumberOld = _v6.a;
-						var fieldNumberOptionOld = _v6.b;
-						var options = _v0.c.a.a;
-						var focus = A2($author$project$SudokuModel$FocusOptions, fieldNumberOld, fieldNumberOptionOld);
-						var _v7 = A2(
-							$author$project$Sudoku$moveField,
-							_Utils_Tuple2(fieldNumberOld, fieldNumberOptionOld),
-							dir);
-						var fieldNumber = _v7.a;
-						var fields = ($author$project$Sudoku$optionsIsEmpty(options) && (!_Utils_eq(fieldNumber, fieldNumberOld))) ? A3(
-							$author$project$Sudoku$setField,
-							fieldNumberOld,
-							model.fields,
-							$author$project$SudokuModel$Edit($elm$core$Maybe$Nothing)) : model.fields;
-						return {
-							cmd: $elm$core$Platform$Cmd$none,
-							model: _Utils_update(
-								model,
-								{
-									fields: fields,
-									focus: A3($author$project$Sudoku$moveFocus, focus, dir, fields)
-								}),
-							session: session
-						};
+					if (_v0.c.$ === 'Just') {
+						if ((_v0.b.$ === 'Focus') && (_v0.c.a.$ === 'Options')) {
+							var dir = _v0.a.a;
+							var _v8 = _v0.b;
+							var fieldNumberOld = _v8.a;
+							var fieldNumberOptionOld = _v8.b;
+							var options = _v0.c.a.a;
+							var oldfocus = A2($author$project$SudokuModel$Focus, fieldNumberOld, fieldNumberOptionOld);
+							var field = $author$project$SudokuModel$Options(options);
+							var focus = A4($author$project$Sudoku$moveFocus, field, oldfocus, dir, model.fields);
+							var fields = function () {
+								if (focus.$ === 'Focus') {
+									var fieldNumber = focus.a;
+									return ($author$project$Sudoku$optionsIsEmpty(options) && (!_Utils_eq(fieldNumber, fieldNumberOld))) ? A3(
+										$author$project$Sudoku$setField,
+										fieldNumberOld,
+										model.fields,
+										$author$project$SudokuModel$Edit($elm$core$Maybe$Nothing)) : model.fields;
+								} else {
+									return model.fields;
+								}
+							}();
+							return {
+								cmd: $elm$core$Platform$Cmd$none,
+								model: _Utils_update(
+									model,
+									{fields: fields, focus: focus}),
+								session: session
+							};
+						} else {
+							var dir = _v0.a.a;
+							var focus = _v0.b;
+							var field = _v0.c.a;
+							return {
+								cmd: $elm$core$Platform$Cmd$none,
+								model: _Utils_update(
+									model,
+									{
+										focus: A4($author$project$Sudoku$moveFocus, field, focus, dir, model.fields)
+									}),
+								session: session
+							};
+						}
 					} else {
-						var dir = _v0.a.a;
-						var focus = _v0.b;
-						return {
-							cmd: $elm$core$Platform$Cmd$none,
-							model: _Utils_update(
-								model,
-								{
-									focus: A3($author$project$Sudoku$moveFocus, focus, dir, model.fields)
-								}),
-							session: session
-						};
+						break _v0$18;
 					}
 				case 'OptionsToggled':
-					if (_v0.c.$ === 'Just') {
-						switch (_v0.b.$) {
-							case 'FocusEdit':
-								if (_v0.c.a.$ === 'Edit') {
-									var _v8 = _v0.a;
-									var fieldNumber = _v0.b.a;
-									var maybeValue = _v0.c.a.a;
-									var fields = A3(
-										$author$project$Sudoku$setField,
-										fieldNumber,
-										model.fields,
-										$author$project$SudokuModel$Options(
-											$author$project$Sudoku$initOptions(maybeValue)));
-									return {
-										cmd: $elm$core$Platform$Cmd$none,
-										model: _Utils_update(
-											model,
-											{
-												faults: A3($author$project$SudokuFaults$recomputeFaults, fields, fieldNumber, model.faults),
-												fields: fields,
-												focus: A2($author$project$SudokuModel$FocusOptions, fieldNumber, 0)
-											}),
-										session: session
-									};
-								} else {
-									break _v0$18;
-								}
-							case 'FocusOptions':
-								if (_v0.c.a.$ === 'Options') {
-									var _v9 = _v0.a;
-									var _v10 = _v0.b;
-									var fieldNumber = _v10.a;
-									var fieldOptionNumber = _v10.b;
-									var options = _v0.c.a.a;
-									var fields = A3(
-										$author$project$Sudoku$setField,
-										fieldNumber,
-										model.fields,
-										$author$project$SudokuModel$Edit(
-											A2($author$project$Sudoku$getOption, fieldOptionNumber, options)));
-									return {
-										cmd: $elm$core$Platform$Cmd$none,
-										model: _Utils_update(
-											model,
-											{
-												faults: A3($author$project$SudokuFaults$recomputeFaults, fields, fieldNumber, model.faults),
-												fields: fields,
-												focus: $author$project$SudokuModel$FocusEdit(fieldNumber)
-											}),
-										session: session
-									};
-								} else {
-									break _v0$18;
-								}
+					if ((_v0.b.$ === 'Focus') && (_v0.c.$ === 'Just')) {
+						switch (_v0.c.a.$) {
+							case 'Edit':
+								var _v10 = _v0.a;
+								var _v11 = _v0.b;
+								var fieldNumber = _v11.a;
+								var maybeValue = _v0.c.a.a;
+								var fields = A3(
+									$author$project$Sudoku$setField,
+									fieldNumber,
+									model.fields,
+									$author$project$SudokuModel$Options(
+										$author$project$Sudoku$initOptions(maybeValue)));
+								return {
+									cmd: $elm$core$Platform$Cmd$none,
+									model: _Utils_update(
+										model,
+										{
+											faults: A3($author$project$SudokuFaults$recomputeFaults, fields, fieldNumber, model.faults),
+											fields: fields,
+											focus: A2($author$project$SudokuModel$Focus, fieldNumber, 0)
+										}),
+									session: session
+								};
+							case 'Options':
+								var _v12 = _v0.a;
+								var _v13 = _v0.b;
+								var fieldNumber = _v13.a;
+								var fieldOptionNumber = _v13.b;
+								var options = _v0.c.a.a;
+								var fields = A3(
+									$author$project$Sudoku$setField,
+									fieldNumber,
+									model.fields,
+									$author$project$SudokuModel$Edit(
+										A2($author$project$Sudoku$getOption, fieldOptionNumber, options)));
+								return {
+									cmd: $elm$core$Platform$Cmd$none,
+									model: _Utils_update(
+										model,
+										{
+											faults: A3($author$project$SudokuFaults$recomputeFaults, fields, fieldNumber, model.faults),
+											fields: fields,
+											focus: A2($author$project$SudokuModel$Focus, fieldNumber, 0)
+										}),
+									session: session
+								};
 							default:
 								break _v0$18;
 						}
@@ -8022,15 +7985,15 @@ var $author$project$Sudoku$update = F3(
 						break _v0$18;
 					}
 				case 'OptionFocusChanged':
-					var _v11 = _v0.a;
-					var fieldNumber = _v11.a;
-					var optionFieldNumber = _v11.b;
+					var _v14 = _v0.a;
+					var fieldNumber = _v14.a;
+					var optionFieldNumber = _v14.b;
 					return {
 						cmd: $elm$core$Platform$Cmd$none,
 						model: _Utils_update(
 							model,
 							{
-								focus: A2($author$project$SudokuModel$FocusOptions, fieldNumber, optionFieldNumber)
+								focus: A2($author$project$SudokuModel$Focus, fieldNumber, optionFieldNumber)
 							}),
 						session: session
 					};
@@ -8070,7 +8033,7 @@ var $author$project$Sudoku$update = F3(
 					if (_v0.c.$ === 'Just') {
 						switch (_v0.c.a.$) {
 							case 'Edit':
-								var _v14 = _v0.a;
+								var _v17 = _v0.a;
 								var maybeValue = _v0.c.a.a;
 								return _Utils_eq(model.highlight, maybeValue) ? {
 									cmd: $elm$core$Platform$Cmd$none,
@@ -8086,7 +8049,7 @@ var $author$project$Sudoku$update = F3(
 									session: session
 								};
 							case 'Frozen':
-								var _v15 = _v0.a;
+								var _v18 = _v0.a;
 								var value = _v0.c.a.a;
 								return _Utils_eq(
 									model.highlight,
@@ -8112,57 +8075,62 @@ var $author$project$Sudoku$update = F3(
 						break _v0$18;
 					}
 				case 'Possibilities':
-					switch (_v0.b.$) {
-						case 'FocusEdit':
-							var _v16 = _v0.a;
-							var fieldNumber = _v0.b.a;
-							var fields = A3(
-								$author$project$Sudoku$setField,
-								fieldNumber,
-								model.fields,
-								A2($author$project$Sudoku$generateOptions, model.fields, fieldNumber));
-							return {
-								cmd: $elm$core$Platform$Cmd$none,
-								model: _Utils_update(
-									model,
-									{
-										faults: A3($author$project$SudokuFaults$recomputeFaults, fields, fieldNumber, model.faults),
-										fields: fields,
-										focus: A2(
-											$author$project$SudokuModel$fieldNumberToFocus,
-											fields,
-											_Utils_Tuple2(fieldNumber, 0))
-									}),
-								session: session
-							};
-						case 'FocusOptions':
-							var _v17 = _v0.a;
-							var _v18 = _v0.b;
-							var fieldNumber = _v18.a;
-							var fields = A3(
-								$author$project$Sudoku$setField,
-								fieldNumber,
-								model.fields,
-								A2($author$project$Sudoku$generateOptions, model.fields, fieldNumber));
-							return {
-								cmd: $elm$core$Platform$Cmd$none,
-								model: _Utils_update(
-									model,
-									{
-										faults: A3($author$project$SudokuFaults$recomputeFaults, fields, fieldNumber, model.faults),
-										fields: fields,
-										focus: A2(
-											$author$project$SudokuModel$fieldNumberToFocus,
-											fields,
-											_Utils_Tuple2(fieldNumber, 0))
-									}),
-								session: session
-							};
-						default:
-							break _v0$18;
+					if ((_v0.b.$ === 'Focus') && (_v0.c.$ === 'Just')) {
+						switch (_v0.c.a.$) {
+							case 'Edit':
+								var _v19 = _v0.a;
+								var _v20 = _v0.b;
+								var fieldNumber = _v20.a;
+								var fields = A3(
+									$author$project$Sudoku$setField,
+									fieldNumber,
+									model.fields,
+									A2($author$project$Sudoku$generateOptions, model.fields, fieldNumber));
+								return {
+									cmd: $elm$core$Platform$Cmd$none,
+									model: _Utils_update(
+										model,
+										{
+											faults: A3($author$project$SudokuFaults$recomputeFaults, fields, fieldNumber, model.faults),
+											fields: fields,
+											focus: A2(
+												$author$project$SudokuModel$fieldNumberToFocus,
+												fields,
+												_Utils_Tuple2(fieldNumber, 0))
+										}),
+									session: session
+								};
+							case 'Options':
+								var _v21 = _v0.a;
+								var _v22 = _v0.b;
+								var fieldNumber = _v22.a;
+								var fields = A3(
+									$author$project$Sudoku$setField,
+									fieldNumber,
+									model.fields,
+									A2($author$project$Sudoku$generateOptions, model.fields, fieldNumber));
+								return {
+									cmd: $elm$core$Platform$Cmd$none,
+									model: _Utils_update(
+										model,
+										{
+											faults: A3($author$project$SudokuFaults$recomputeFaults, fields, fieldNumber, model.faults),
+											fields: fields,
+											focus: A2(
+												$author$project$SudokuModel$fieldNumberToFocus,
+												fields,
+												_Utils_Tuple2(fieldNumber, 0))
+										}),
+									session: session
+								};
+							default:
+								break _v0$18;
+						}
+					} else {
+						break _v0$18;
 					}
 				case 'ButtonClear':
-					var _v19 = _v0.a;
+					var _v23 = _v0.a;
 					return {
 						cmd: $elm$core$Platform$Cmd$none,
 						model: _Utils_update(
@@ -8176,10 +8144,10 @@ var $author$project$Sudoku$update = F3(
 						session: session
 					};
 				case 'ButtonNew':
-					var _v20 = _v0.a;
-					var _v21 = $author$project$Sudoku$init(session);
-					var model1 = _v21.a;
-					var cmd = _v21.b;
+					var _v24 = _v0.a;
+					var _v25 = $author$project$Sudoku$init(session);
+					var model1 = _v25.a;
+					var cmd = _v25.b;
 					return {cmd: cmd, model: model1, session: session};
 				default:
 					break _v0$18;
@@ -9179,30 +9147,14 @@ var $rundis$elm_bootstrap$Bootstrap$Table$tr = F2(
 var $author$project$Sudoku$FocusChanged = function (a) {
 	return {$: 'FocusChanged', a: a};
 };
-var $rundis$elm_bootstrap$Bootstrap$Internal$Role$Danger = {$: 'Danger'};
-var $rundis$elm_bootstrap$Bootstrap$Table$Roled = function (a) {
-	return {$: 'Roled', a: a};
-};
-var $rundis$elm_bootstrap$Bootstrap$Table$RoledCell = function (a) {
-	return {$: 'RoledCell', a: a};
-};
-var $rundis$elm_bootstrap$Bootstrap$Table$cellDanger = $rundis$elm_bootstrap$Bootstrap$Table$RoledCell(
-	$rundis$elm_bootstrap$Bootstrap$Table$Roled($rundis$elm_bootstrap$Bootstrap$Internal$Role$Danger));
 var $author$project$SudokuModel$focusOnField = F2(
 	function (focus, fieldNumber) {
-		switch (focus.$) {
-			case 'FocusBlurred':
-				return $author$project$SudokuModel$FocusBlurred;
-			case 'FocusEdit':
-				var focusFieldNumber = focus.a;
-				return _Utils_eq(focusFieldNumber, fieldNumber) ? $author$project$SudokuModel$FocusEdit(focusFieldNumber) : $author$project$SudokuModel$FocusBlurred;
-			case 'FocusFrozen':
-				var focusFieldNumber = focus.a;
-				return _Utils_eq(focusFieldNumber, fieldNumber) ? $author$project$SudokuModel$FocusFrozen(focusFieldNumber) : $author$project$SudokuModel$FocusBlurred;
-			default:
-				var focusFieldNumber = focus.a;
-				var focusFieldOptionNumber = focus.b;
-				return _Utils_eq(focusFieldNumber, fieldNumber) ? A2($author$project$SudokuModel$FocusOptions, focusFieldNumber, focusFieldOptionNumber) : $author$project$SudokuModel$FocusBlurred;
+		if (focus.$ === 'FocusBlurred') {
+			return $author$project$SudokuModel$FocusBlurred;
+		} else {
+			var focusFieldNumber = focus.a;
+			var focusFieldOptionNumber = focus.b;
+			return _Utils_eq(focusFieldNumber, fieldNumber) ? A2($author$project$SudokuModel$Focus, focusFieldNumber, focusFieldOptionNumber) : $author$project$SudokuModel$FocusBlurred;
 		}
 	});
 var $author$project$Sudoku$getCssClasses = F3(
@@ -9411,182 +9363,161 @@ var $author$project$Sudoku$viewCell = F4(
 		var faultEdit = _v0.a;
 		var faultFrozen = _v0.b;
 		var _v1 = _Utils_Tuple2(field, focus);
-		_v1$8:
-		while (true) {
+		if (_v1.b.$ === 'Focus') {
 			switch (_v1.a.$) {
 				case 'Frozen':
-					switch (_v1.b.$) {
-						case 'FocusFrozen':
-							var value = _v1.a.a;
-							return A2(
-								$rundis$elm_bootstrap$Bootstrap$Table$td,
-								_List_fromArray(
-									[
-										A3(
-										$author$project$Sudoku$getCssClasses,
-										cssArgs,
-										A2($author$project$SudokuModel$isHighlighted, model.highlight, value),
-										value),
-										$rundis$elm_bootstrap$Bootstrap$Table$cellAttr(
-										$elm$html$Html$Events$onClick(
-											$author$project$Sudoku$FocusChanged(fieldNumber)))
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text(
-										$elm$core$String$fromInt(value))
-									]));
-						case 'FocusBlurred':
-							var value = _v1.a.a;
-							var _v2 = _v1.b;
-							return A2(
-								$rundis$elm_bootstrap$Bootstrap$Table$td,
-								_List_fromArray(
-									[
-										A3(
-										$author$project$Sudoku$getCssClasses,
-										cssArgs,
-										A2($author$project$SudokuModel$isHighlighted, model.highlight, value),
-										value),
-										$rundis$elm_bootstrap$Bootstrap$Table$cellAttr(
-										$elm$html$Html$Events$onClick(
-											$author$project$Sudoku$FocusChanged(fieldNumber)))
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text(
-										$elm$core$String$fromInt(value))
-									]));
-						default:
-							break _v1$8;
-					}
+					var value = _v1.a.a;
+					var _v2 = _v1.b;
+					return A2(
+						$rundis$elm_bootstrap$Bootstrap$Table$td,
+						_List_fromArray(
+							[
+								A3(
+								$author$project$Sudoku$getCssClasses,
+								cssArgs,
+								A2($author$project$SudokuModel$isHighlighted, model.highlight, value),
+								value),
+								$rundis$elm_bootstrap$Bootstrap$Table$cellAttr(
+								$elm$html$Html$Events$onClick(
+									$author$project$Sudoku$FocusChanged(fieldNumber)))
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(
+								$elm$core$String$fromInt(value))
+							]));
 				case 'Edit':
 					if (_v1.a.a.$ === 'Just') {
-						switch (_v1.b.$) {
-							case 'FocusEdit':
-								var value = _v1.a.a.a;
-								return A2(
-									$rundis$elm_bootstrap$Bootstrap$Table$td,
-									_List_fromArray(
-										[
-											A3(
-											$author$project$Sudoku$getCssClasses,
-											cssArgs,
-											A2($author$project$SudokuModel$isHighlighted, model.highlight, value),
-											value)
-										]),
-									_List_fromArray(
-										[
-											$elm$html$Html$text(
-											$elm$core$String$fromInt(value))
-										]));
-							case 'FocusBlurred':
-								var value = _v1.a.a.a;
-								var _v4 = _v1.b;
-								return A2(
-									$rundis$elm_bootstrap$Bootstrap$Table$td,
-									_List_fromArray(
-										[
-											A3(
-											$author$project$Sudoku$getCssClasses,
-											cssArgs,
-											A2($author$project$SudokuModel$isHighlighted, model.highlight, value),
-											value),
-											$rundis$elm_bootstrap$Bootstrap$Table$cellAttr(
-											$elm$html$Html$Events$onClick(
-												$author$project$Sudoku$FocusChanged(fieldNumber)))
-										]),
-									_List_fromArray(
-										[
-											$elm$html$Html$text(
-											$elm$core$String$fromInt(value))
-										]));
-							default:
-								break _v1$8;
-						}
+						var value = _v1.a.a.a;
+						var _v4 = _v1.b;
+						return A2(
+							$rundis$elm_bootstrap$Bootstrap$Table$td,
+							_List_fromArray(
+								[
+									A3(
+									$author$project$Sudoku$getCssClasses,
+									cssArgs,
+									A2($author$project$SudokuModel$isHighlighted, model.highlight, value),
+									value)
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text(
+									$elm$core$String$fromInt(value))
+								]));
 					} else {
-						switch (_v1.b.$) {
-							case 'FocusEdit':
-								var _v3 = _v1.a.a;
-								return A2(
-									$rundis$elm_bootstrap$Bootstrap$Table$td,
-									_List_fromArray(
-										[
-											A3($author$project$Sudoku$getCssClasses, cssArgs, false, 0)
-										]),
-									_List_fromArray(
-										[
-											$elm$html$Html$text(' ')
-										]));
-							case 'FocusBlurred':
-								var _v5 = _v1.a.a;
-								var _v6 = _v1.b;
-								return A2(
-									$rundis$elm_bootstrap$Bootstrap$Table$td,
-									_List_fromArray(
-										[
-											A3($author$project$Sudoku$getCssClasses, cssArgs, false, 0),
-											$rundis$elm_bootstrap$Bootstrap$Table$cellAttr(
-											$elm$html$Html$Events$onClick(
-												$author$project$Sudoku$FocusChanged(fieldNumber)))
-										]),
-									_List_fromArray(
-										[
-											$elm$html$Html$text(' ')
-										]));
-							default:
-								break _v1$8;
-						}
+						var _v5 = _v1.a.a;
+						var _v6 = _v1.b;
+						return A2(
+							$rundis$elm_bootstrap$Bootstrap$Table$td,
+							_List_fromArray(
+								[
+									A3($author$project$Sudoku$getCssClasses, cssArgs, false, 0)
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text(' ')
+								]));
 					}
 				default:
-					switch (_v1.b.$) {
-						case 'FocusOptions':
-							var options = _v1.a.a;
-							var _v7 = _v1.b;
-							var focusFieldOptionNumber = _v7.b;
-							return A2(
-								$rundis$elm_bootstrap$Bootstrap$Table$td,
-								_List_fromArray(
-									[
-										$rundis$elm_bootstrap$Bootstrap$Table$cellAttr(
-										$elm$html$Html$Attributes$class(borders + ' options focus'))
-									]),
-								_List_fromArray(
-									[
-										A4(
-										$author$project$Sudoku$viewOptions,
-										model,
-										fieldNumber,
-										options,
-										$elm$core$Maybe$Just(focusFieldOptionNumber))
-									]));
-						case 'FocusBlurred':
-							var options = _v1.a.a;
-							var _v8 = _v1.b;
-							return A2(
-								$rundis$elm_bootstrap$Bootstrap$Table$td,
-								_List_fromArray(
-									[
-										$rundis$elm_bootstrap$Bootstrap$Table$cellAttr(
-										$elm$html$Html$Attributes$class(borders + ' options'))
-									]),
-								_List_fromArray(
-									[
-										A4($author$project$Sudoku$viewOptions, model, fieldNumber, options, $elm$core$Maybe$Nothing)
-									]));
-						default:
-							break _v1$8;
+					var options = _v1.a.a;
+					var _v10 = _v1.b;
+					var focusFieldOptionNumber = _v10.b;
+					return A2(
+						$rundis$elm_bootstrap$Bootstrap$Table$td,
+						_List_fromArray(
+							[
+								$rundis$elm_bootstrap$Bootstrap$Table$cellAttr(
+								$elm$html$Html$Attributes$class(borders + ' options focus'))
+							]),
+						_List_fromArray(
+							[
+								A4(
+								$author$project$Sudoku$viewOptions,
+								model,
+								fieldNumber,
+								options,
+								$elm$core$Maybe$Just(focusFieldOptionNumber))
+							]));
+			}
+		} else {
+			switch (_v1.a.$) {
+				case 'Frozen':
+					var value = _v1.a.a;
+					var _v3 = _v1.b;
+					return A2(
+						$rundis$elm_bootstrap$Bootstrap$Table$td,
+						_List_fromArray(
+							[
+								A3(
+								$author$project$Sudoku$getCssClasses,
+								cssArgs,
+								A2($author$project$SudokuModel$isHighlighted, model.highlight, value),
+								value),
+								$rundis$elm_bootstrap$Bootstrap$Table$cellAttr(
+								$elm$html$Html$Events$onClick(
+									$author$project$Sudoku$FocusChanged(fieldNumber)))
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(
+								$elm$core$String$fromInt(value))
+							]));
+				case 'Edit':
+					if (_v1.a.a.$ === 'Just') {
+						var value = _v1.a.a.a;
+						var _v7 = _v1.b;
+						return A2(
+							$rundis$elm_bootstrap$Bootstrap$Table$td,
+							_List_fromArray(
+								[
+									A3(
+									$author$project$Sudoku$getCssClasses,
+									cssArgs,
+									A2($author$project$SudokuModel$isHighlighted, model.highlight, value),
+									value),
+									$rundis$elm_bootstrap$Bootstrap$Table$cellAttr(
+									$elm$html$Html$Events$onClick(
+										$author$project$Sudoku$FocusChanged(fieldNumber)))
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text(
+									$elm$core$String$fromInt(value))
+								]));
+					} else {
+						var _v8 = _v1.a.a;
+						var _v9 = _v1.b;
+						return A2(
+							$rundis$elm_bootstrap$Bootstrap$Table$td,
+							_List_fromArray(
+								[
+									A3($author$project$Sudoku$getCssClasses, cssArgs, false, 0),
+									$rundis$elm_bootstrap$Bootstrap$Table$cellAttr(
+									$elm$html$Html$Events$onClick(
+										$author$project$Sudoku$FocusChanged(fieldNumber)))
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text(' ')
+								]));
 					}
+				default:
+					var options = _v1.a.a;
+					var _v11 = _v1.b;
+					return A2(
+						$rundis$elm_bootstrap$Bootstrap$Table$td,
+						_List_fromArray(
+							[
+								$rundis$elm_bootstrap$Bootstrap$Table$cellAttr(
+								$elm$html$Html$Attributes$class(borders + ' options'))
+							]),
+						_List_fromArray(
+							[
+								A4($author$project$Sudoku$viewOptions, model, fieldNumber, options, $elm$core$Maybe$Nothing)
+							]));
 			}
 		}
-		return A2(
-			$rundis$elm_bootstrap$Bootstrap$Table$td,
-			_List_fromArray(
-				[$rundis$elm_bootstrap$Bootstrap$Table$cellDanger]),
-			_List_fromArray(
-				[
-					$elm$html$Html$text('Something is wrong here ')
-				]));
 	});
 var $author$project$Sudoku$viewRow = F4(
 	function (model, row, borders, isSolved) {
