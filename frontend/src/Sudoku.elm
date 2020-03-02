@@ -52,7 +52,7 @@ view model =
     let
         isSolved = solved model.fields model.faults
     in
-        div [ class  "center" ]
+        div [ class "center" ]
             [ viewExplanations
              , viewSudoku model isSolved
              , viewMessage isSolved
