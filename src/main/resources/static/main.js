@@ -8555,6 +8555,70 @@ var $author$project$Sudoku$viewExplanations = A2(
 						]))
 				]))
 		]));
+var $author$project$Sudoku$viewKeyboardNumber = F3(
+	function (enabled, isSolved, value) {
+		return enabled ? A2(
+			$rundis$elm_bootstrap$Bootstrap$Button$button,
+			_List_fromArray(
+				[
+					$rundis$elm_bootstrap$Bootstrap$Button$attrs(
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('keyboard-cell' + ' enabled')
+						])),
+					$rundis$elm_bootstrap$Bootstrap$Button$onClick(
+					$author$project$Sudoku$ValueChanged(value))
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text(
+					$elm$core$String$fromInt(value))
+				])) : A2(
+			$rundis$elm_bootstrap$Bootstrap$Button$button,
+			_List_fromArray(
+				[
+					$rundis$elm_bootstrap$Bootstrap$Button$attrs(
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('keyboard-cell' + ' disabled')
+						]))
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text(
+					$elm$core$String$fromInt(value))
+				]));
+	});
+var $author$project$Sudoku$viewKeyboardCells = F2(
+	function (enabled, isSolved) {
+		return $elm$core$Array$toList(
+			A2(
+				$elm$core$Array$initialize,
+				9,
+				function (i) {
+					return A3($author$project$Sudoku$viewKeyboardNumber, enabled, isSolved, i + 1);
+				}));
+	});
+var $author$project$Sudoku$viewKeyboard = F2(
+	function (focusField, isSolved) {
+		if ((focusField.$ === 'Just') && (focusField.a.$ === 'Edit')) {
+			return A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('keyboard')
+					]),
+				A2($author$project$Sudoku$viewKeyboardCells, true, isSolved));
+		} else {
+			return A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('keyboard')
+					]),
+				A2($author$project$Sudoku$viewKeyboardCells, false, isSolved));
+		}
+	});
 var $author$project$Sudoku$viewMessage = function (isSolved) {
 	return isSolved ? A2(
 		$elm$html$Html$div,
@@ -8918,7 +8982,11 @@ var $author$project$Sudoku$view = function (model) {
 				$author$project$Sudoku$viewExplanations,
 				A2($author$project$Sudoku$viewSudoku, model, isSolved),
 				$author$project$Sudoku$viewMessage(isSolved),
-				$author$project$Sudoku$viewButtons
+				$author$project$Sudoku$viewButtons,
+				A2(
+				$author$project$Sudoku$viewKeyboard,
+				A2($author$project$SudokuModel$focusToField, model.fields, model.focus),
+				isSolved)
 			]));
 };
 var $author$project$Main$view = function (model) {

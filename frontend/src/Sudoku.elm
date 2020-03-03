@@ -57,6 +57,7 @@ view model =
              , viewSudoku model isSolved
              , viewMessage isSolved
              , viewButtons
+             , viewKeyboard ( focusToField model.fields model.focus ) isSolved
             ]
 
 viewExplanations : Html Msg
@@ -246,6 +247,27 @@ getOptionClasses optionNumber isFocus isFault =
             ++ ( if isFault then " fault" else ""  )
         )
 
+viewKeyboard : Maybe Field -> Bool -> Html Msg
+viewKeyboard focusField isSolved =
+    case focusField of
+        Just (Edit _) ->
+            div [ class "keyboard" ]
+                (viewKeyboardCells True isSolved )
+        _ ->
+            div [ class "keyboard" ]
+                (viewKeyboardCells False isSolved )
+
+viewKeyboardCells : Bool -> Bool -> List (Html Msg)
+viewKeyboardCells enabled isSolved =
+    Array.initialize 9 (\i -> viewKeyboardNumber enabled isSolved (i + 1))
+    |> Array.toList
+
+viewKeyboardNumber : Bool -> Bool -> Int -> Html Msg
+viewKeyboardNumber enabled isSolved value =
+    if enabled then
+        Button.button [ Button.attrs [ class ("keyboard-cell" ++ " enabled")], Button.onClick ( ValueChanged value ) ] [ text ( String.fromInt value ) ]
+    else
+        Button.button [ Button.attrs [ class ("keyboard-cell" ++ " disabled")] ] [ text ( String.fromInt value ) ]
 
 -- ####
 -- ####   HELPER
