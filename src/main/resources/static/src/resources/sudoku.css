@@ -16,12 +16,12 @@ div.center-message {
     display: none;
 }
 
-div.center-sudoku{
+div.sudoku-container{
     margin-top: 16vw;
     width: 100vw;
     height: 100vw;
 }
-div.sudoku {
+div.sudoku-grid {
     display: grid;
     grid-template-columns: repeat(27, [col] 1fr) ;
     grid-template-rows:  repeat(27, [row] 1fr) ;
@@ -29,14 +29,27 @@ div.sudoku {
     width: 100vw;
     height: 100vw;
 }
-div.cell {
+div.sudoku-cell {
   grid-column: span 3;
   grid-row: span 3;
-  border: 1px solid black;
+  border: .2vw solid black;
   text-align: center;
-  font-size: large;
+  font-size: 5vw;
   width: 11.1vw;
   line-height: 11.1vw;
+}
+div.sudoku-options-grid {
+  border: .2vw solid black;
+  display: grid;
+  grid-column: span 3;
+  grid-row: span 3;
+  grid-template-columns: repeat (3, 1fr);
+  grid-template-rows: repeat (3, auto);
+}
+div.sudoku-option-cell {
+  font-size: 3vw;
+  line-height: 3.5vw;
+  text-align: center;
 }
 
 div.center-buttons{
@@ -58,42 +71,55 @@ button.button {
     width: 30vw;
     text-align: center;
     vertical-align: middle;
-    padding: .375rem .75rem;
-    font-size: 1rem;
-    line-height: 1.5;
-    border-radius: .25rem;
+    padding: 1vw 1vw;
+    font-size: 4vw;
+    border-radius: 1vw
 }
 
-div.keyboard {
-    position:absolute;
-    display: grid;
-    grid-template-columns: repeat(3, [col] 1fr) ;
-    grid-template-rows:  repeat(3, [row] 1fr) ;
-    text-align: center;
-    left:50%;
-    width: 51vw;
+div.keyboard-container {
+    position: absolute;
     margin-top: 16vw;
-    height: 11.1vw;
-    margin-left:-25.5vw;
-    grid-gap: 2vw;
+    margin-left:-45vw;
+    left:50%;
+    width: 90vw;
 }
-button.keyboard-cell {
+div.keyboard-grid {
+    display: grid;
+    grid-template-columns: repeat(9, [col] 1fr) ;
+    grid-template-rows: repeat(2, [row] 1fr) ;
     text-align: center;
-    font-size: large;
-    width: 17vw;
-    height: 17vw;
-    background-color: var(--color-background-info);
-    color: var(--color-text);
-    vertical-align: middle;
-    border-radius: .25rem;
+    width: 90vw;
+    height: 20vw;
+    grid-gap: 1vw;
 }
-button.keyboard-cell:focus {
+div.keyboard-cell {
+    grid-column: span 1;
+    grid-row: span 1;
+    text-align: center;
+    font-size: 5vw;
+    width: 8vw;
+    line-height: 8vw;
+
+    background-color: var(--color-background-info);
+
+    border: .2vw solid var(--color-text-disabled);
+    border-radius: 2vw;
+}
+div.keyboard-cell-span3 {
+    grid-column: span 3;
+    grid-row: span 1;
+    width: 27vw;
+    border-radius: 6vw;
+}
+div.keyboard-cell:focus {
     outline: 0;
     box-shadow: 0 0 0 0.1rem var(--color-text);
     font-weight: bold;
 }
-button.enabled{}
-button.disabled {
+div.enabled{
+    color: var(--color-text);
+}
+div.disabled {
     color: var(--color-text-disabled);
 }
 
@@ -108,7 +134,7 @@ button.disabled {
       margin-left:-300px;
     }
 
-    div.center-sudoku{
+    div.sudoku-container{
       position:absolute;
       display:block;
       height:450px;
@@ -118,11 +144,11 @@ button.disabled {
       margin-top:-225px;
       margin-left:-222px;
     }
-    div.sudoku {
+    div.sudoku-grid {
       width: 450px;
       height: 460px;
     }
-    div.cell {
+    div.sudoku-cell {
       grid-column: span 3;
       grid-row: span 3;
       border: 1px solid black;
@@ -130,6 +156,19 @@ button.disabled {
       font-size: large;
       width: 50px;
       line-height: 50px;
+    }
+    div.sudoku-options-grid {
+      border: 1px solid black;
+      display: grid;
+      grid-column: span 3;
+      grid-row: span 3;
+      grid-template-columns: repeat (3, 1fr);
+      grid-template-rows: repeat (3, auto);
+    }
+    div.sudoku-option-cell {
+      font-size: small;
+      line-height: 13px;
+      text-align: center;
     }
     div.center-buttons{
       position:absolute;
@@ -172,7 +211,7 @@ button.disabled {
       font-weight: bold;
       color: var(--color-text);
     }
-    div.keyboard {
+    div.keyboard-container {
         display: none;
     }
 
@@ -217,20 +256,7 @@ div.normal-border-vertical {
 }
 
 
-div.options {
-  border: 1px solid black;
-  display: grid;
-  grid-column: span 3;
-  grid-row: span 3;
-  grid-template-columns: repeat (3, 1fr);
-  grid-template-rows: repeat (3, auto);
-}
 
-div.option {
-  font-size: small;
-  line-height: 13px;
-  text-align: center;
-}
 div.option0 {
   grid-column: 1;
   grid-row: 1;

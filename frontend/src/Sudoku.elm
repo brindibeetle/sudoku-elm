@@ -18,6 +18,7 @@ import Bootstrap.Form.Radio as Radio
 import Bootstrap.Form.Fieldset as Fieldset
 import Array exposing (..)
 import RemoteData exposing (RemoteData, WebData, succeed)
+import Icons exposing (..)
 
 
 init : Session -> ( Model, Cmd Msg )
@@ -57,7 +58,7 @@ view model =
              , viewSudoku model isSolved
              , viewMessage isSolved
              , viewButtons
-             , viewKeyboard ( focusToField model.fields model.focus ) isSolved
+             , viewKeyboard model.fields model.focus model.highlight
             ]
 
 viewExplanations : Html Msg
@@ -111,8 +112,8 @@ viewButtons =
 
 viewSudoku : Model -> Bool -> Html Msg
 viewSudoku model isSolved =
-    div [ class "center-sudoku"]
-        [ div [ class "sudoku" ]
+    div [ class "sudoku-container"]
+        [ div [ class "sudoku-grid" ]
             (viewCells model isSolved )
         ]
 
@@ -166,7 +167,7 @@ viewCell model isSolved fieldNumber =
 
             ( Options options, focus1 ) ->
                 div
-                    [ class (borders ++ " options" ) ]
+                    [ class (borders ++ " sudoku-options-grid" ) ]
                     ( viewOptions options model.faults focus1 fieldNumber )
 
 
@@ -197,7 +198,7 @@ getBorders fieldNumber =
 getCellClasses : { css : String, field : Field, isFocus : Bool, isFault : Bool, isSolved : Bool } -> Bool -> Int ->  Attribute Msg
 getCellClasses { css, field, isFocus, isFault, isSolved } isHighlight value =
     class
-        ( "cell"
+        ( "sudoku-cell"
             ++ " " ++ css
             ++ " "
                 ++ ( case field of
@@ -206,7 +207,7 @@ getCellClasses { css, field, isFocus, isFault, isSolved } isHighlight value =
                         Edit _ ->
                             "edit"
                         Options _ ->
-                            "options"
+                            "sudoku-options-grid"
                     )
             ++ " " ++ ( if isFocus then "focus" else ""  )
             ++ " " ++ ( if isFault then "fault" else ""  )
@@ -217,6 +218,7 @@ getCellClasses { css, field, isFocus, isFault, isSolved } isHighlight value =
 
 viewOptions : Array (Maybe Int) -> Faults -> Focus -> Int -> List(Html Msg)
 viewOptions options faults focus fieldNumber =
+
     Array.initialize 9 (viewOption options faults focus fieldNumber )
         |> Array.toList
     -- (getOptions field model.optionCijfers |> Maybe.withDefault Array.empty |> Array.toList |> List.map (viewOption model isFocus) )
@@ -241,133 +243,166 @@ viewOption options faults focus fieldNumber optionNumber =
 getOptionClasses : Int -> Bool -> Bool -> Attribute Msg
 getOptionClasses optionNumber isFocus isFault =
     class
-        ( "option"
+        ( "sudoku-option-cell"
             ++ " " ++ "option" ++ String.fromInt optionNumber
             ++ ( if isFocus then " focus" else ""  )
             ++ ( if isFault then " fault" else ""  )
         )
 
-viewKeyboard : Maybe Field -> Bool -> Html Msg
-viewKeyboard focusField isSolved =
-    case focusField of
-        Just (Edit _) ->
-            div [ class "keyboard" ]
-                (viewKeyboardCells True isSolved )
-        _ ->
-            div [ class "keyboard" ]
-                (viewKeyboardCells False isSolved )
+-- if isSolved dan Focus is nooit meer
+viewKeyboard : Array Field -> Focus -> Maybe Int -> Html Msg
+viewKeyboard fields focus maybeHighlightValue =
+    let
+        maybeField = focusToField fields focus
+        maybeValue = focusToFieldValue fields focus
+    in
+        div [ class "keyboard-container" ]
+            [ div [ class "keyboard-grid" ]
+                ( List.concat
+                [
+                    --numbers 1 to 9
+                    case maybeField of
+                        Just (Edit _) ->
+                            viewKeyboardNumbers True
+                        Just (Options _) ->
+                            viewKeyboardNumbers True
+                        _ ->
+                            viewKeyboardNumbers False
+                    ,
+                    --options
+                    case maybeField of
+                        Just (Edit _) ->
+                            [ div [ class ("keyboard-cell keyboard-cell-span3" ++ " enabled"), onClick OptionsToggled ]
+                                [ Icons.minimize ]
+                            ]
+                        Just (Options _) ->
+                            [ div [ class ("keyboard-cell keyboard-cell-span3" ++ " enabled"), onClick OptionsToggled ]
+                                [ Icons.maximize ]
+                            ]
+                        _ ->
+                            [ div [ class ("keyboard-cell keyboard-cell-span3" ++ " disabled") ]
+                                [ Icons.minimize ]
+                            ]
+                    ,
+                    --clear
+                    case ( maybeField, maybeValue ) of
+                        ( Just (Edit _), Just value) ->
+                            [ div [ class ("keyboard-cell keyboard-cell-span3" ++ " enabled"), onClick ValueCleared ]
+                                [ Icons.x ]
+                            ]
+
+                        ( Just (Options _ ), Just value) ->
+                            [ div [ class ("keyboard-cell keyboard-cell-span3" ++ " enabled"), onClick ValueCleared]
+                                [ Icons.x ]
+                            ]
+                        ( _, _ ) ->
+                            [ div [ class ("keyboard-cell keyboard-cell-span3" ++ " disabled") ]
+                                [ Icons.x ]
+                            ]
+                    ,
+                    --highlight
+                    case maybeField of
+                        Just (Options _) ->
+                            [ div [ class ("keyboard-cell keyboard-cell-span3" ++ " disabled") ]
+                                [ Icons.eye ]
+                            ]
+
+                        _ ->
+                            case ( maybeHighlightValue, maybeValue ) of
+
+                                ( Just highlightValue, Just value ) ->
+                                    if ( highlightValue == value ) then
+                                        [ div [ class ("keyboard-cell keyboard-cell-span3" ++ " enabled"), onClick HighLighted ]
+                                            [ Icons.eyeOff ]
+                                        ]
+                                    else
+                                        [ div [ class ("keyboard-cell keyboard-cell-span3" ++ " enabled"), onClick HighLighted ]
+                                            [ Icons.eye ]
+                                        ]
+
+                                ( Just value, Nothing) ->
+                                    [ div [ class ("keyboard-cell keyboard-cell-span3" ++ " enabled"), onClick HighLighted ]
+                                        [ Icons.eyeOff ]
+                                    ]
+
+                                ( Nothing, Just value ) ->
+                                    [ div [ class ("keyboard-cell keyboard-cell-span3" ++ " enabled"), onClick HighLighted ]
+                                        [ Icons.eye ]
+                                    ]
+
+                                ( Nothing, Nothing ) ->
+                                    [ div [ class ("keyboard-cell keyboard-cell-span3" ++ " disabled") ]
+                                        [ Icons.eye ]
+                                    ]
+                ] )
+            ]
 
 viewKeyboardCells : Bool -> Bool -> List (Html Msg)
-viewKeyboardCells enabled isSolved =
-    Array.initialize 9 (\i -> viewKeyboardNumber enabled isSolved (i + 1))
+viewKeyboardCells enabled isOptions =
+    List.append
+        ( viewKeyboardNumbers enabled )
+        ( viewIcons enabled isOptions )
+
+viewKeyboardNumbers : Bool -> List (Html Msg)
+viewKeyboardNumbers enabled =
+    Array.initialize 9 (\i -> viewKeyboardNumber enabled (i + 1))
     |> Array.toList
 
-viewKeyboardNumber : Bool -> Bool -> Int -> Html Msg
-viewKeyboardNumber enabled isSolved value =
+viewKeyboardNumber : Bool -> Int -> Html Msg
+viewKeyboardNumber enabled value =
     if enabled then
-        Button.button [ Button.attrs [ class ("keyboard-cell" ++ " enabled")], Button.onClick ( ValueChanged value ) ] [ text ( String.fromInt value ) ]
+        div [ class ("keyboard-cell" ++ " enabled"),  onClick ( ValueChanged value ) ] [ text ( String.fromInt value ) ]
     else
-        Button.button [ Button.attrs [ class ("keyboard-cell" ++ " disabled")] ] [ text ( String.fromInt value ) ]
+         div [ class ("keyboard-cell" ++ " disabled") ]  [ text ( String.fromInt value ) ]
+
+
+viewIcons: Bool -> Bool -> List (Html Msg)
+viewIcons enabled isOptions =
+    [ viewIconOption enabled isOptions
+    , viewIconClear enabled
+    , viewIconHighlight enabled
+    ]
+
+viewEmpty : Html Msg
+viewEmpty =
+     div [] []
+
+viewIconOption : Bool -> Bool -> Html Msg
+viewIconOption enabled isOptions =
+    case ( enabled, isOptions ) of
+        ( True, True ) ->
+            div [ class ("keyboard-cell keyboard-cell-span3" ++ " enabled"), onClick OptionsToggled ]
+                [ Icons.maximize ]
+
+        ( True, False ) ->
+            div [ class ("keyboard-cell keyboard-cell-span3" ++ " enabled"), onClick OptionsToggled ]
+                [ Icons.minimize ]
+
+        ( False, _ ) ->
+            div [ class ("keyboard-cell keyboard-cell-span3" ++ " disabled")]
+                [ Icons.edit2 ]
+
+viewIconClear : Bool -> Html Msg
+viewIconClear enabled =
+    if enabled then
+        div [ class ("keyboard-cell keyboard-cell-span3" ++ " enabled"), onClick ValueCleared ]
+            [ Icons.x ]
+    else
+        div [ class ("keyboard-cell keyboard-cell-span3" ++ " disabled") ]
+            [ Icons.x ]
+
+viewIconHighlight : Bool -> Html Msg
+viewIconHighlight enabled =
+    if enabled then
+        div [ class ("keyboard-cell keyboard-cell-span3" ++ " enabled"), onClick HighLighted ]
+            [ Icons.sun ]
+    else
+        div [ class ("keyboard-cell keyboard-cell-span3" ++ " disabled")]
+            [ Icons.sun ]
 
 -- ####
 -- ####   HELPER
 -- #### 
-
-maybeJoin : Maybe ( Maybe a) -> Maybe a
-maybeJoin maybeMaybeA =
-    case maybeMaybeA of
-        Just (Just value) ->
-            Just value
-    
-        _ ->
-            Nothing   
-     
-
-getFrozen : Int -> Array Bool -> Bool
-getFrozen field frozens =
-    Array.get field frozens |> Maybe.withDefault False
-
-
-getCijfer : Int -> Array (Maybe Int) -> Maybe Int
-getCijfer field cijfers =
-    Array.get field cijfers |> maybeJoin
-
-
-getCijferString : Maybe Int -> String
-getCijferString maybeCijfer =
-    case maybeCijfer of
-        Just cijfer ->
-            String.fromInt cijfer
-        
-        Nothing ->
-            ""
-
-
-setField : Int -> Array Field -> Field -> Array Field
-setField fieldNumber fields field  =
-    Array.set fieldNumber field fields
-
-
-getOptions : Maybe Int -> Array (Array Int) -> Array Int
-getOptions maybeField options =
-    case maybeField of
-        Just field ->
-            Array.get field options |> Maybe.withDefault Array.empty
-
-        Nothing ->
-            Array.empty
-
-
-initOptions : Maybe Int -> Array ( Maybe Int )
-initOptions maybeValue =
-    case maybeValue of
-        Just value ->
-            Array.repeat 9 Nothing |> Array.set 0 (Just value)
-            
-        Nothing ->
-            Array.repeat 9 Nothing
-
-setOption : Int -> Int -> Array (Maybe Int) -> Array (Maybe Int)
-setOption field value options =
-    -- value present in options?
-    case Array.toList options |> List.filter (\val -> val == Just value) of
-        [] -> 
-            Array.set field (Just value) options
-
-        -- if value present :
-        _ -> 
-            options
-
-getOption : Int -> Array (Maybe Int) -> Maybe Int
-getOption field options =
-    Array.get field options |> maybeJoin
-
-clearOption : Int -> Array (Maybe Int) -> Array (Maybe Int)
-clearOption field options =
-    -- value present in options?
-    Array.set field Nothing options
-
-
-addOption : Int -> Maybe Int -> Array (Array Int) -> Array (Array Int)
-addOption field maybeCijfer optionCijfers =
-    case maybeCijfer of
-        Just cijfer ->
-            let
-                optionCijfers1 = Array.get field optionCijfers |> Maybe.withDefault Array.empty
-            in
-                -- no doubles
-                if optionCijfers1 |> Array.filter (\option -> option == cijfer) |> Array.isEmpty then
-                    Array.set field ( optionCijfers1 |> Array.push cijfer) optionCijfers
-                else
-                    optionCijfers
-        Nothing ->
-            optionCijfers
-
-
-optionsIsEmpty : Array (Maybe Int) -> Bool
-optionsIsEmpty options =
-    options |> Array.filter (\option -> option /= Nothing) |> Array.isEmpty
-
 
 generateOptions : Array Field -> Int -> Field
 generateOptions fields fieldNumber =
@@ -387,35 +422,6 @@ generateOptions fields fieldNumber =
                 |> List.take 9
                 |> Array.fromList
                 |> Options
-
-
-maybeComparison : Maybe Int -> Maybe Int -> Order
-maybeComparison maybeI maybeJ =
-    case ( maybeI, maybeJ ) of
-        ( Just i, Just j ) ->
-            compare i j
-        ( Just i, Nothing ) ->
-            LT
-        ( Nothing, Just j ) ->
-            GT
-        ( Nothing, Nothing ) ->
-            EQ
-
-
-clearFields : Array Field -> Array Field
-clearFields fields =
-    Array.map clearField fields
-
-
-clearField : Field -> Field
-clearField field =
-    case field of
-        Edit _ ->
-            Edit Nothing
-        Options _ ->
-            Edit Nothing
-        Frozen _ ->
-            field
 
 
 solved : Array Field -> Dict String (Dict (Int, Int) Bool) -> Bool

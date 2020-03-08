@@ -6720,7 +6720,7 @@ var $author$project$SudokuModel$Focus = F2(
 var $author$project$SudokuModel$Options = function (a) {
 	return {$: 'Options', a: a};
 };
-var $author$project$Sudoku$clearField = function (field) {
+var $author$project$SudokuModel$clearField = function (field) {
 	switch (field.$) {
 		case 'Edit':
 			return $author$project$SudokuModel$Edit($elm$core$Maybe$Nothing);
@@ -6755,8 +6755,8 @@ var $elm$core$Array$map = F2(
 			A2($elm$core$Elm$JsArray$map, helper, tree),
 			A2($elm$core$Elm$JsArray$map, func, tail));
 	});
-var $author$project$Sudoku$clearFields = function (fields) {
-	return A2($elm$core$Array$map, $author$project$Sudoku$clearField, fields);
+var $author$project$SudokuModel$clearFields = function (fields) {
+	return A2($elm$core$Array$map, $author$project$SudokuModel$clearField, fields);
 };
 var $elm$core$Bitwise$and = _Bitwise_and;
 var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
@@ -6810,7 +6810,7 @@ var $elm$core$Array$set = F3(
 			A4($elm$core$Array$setHelp, startShift, index, value, tree),
 			tail));
 	});
-var $author$project$Sudoku$clearOption = F2(
+var $author$project$SudokuModel$clearOption = F2(
 	function (field, options) {
 		return A3($elm$core$Array$set, field, $elm$core$Maybe$Nothing, options);
 	});
@@ -7407,7 +7407,7 @@ var $author$project$Sudoku$generateOptions = F2(
 			}
 		}
 	});
-var $author$project$Sudoku$maybeJoin = function (maybeMaybeA) {
+var $author$project$SudokuModel$maybeJoin = function (maybeMaybeA) {
 	if ((maybeMaybeA.$ === 'Just') && (maybeMaybeA.a.$ === 'Just')) {
 		var value = maybeMaybeA.a.a;
 		return $elm$core$Maybe$Just(value);
@@ -7415,9 +7415,9 @@ var $author$project$Sudoku$maybeJoin = function (maybeMaybeA) {
 		return $elm$core$Maybe$Nothing;
 	}
 };
-var $author$project$Sudoku$getOption = F2(
+var $author$project$SudokuModel$getOption = F2(
 	function (field, options) {
-		return $author$project$Sudoku$maybeJoin(
+		return $author$project$SudokuModel$maybeJoin(
 			A2($elm$core$Array$get, field, options));
 	});
 var $elm$core$Array$repeat = F2(
@@ -7429,7 +7429,7 @@ var $elm$core$Array$repeat = F2(
 				return e;
 			});
 	});
-var $author$project$Sudoku$initOptions = function (maybeValue) {
+var $author$project$SudokuModel$initOptions = function (maybeValue) {
 	if (maybeValue.$ === 'Just') {
 		var value = maybeValue.a;
 		return A3(
@@ -7547,7 +7547,7 @@ var $elm$core$Array$isEmpty = function (_v0) {
 	var len = _v0.a;
 	return !len;
 };
-var $author$project$Sudoku$optionsIsEmpty = function (options) {
+var $author$project$SudokuModel$optionsIsEmpty = function (options) {
 	return $elm$core$Array$isEmpty(
 		A2(
 			$elm$core$Array$filter,
@@ -7715,11 +7715,11 @@ var $author$project$SudokuFaults$recomputeFaults = F3(
 				}),
 			faults);
 	});
-var $author$project$Sudoku$setField = F3(
+var $author$project$SudokuModel$setField = F3(
 	function (fieldNumber, fields, field) {
 		return A3($elm$core$Array$set, fieldNumber, field, fields);
 	});
-var $author$project$Sudoku$setOption = F3(
+var $author$project$SudokuModel$setOption = F3(
 	function (field, value, options) {
 		var _v0 = A2(
 			$elm$core$List$filter,
@@ -7754,7 +7754,7 @@ var $author$project$Sudoku$update = F3(
 								var _v1 = _v0.b;
 								var fieldNumber = _v1.a;
 								var fields = A3(
-									$author$project$Sudoku$setField,
+									$author$project$SudokuModel$setField,
 									fieldNumber,
 									model.fields,
 									$author$project$SudokuModel$Edit(
@@ -7776,11 +7776,11 @@ var $author$project$Sudoku$update = F3(
 								var fieldOptionNumber = _v2.b;
 								var options = _v0.c.a.a;
 								var fields = A3(
-									$author$project$Sudoku$setField,
+									$author$project$SudokuModel$setField,
 									fieldNumber,
 									model.fields,
 									$author$project$SudokuModel$Options(
-										A3($author$project$Sudoku$setOption, fieldOptionNumber, value, options)));
+										A3($author$project$SudokuModel$setOption, fieldOptionNumber, value, options)));
 								return {
 									cmd: $elm$core$Platform$Cmd$none,
 									model: _Utils_update(
@@ -7806,11 +7806,11 @@ var $author$project$Sudoku$update = F3(
 							var fieldOptionNumber = _v4.b;
 							var options = _v0.c.a.a;
 							var fields = A3(
-								$author$project$Sudoku$setField,
+								$author$project$SudokuModel$setField,
 								fieldNumber,
 								model.fields,
 								$author$project$SudokuModel$Options(
-									A2($author$project$Sudoku$clearOption, fieldOptionNumber, options)));
+									A2($author$project$SudokuModel$clearOption, fieldOptionNumber, options)));
 							return {
 								cmd: $elm$core$Platform$Cmd$none,
 								model: _Utils_update(
@@ -7826,7 +7826,7 @@ var $author$project$Sudoku$update = F3(
 							var _v6 = _v0.b;
 							var fieldNumber = _v6.a;
 							var fields = A3(
-								$author$project$Sudoku$setField,
+								$author$project$SudokuModel$setField,
 								fieldNumber,
 								model.fields,
 								$author$project$SudokuModel$Edit($elm$core$Maybe$Nothing));
@@ -7850,8 +7850,8 @@ var $author$project$Sudoku$update = F3(
 						var _v7 = _v0.b;
 						var fieldNumberOld = _v7.a;
 						var options = _v0.c.a.a;
-						var fields = $author$project$Sudoku$optionsIsEmpty(options) ? A3(
-							$author$project$Sudoku$setField,
+						var fields = $author$project$SudokuModel$optionsIsEmpty(options) ? A3(
+							$author$project$SudokuModel$setField,
 							fieldNumberOld,
 							model.fields,
 							$author$project$SudokuModel$Edit($elm$core$Maybe$Nothing)) : model.fields;
@@ -7897,8 +7897,8 @@ var $author$project$Sudoku$update = F3(
 							var fields = function () {
 								if (focus.$ === 'Focus') {
 									var fieldNumber = focus.a;
-									return ($author$project$Sudoku$optionsIsEmpty(options) && (!_Utils_eq(fieldNumber, fieldNumberOld))) ? A3(
-										$author$project$Sudoku$setField,
+									return ($author$project$SudokuModel$optionsIsEmpty(options) && (!_Utils_eq(fieldNumber, fieldNumberOld))) ? A3(
+										$author$project$SudokuModel$setField,
 										fieldNumberOld,
 										model.fields,
 										$author$project$SudokuModel$Edit($elm$core$Maybe$Nothing)) : model.fields;
@@ -7939,11 +7939,11 @@ var $author$project$Sudoku$update = F3(
 								var fieldNumber = _v11.a;
 								var maybeValue = _v0.c.a.a;
 								var fields = A3(
-									$author$project$Sudoku$setField,
+									$author$project$SudokuModel$setField,
 									fieldNumber,
 									model.fields,
 									$author$project$SudokuModel$Options(
-										$author$project$Sudoku$initOptions(maybeValue)));
+										$author$project$SudokuModel$initOptions(maybeValue)));
 								return {
 									cmd: $elm$core$Platform$Cmd$none,
 									model: _Utils_update(
@@ -7962,11 +7962,11 @@ var $author$project$Sudoku$update = F3(
 								var fieldOptionNumber = _v13.b;
 								var options = _v0.c.a.a;
 								var fields = A3(
-									$author$project$Sudoku$setField,
+									$author$project$SudokuModel$setField,
 									fieldNumber,
 									model.fields,
 									$author$project$SudokuModel$Edit(
-										A2($author$project$Sudoku$getOption, fieldOptionNumber, options)));
+										A2($author$project$SudokuModel$getOption, fieldOptionNumber, options)));
 								return {
 									cmd: $elm$core$Platform$Cmd$none,
 									model: _Utils_update(
@@ -8082,7 +8082,7 @@ var $author$project$Sudoku$update = F3(
 								var _v20 = _v0.b;
 								var fieldNumber = _v20.a;
 								var fields = A3(
-									$author$project$Sudoku$setField,
+									$author$project$SudokuModel$setField,
 									fieldNumber,
 									model.fields,
 									A2($author$project$Sudoku$generateOptions, model.fields, fieldNumber));
@@ -8105,7 +8105,7 @@ var $author$project$Sudoku$update = F3(
 								var _v22 = _v0.b;
 								var fieldNumber = _v22.a;
 								var fields = A3(
-									$author$project$Sudoku$setField,
+									$author$project$SudokuModel$setField,
 									fieldNumber,
 									model.fields,
 									A2($author$project$Sudoku$generateOptions, model.fields, fieldNumber));
@@ -8137,7 +8137,7 @@ var $author$project$Sudoku$update = F3(
 							model,
 							{
 								faults: $author$project$SudokuFaults$initFaults,
-								fields: $author$project$Sudoku$clearFields(model.fields),
+								fields: $author$project$SudokuModel$clearFields(model.fields),
 								focus: $author$project$SudokuModel$FocusBlurred,
 								highlight: $elm$core$Maybe$Nothing
 							}),
@@ -8555,18 +8555,175 @@ var $author$project$Sudoku$viewExplanations = A2(
 						]))
 				]))
 		]));
-var $author$project$Sudoku$viewKeyboardNumber = F3(
-	function (enabled, isSolved, value) {
-		return enabled ? A2(
-			$rundis$elm_bootstrap$Bootstrap$Button$button,
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+};
+var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
+var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
+var $elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
+var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
+var $elm$svg$Svg$Attributes$d = _VirtualDom_attribute('d');
+var $elm$svg$Svg$path = $elm$svg$Svg$trustedNode('path');
+var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
+var $elm$svg$Svg$Attributes$class = _VirtualDom_attribute('class');
+var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
+var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
+var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
+var $elm$svg$Svg$Attributes$strokeLinecap = _VirtualDom_attribute('stroke-linecap');
+var $elm$svg$Svg$Attributes$strokeLinejoin = _VirtualDom_attribute('stroke-linejoin');
+var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
+var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
+var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
+var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
+var $author$project$Icons$svgFeatherIcon = function (className) {
+	return $elm$svg$Svg$svg(
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$class('feather feather-' + className),
+				$elm$svg$Svg$Attributes$fill('none'),
+				$elm$svg$Svg$Attributes$height('24'),
+				$elm$svg$Svg$Attributes$stroke('currentColor'),
+				$elm$svg$Svg$Attributes$strokeLinecap('round'),
+				$elm$svg$Svg$Attributes$strokeLinejoin('round'),
+				$elm$svg$Svg$Attributes$strokeWidth('2'),
+				$elm$svg$Svg$Attributes$viewBox('0 0 24 24'),
+				$elm$svg$Svg$Attributes$width('24')
+			]));
+};
+var $author$project$Icons$eye = A2(
+	$author$project$Icons$svgFeatherIcon,
+	'eye',
+	_List_fromArray(
+		[
+			A2(
+			$elm$svg$Svg$path,
 			_List_fromArray(
 				[
-					$rundis$elm_bootstrap$Bootstrap$Button$attrs(
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('keyboard-cell' + ' enabled')
-						])),
-					$rundis$elm_bootstrap$Bootstrap$Button$onClick(
+					$elm$svg$Svg$Attributes$d('M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z')
+				]),
+			_List_Nil),
+			A2(
+			$elm$svg$Svg$circle,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$cx('12'),
+					$elm$svg$Svg$Attributes$cy('12'),
+					$elm$svg$Svg$Attributes$r('3')
+				]),
+			_List_Nil)
+		]));
+var $elm$svg$Svg$line = $elm$svg$Svg$trustedNode('line');
+var $elm$svg$Svg$Attributes$x1 = _VirtualDom_attribute('x1');
+var $elm$svg$Svg$Attributes$x2 = _VirtualDom_attribute('x2');
+var $elm$svg$Svg$Attributes$y1 = _VirtualDom_attribute('y1');
+var $elm$svg$Svg$Attributes$y2 = _VirtualDom_attribute('y2');
+var $author$project$Icons$eyeOff = A2(
+	$author$project$Icons$svgFeatherIcon,
+	'eye-off',
+	_List_fromArray(
+		[
+			A2(
+			$elm$svg$Svg$path,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$d('M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24')
+				]),
+			_List_Nil),
+			A2(
+			$elm$svg$Svg$line,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$x1('1'),
+					$elm$svg$Svg$Attributes$y1('1'),
+					$elm$svg$Svg$Attributes$x2('23'),
+					$elm$svg$Svg$Attributes$y2('23')
+				]),
+			_List_Nil)
+		]));
+var $author$project$SudokuModel$focusToFieldOption = function (focus) {
+	if (focus.$ === 'FocusBlurred') {
+		return $elm$core$Maybe$Nothing;
+	} else {
+		var fieldOption = focus.b;
+		return $elm$core$Maybe$Just(fieldOption);
+	}
+};
+var $author$project$SudokuModel$focusToFieldValue = F2(
+	function (fields, focus) {
+		var _v0 = A2($author$project$SudokuModel$focusToField, fields, focus);
+		if (_v0.$ === 'Just') {
+			switch (_v0.a.$) {
+				case 'Edit':
+					var maybeValue = _v0.a.a;
+					return maybeValue;
+				case 'Frozen':
+					var value = _v0.a.a;
+					return $elm$core$Maybe$Just(value);
+				default:
+					var options = _v0.a.a;
+					var _v1 = $author$project$SudokuModel$focusToFieldOption(focus);
+					if (_v1.$ === 'Just') {
+						var value = _v1.a;
+						return $author$project$SudokuModel$maybeJoin(
+							A2($elm$core$Array$get, value, options));
+					} else {
+						return $elm$core$Maybe$Nothing;
+					}
+			}
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $author$project$Icons$maximize = A2(
+	$author$project$Icons$svgFeatherIcon,
+	'maximize',
+	_List_fromArray(
+		[
+			A2(
+			$elm$svg$Svg$path,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$d('M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3')
+				]),
+			_List_Nil)
+		]));
+var $author$project$Icons$minimize = A2(
+	$author$project$Icons$svgFeatherIcon,
+	'minimize',
+	_List_fromArray(
+		[
+			A2(
+			$elm$svg$Svg$path,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$d('M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3')
+				]),
+			_List_Nil)
+		]));
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
+var $author$project$Sudoku$viewKeyboardNumber = F2(
+	function (enabled, value) {
+		return enabled ? A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('keyboard-cell' + ' enabled'),
+					$elm$html$Html$Events$onClick(
 					$author$project$Sudoku$ValueChanged(value))
 				]),
 			_List_fromArray(
@@ -8574,14 +8731,10 @@ var $author$project$Sudoku$viewKeyboardNumber = F3(
 					$elm$html$Html$text(
 					$elm$core$String$fromInt(value))
 				])) : A2(
-			$rundis$elm_bootstrap$Bootstrap$Button$button,
+			$elm$html$Html$div,
 			_List_fromArray(
 				[
-					$rundis$elm_bootstrap$Bootstrap$Button$attrs(
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('keyboard-cell' + ' disabled')
-						]))
+					$elm$html$Html$Attributes$class('keyboard-cell' + ' disabled')
 				]),
 			_List_fromArray(
 				[
@@ -8589,35 +8742,277 @@ var $author$project$Sudoku$viewKeyboardNumber = F3(
 					$elm$core$String$fromInt(value))
 				]));
 	});
-var $author$project$Sudoku$viewKeyboardCells = F2(
-	function (enabled, isSolved) {
-		return $elm$core$Array$toList(
+var $author$project$Sudoku$viewKeyboardNumbers = function (enabled) {
+	return $elm$core$Array$toList(
+		A2(
+			$elm$core$Array$initialize,
+			9,
+			function (i) {
+				return A2($author$project$Sudoku$viewKeyboardNumber, enabled, i + 1);
+			}));
+};
+var $author$project$Icons$x = A2(
+	$author$project$Icons$svgFeatherIcon,
+	'x',
+	_List_fromArray(
+		[
 			A2(
-				$elm$core$Array$initialize,
-				9,
-				function (i) {
-					return A3($author$project$Sudoku$viewKeyboardNumber, enabled, isSolved, i + 1);
-				}));
-	});
-var $author$project$Sudoku$viewKeyboard = F2(
-	function (focusField, isSolved) {
-		if ((focusField.$ === 'Just') && (focusField.a.$ === 'Edit')) {
-			return A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('keyboard')
-					]),
-				A2($author$project$Sudoku$viewKeyboardCells, true, isSolved));
-		} else {
-			return A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('keyboard')
-					]),
-				A2($author$project$Sudoku$viewKeyboardCells, false, isSolved));
-		}
+			$elm$svg$Svg$line,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$x1('18'),
+					$elm$svg$Svg$Attributes$y1('6'),
+					$elm$svg$Svg$Attributes$x2('6'),
+					$elm$svg$Svg$Attributes$y2('18')
+				]),
+			_List_Nil),
+			A2(
+			$elm$svg$Svg$line,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$x1('6'),
+					$elm$svg$Svg$Attributes$y1('6'),
+					$elm$svg$Svg$Attributes$x2('18'),
+					$elm$svg$Svg$Attributes$y2('18')
+				]),
+			_List_Nil)
+		]));
+var $author$project$Sudoku$viewKeyboard = F3(
+	function (fields, focus, maybeHighlightValue) {
+		var maybeValue = A2($author$project$SudokuModel$focusToFieldValue, fields, focus);
+		var maybeField = A2($author$project$SudokuModel$focusToField, fields, focus);
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('keyboard-container')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('keyboard-grid')
+						]),
+					$elm$core$List$concat(
+						_List_fromArray(
+							[
+								function () {
+								_v0$2:
+								while (true) {
+									if (maybeField.$ === 'Just') {
+										switch (maybeField.a.$) {
+											case 'Edit':
+												return $author$project$Sudoku$viewKeyboardNumbers(true);
+											case 'Options':
+												return $author$project$Sudoku$viewKeyboardNumbers(true);
+											default:
+												break _v0$2;
+										}
+									} else {
+										break _v0$2;
+									}
+								}
+								return $author$project$Sudoku$viewKeyboardNumbers(false);
+							}(),
+								function () {
+								_v1$2:
+								while (true) {
+									if (maybeField.$ === 'Just') {
+										switch (maybeField.a.$) {
+											case 'Edit':
+												return _List_fromArray(
+													[
+														A2(
+														$elm$html$Html$div,
+														_List_fromArray(
+															[
+																$elm$html$Html$Attributes$class('keyboard-cell keyboard-cell-span3' + ' enabled'),
+																$elm$html$Html$Events$onClick($author$project$Sudoku$OptionsToggled)
+															]),
+														_List_fromArray(
+															[$author$project$Icons$minimize]))
+													]);
+											case 'Options':
+												return _List_fromArray(
+													[
+														A2(
+														$elm$html$Html$div,
+														_List_fromArray(
+															[
+																$elm$html$Html$Attributes$class('keyboard-cell keyboard-cell-span3' + ' enabled'),
+																$elm$html$Html$Events$onClick($author$project$Sudoku$OptionsToggled)
+															]),
+														_List_fromArray(
+															[$author$project$Icons$maximize]))
+													]);
+											default:
+												break _v1$2;
+										}
+									} else {
+										break _v1$2;
+									}
+								}
+								return _List_fromArray(
+									[
+										A2(
+										$elm$html$Html$div,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('keyboard-cell keyboard-cell-span3' + ' disabled')
+											]),
+										_List_fromArray(
+											[$author$project$Icons$minimize]))
+									]);
+							}(),
+								function () {
+								var _v2 = _Utils_Tuple2(maybeField, maybeValue);
+								_v2$2:
+								while (true) {
+									if ((_v2.a.$ === 'Just') && (_v2.b.$ === 'Just')) {
+										switch (_v2.a.a.$) {
+											case 'Edit':
+												var value = _v2.b.a;
+												return _List_fromArray(
+													[
+														A2(
+														$elm$html$Html$div,
+														_List_fromArray(
+															[
+																$elm$html$Html$Attributes$class('keyboard-cell keyboard-cell-span3' + ' enabled'),
+																$elm$html$Html$Events$onClick($author$project$Sudoku$ValueCleared)
+															]),
+														_List_fromArray(
+															[$author$project$Icons$x]))
+													]);
+											case 'Options':
+												var value = _v2.b.a;
+												return _List_fromArray(
+													[
+														A2(
+														$elm$html$Html$div,
+														_List_fromArray(
+															[
+																$elm$html$Html$Attributes$class('keyboard-cell keyboard-cell-span3' + ' enabled'),
+																$elm$html$Html$Events$onClick($author$project$Sudoku$ValueCleared)
+															]),
+														_List_fromArray(
+															[$author$project$Icons$x]))
+													]);
+											default:
+												break _v2$2;
+										}
+									} else {
+										break _v2$2;
+									}
+								}
+								return _List_fromArray(
+									[
+										A2(
+										$elm$html$Html$div,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('keyboard-cell keyboard-cell-span3' + ' disabled')
+											]),
+										_List_fromArray(
+											[$author$project$Icons$x]))
+									]);
+							}(),
+								function () {
+								if ((maybeField.$ === 'Just') && (maybeField.a.$ === 'Options')) {
+									return _List_fromArray(
+										[
+											A2(
+											$elm$html$Html$div,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('keyboard-cell keyboard-cell-span3' + ' disabled')
+												]),
+											_List_fromArray(
+												[$author$project$Icons$eye]))
+										]);
+								} else {
+									var _v4 = _Utils_Tuple2(maybeHighlightValue, maybeValue);
+									if (_v4.a.$ === 'Just') {
+										if (_v4.b.$ === 'Just') {
+											var highlightValue = _v4.a.a;
+											var value = _v4.b.a;
+											return _Utils_eq(highlightValue, value) ? _List_fromArray(
+												[
+													A2(
+													$elm$html$Html$div,
+													_List_fromArray(
+														[
+															$elm$html$Html$Attributes$class('keyboard-cell keyboard-cell-span3' + ' enabled'),
+															$elm$html$Html$Events$onClick($author$project$Sudoku$HighLighted)
+														]),
+													_List_fromArray(
+														[$author$project$Icons$eyeOff]))
+												]) : _List_fromArray(
+												[
+													A2(
+													$elm$html$Html$div,
+													_List_fromArray(
+														[
+															$elm$html$Html$Attributes$class('keyboard-cell keyboard-cell-span3' + ' enabled'),
+															$elm$html$Html$Events$onClick($author$project$Sudoku$HighLighted)
+														]),
+													_List_fromArray(
+														[$author$project$Icons$eye]))
+												]);
+										} else {
+											var value = _v4.a.a;
+											var _v5 = _v4.b;
+											return _List_fromArray(
+												[
+													A2(
+													$elm$html$Html$div,
+													_List_fromArray(
+														[
+															$elm$html$Html$Attributes$class('keyboard-cell keyboard-cell-span3' + ' enabled'),
+															$elm$html$Html$Events$onClick($author$project$Sudoku$HighLighted)
+														]),
+													_List_fromArray(
+														[$author$project$Icons$eyeOff]))
+												]);
+										}
+									} else {
+										if (_v4.b.$ === 'Just') {
+											var _v6 = _v4.a;
+											var value = _v4.b.a;
+											return _List_fromArray(
+												[
+													A2(
+													$elm$html$Html$div,
+													_List_fromArray(
+														[
+															$elm$html$Html$Attributes$class('keyboard-cell keyboard-cell-span3' + ' enabled'),
+															$elm$html$Html$Events$onClick($author$project$Sudoku$HighLighted)
+														]),
+													_List_fromArray(
+														[$author$project$Icons$eye]))
+												]);
+										} else {
+											var _v7 = _v4.a;
+											var _v8 = _v4.b;
+											return _List_fromArray(
+												[
+													A2(
+													$elm$html$Html$div,
+													_List_fromArray(
+														[
+															$elm$html$Html$Attributes$class('keyboard-cell keyboard-cell-span3' + ' disabled')
+														]),
+													_List_fromArray(
+														[$author$project$Icons$eye]))
+												]);
+										}
+									}
+								}
+							}()
+							])))
+				]));
 	});
 var $author$project$Sudoku$viewMessage = function (isSolved) {
 	return isSolved ? A2(
@@ -8666,14 +9061,14 @@ var $author$project$Sudoku$getCellClasses = F3(
 		var isFault = _v0.isFault;
 		var isSolved = _v0.isSolved;
 		return $elm$html$Html$Attributes$class(
-			'cell' + (' ' + (css + (' ' + (function () {
+			'sudoku-cell' + (' ' + (css + (' ' + (function () {
 				switch (field.$) {
 					case 'Frozen':
 						return 'frozen';
 					case 'Edit':
 						return 'edit';
 					default:
-						return 'options';
+						return 'sudoku-options-grid';
 				}
 			}() + (' ' + ((isFocus ? 'focus' : '') + (' ' + ((isFault ? 'fault' : '') + (' ' + ((isHighlight ? 'highlight' : '') + (' ' + (isSolved ? ('animation' + $elm$core$String$fromInt(value)) : '')))))))))))));
 	});
@@ -8710,22 +9105,6 @@ var $author$project$SudokuModel$modelToField = F2(
 			$author$project$SudokuModel$Frozen(0),
 			A2($elm$core$Array$get, field, fields));
 	});
-var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
-};
-var $elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$Normal(decoder));
-	});
-var $elm$html$Html$Events$onClick = function (msg) {
-	return A2(
-		$elm$html$Html$Events$on,
-		'click',
-		$elm$json$Json$Decode$succeed(msg));
-};
 var $author$project$Sudoku$OptionFocusChanged = F2(
 	function (a, b) {
 		return {$: 'OptionFocusChanged', a: a, b: b};
@@ -8733,7 +9112,7 @@ var $author$project$Sudoku$OptionFocusChanged = F2(
 var $author$project$Sudoku$getOptionClasses = F3(
 	function (optionNumber, isFocus, isFault) {
 		return $elm$html$Html$Attributes$class(
-			'option' + (' ' + ('option' + ($elm$core$String$fromInt(optionNumber) + ((isFocus ? ' focus' : '') + (isFault ? ' fault' : ''))))));
+			'sudoku-option-cell' + (' ' + ('option' + ($elm$core$String$fromInt(optionNumber) + ((isFocus ? ' focus' : '') + (isFault ? ' fault' : ''))))));
 	});
 var $author$project$SudokuFaults$getOptionFault = F3(
 	function (fieldNumber, optionNumber, faults) {
@@ -8754,7 +9133,7 @@ var $author$project$SudokuFaults$getOptionFault = F3(
 	});
 var $author$project$Sudoku$viewOption = F5(
 	function (options, faults, focus, fieldNumber, optionNumber) {
-		var option = $author$project$Sudoku$maybeJoin(
+		var option = $author$project$SudokuModel$maybeJoin(
 			A2($elm$core$Array$get, optionNumber, options));
 		var isFocus = _Utils_eq(
 			focus,
@@ -8937,7 +9316,7 @@ var $author$project$Sudoku$viewCell = F3(
 					$elm$html$Html$div,
 					_List_fromArray(
 						[
-							$elm$html$Html$Attributes$class(borders + ' options')
+							$elm$html$Html$Attributes$class(borders + ' sudoku-options-grid')
 						]),
 					A4($author$project$Sudoku$viewOptions, options, model.faults, focus1, fieldNumber));
 		}
@@ -8956,7 +9335,7 @@ var $author$project$Sudoku$viewSudoku = F2(
 			$elm$html$Html$div,
 			_List_fromArray(
 				[
-					$elm$html$Html$Attributes$class('center-sudoku')
+					$elm$html$Html$Attributes$class('sudoku-container')
 				]),
 			_List_fromArray(
 				[
@@ -8964,7 +9343,7 @@ var $author$project$Sudoku$viewSudoku = F2(
 					$elm$html$Html$div,
 					_List_fromArray(
 						[
-							$elm$html$Html$Attributes$class('sudoku')
+							$elm$html$Html$Attributes$class('sudoku-grid')
 						]),
 					A2($author$project$Sudoku$viewCells, model, isSolved))
 				]));
@@ -8983,10 +9362,7 @@ var $author$project$Sudoku$view = function (model) {
 				A2($author$project$Sudoku$viewSudoku, model, isSolved),
 				$author$project$Sudoku$viewMessage(isSolved),
 				$author$project$Sudoku$viewButtons,
-				A2(
-				$author$project$Sudoku$viewKeyboard,
-				A2($author$project$SudokuModel$focusToField, model.fields, model.focus),
-				isSolved)
+				A3($author$project$Sudoku$viewKeyboard, model.fields, model.focus, model.highlight)
 			]));
 };
 var $author$project$Main$view = function (model) {

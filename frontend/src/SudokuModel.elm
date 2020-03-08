@@ -79,9 +79,6 @@ focusToFieldOption focus =
         FocusBlurred ->
             Nothing
         
-        Focus _ 0 ->
-            Nothing
-
         Focus _ fieldOption ->
             Just fieldOption
 
@@ -97,6 +94,27 @@ focusOnField focus fieldNumber =
                 Focus focusFieldNumber focusFieldOptionNumber
             else
                 FocusBlurred
+
+focusToFieldValue : Array Field -> Focus -> Maybe Int
+focusToFieldValue fields focus =
+    case focusToField fields focus of
+        Just (Edit maybeValue) ->
+            maybeValue
+
+        Just (Frozen value) ->
+            Just value
+
+        Just (Options options) ->
+            case focusToFieldOption focus of
+                Just value ->
+                    Array.get value options |> maybeJoin
+                _ ->
+                    Nothing
+
+        Nothing ->
+            Nothing
+
+
 
 
 isHighlighted : Maybe Int -> Int -> Bool
@@ -127,3 +145,72 @@ fieldFilledOut field filled =
             True
         Options _ ->
             False
+
+
+-- ####
+-- ####   HELPER
+-- ####
+
+maybeJoin : Maybe ( Maybe a) -> Maybe a
+maybeJoin maybeMaybeA =
+    case maybeMaybeA of
+        Just (Just value) ->
+            Just value
+
+        _ ->
+            Nothing
+
+
+setField : Int -> Array Field -> Field -> Array Field
+setField fieldNumber fields field  =
+    Array.set fieldNumber field fields
+
+
+initOptions : Maybe Int -> Array ( Maybe Int )
+initOptions maybeValue =
+    case maybeValue of
+        Just value ->
+            Array.repeat 9 Nothing |> Array.set 0 (Just value)
+
+        Nothing ->
+            Array.repeat 9 Nothing
+
+setOption : Int -> Int -> Array (Maybe Int) -> Array (Maybe Int)
+setOption field value options =
+    -- value present in options?
+    case Array.toList options |> List.filter (\val -> val == Just value) of
+        [] ->
+            Array.set field (Just value) options
+
+        -- if value present :
+        _ ->
+            options
+
+getOption : Int -> Array (Maybe Int) -> Maybe Int
+getOption field options =
+    Array.get field options |> maybeJoin
+
+clearOption : Int -> Array (Maybe Int) -> Array (Maybe Int)
+clearOption field options =
+    -- value present in options?
+    Array.set field Nothing options
+
+
+optionsIsEmpty : Array (Maybe Int) -> Bool
+optionsIsEmpty options =
+    options |> Array.filter (\option -> option /= Nothing) |> Array.isEmpty
+
+clearFields : Array Field -> Array Field
+clearFields fields =
+    Array.map clearField fields
+
+clearField : Field -> Field
+clearField field =
+    case field of
+        Edit _ ->
+            Edit Nothing
+        Options _ ->
+            Edit Nothing
+        Frozen _ ->
+            field
+
