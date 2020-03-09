@@ -56,15 +56,14 @@ view model =
         div [ class "center" ]
             [ viewExplanations
              , viewSudoku model isSolved
-             , viewMessage isSolved
              , viewButtons
              , viewKeyboard model.fields model.focus model.highlight
             ]
 
 viewExplanations : Html Msg
 viewExplanations =
-    div [ class "center-explanations"]
-        [ div [ class "alert alert-warning alert-dismissible fade show" ]
+    div [ class "explanations-container"]
+        [ div [ class "explanations-text" ]
             [ viewExplainItem [ viewExplainStrong ("navigate"), viewExplainText ( " - use the arrow keys to navigate through the grid." ) ]
             , viewExplainItem [ viewExplainStrong ("edit"), viewExplainText ( " - a number, backspace, space, delete changes the value in a cell." ) ]
             , viewExplainItem
@@ -92,19 +91,10 @@ viewExplainItem : List(Html Msg) -> Html Msg
 viewExplainItem items =
     div [] items
 
-viewMessage : Bool -> Html Msg
-viewMessage isSolved =
-    if isSolved then
-        div [ class "center-message" ]
-            [ text "Congratulations! Try a new one?" ]
-    else
-        div [ class "center-message" ]
-            [ text "" ]
-
 
 viewButtons : Html Msg
 viewButtons =
-        div [ class "center-buttons" ]
+        div [ class "buttons-container" ]
             [ Button.button [ Button.attrs [ class "button" ], Button.onClick ButtonNew ] [ text "New Quiz" ]
             , Button.button [ Button.attrs [ class "button" ], Button.onClick ButtonClear ] [ text "Clear" ]
             ]
@@ -520,10 +510,11 @@ update : Msg -> Model -> Session -> { model : Model, session : Session, cmd : Cm
 update msg model session =
     let
         focusField = focusToField model.fields model.focus
+        isSolved = solved model.fields model.faults
         -- focusOptionField = focusToFieldOption model.focus
     in
-        case ( msg, model.focus, focusField ) of
-            ( ValueChanged value, Focus fieldNumber _, Just (Edit _ )) ->
+        case ( isSolved, ( msg, model.focus, focusField )) of
+            ( False, (ValueChanged value, Focus fieldNumber _, Just (Edit _ ))) ->
                 let
                     fields = Edit (Just value) |> setField fieldNumber model.fields
                 in
@@ -537,7 +528,7 @@ update msg model session =
                     }
 
             -- Option changed value
-            ( ValueChanged value, Focus fieldNumber fieldOptionNumber, Just (Options options) ) ->
+            ( False, ( ValueChanged value, Focus fieldNumber fieldOptionNumber, Just (Options options) )) ->
                 let
                     fields = setOption fieldOptionNumber value options |> Options |> setField fieldNumber model.fields
                 in
@@ -551,7 +542,7 @@ update msg model session =
                     , cmd = Cmd.none
                     }
 
-            ( ValueCleared, Focus fieldNumber fieldOptionNumber, Just(Options options) ) ->
+            ( False, ( ValueCleared, Focus fieldNumber fieldOptionNumber, Just(Options options) )) ->
                 let
                     fields = clearOption fieldOptionNumber options |> Options |> setField fieldNumber model.fields
                 in
@@ -564,7 +555,7 @@ update msg model session =
                     , cmd = Cmd.none
                     }
 
-            ( ValueCleared, Focus fieldNumber _, _ ) ->
+            ( False, ( ValueCleared, Focus fieldNumber _, _ )) ->
                 let
                     fields = Edit Nothing |> setField fieldNumber model.fields
                 in
@@ -578,7 +569,7 @@ update msg model session =
                     }
             
 
-            ( FocusChanged fieldNumber, Focus fieldNumberOld _, Just (Options options) ) ->
+            ( False, ( FocusChanged fieldNumber, Focus fieldNumberOld _, Just (Options options) )) ->
                 --when leaving an empty Options field, change it to Editfield
                 let
                     fields =
@@ -596,7 +587,7 @@ update msg model session =
                     , cmd = Cmd.none
                     }
 
-            ( FocusChanged fieldNumber, _, _ ) ->
+            ( False, ( FocusChanged fieldNumber, _, _ )) ->
                 { model =
                     { model
                     | focus = fieldNumberToFocus model.fields (fieldNumber, 0)
@@ -605,7 +596,7 @@ update msg model session =
                 , cmd = Cmd.none
                 }
 
-            ( MovedFocus dir, Focus fieldNumberOld fieldNumberOptionOld, Just (Options options) ) ->
+            ( False, ( MovedFocus dir, Focus fieldNumberOld fieldNumberOptionOld, Just (Options options) )) ->
                 --when leaving an empty Options field, change it to Editfield
                 let
                     oldfocus = Focus fieldNumberOld fieldNumberOptionOld
@@ -630,7 +621,7 @@ update msg model session =
                     , cmd = Cmd.none
                     }
 
-            ( MovedFocus dir, focus, Just field ) ->
+            ( False, ( MovedFocus dir, focus, Just field )) ->
                 { model =
                     { model
                     | focus = moveFocus field focus dir model.fields
@@ -639,7 +630,7 @@ update msg model session =
                 , cmd = Cmd.none
                 }
 
-            ( OptionsToggled, Focus fieldNumber _, Just (Edit maybeValue) ) ->
+            ( False, ( OptionsToggled, Focus fieldNumber _, Just (Edit maybeValue) )) ->
                 let
                     fields = initOptions maybeValue |> Options |> setField fieldNumber model.fields
                 in
@@ -653,7 +644,7 @@ update msg model session =
                     , cmd = Cmd.none
                     }
 
-            ( OptionsToggled, Focus fieldNumber fieldOptionNumber, Just (Options options) ) ->
+            ( False, ( OptionsToggled, Focus fieldNumber fieldOptionNumber, Just (Options options) )) ->
                 let
                     fields = Edit (getOption fieldOptionNumber options ) |> setField fieldNumber model.fields
                 in
@@ -667,7 +658,7 @@ update msg model session =
                     , cmd = Cmd.none
                     }
 
-            ( OptionFocusChanged fieldNumber optionFieldNumber, _, _ ) ->
+            ( False, ( OptionFocusChanged fieldNumber optionFieldNumber, _, _ )) ->
                 { model = 
                     { model 
                     | focus = Focus fieldNumber optionFieldNumber
@@ -689,7 +680,7 @@ update msg model session =
         --     , cmd = Cmd.none
         --     }
 
-            ( SudokuQuizReceived sudokuQuizWebData, _, _ ) ->
+            (_, ( SudokuQuizReceived sudokuQuizWebData, _, _ )) ->
                 case sudokuQuizWebData of
                     RemoteData.Success sudokuQuiz ->
                         { model = 
@@ -714,7 +705,7 @@ update msg model session =
                     _ ->
                         { model = model, session = session, cmd = Cmd.none }
 
-            ( HighLighted, _, Just (Edit maybeValue)) ->
+            ( False, ( HighLighted, _, Just (Edit maybeValue))) ->
                 if model.highlight == maybeValue then
                     { model =
                         { model
@@ -730,7 +721,7 @@ update msg model session =
                         , session = session, cmd = Cmd.none
                     }
 
-            ( HighLighted, _, Just (Frozen value)) ->
+            ( False, ( HighLighted, _, Just (Frozen value))) ->
                 if model.highlight == Just value then
                     { model =
                         { model
@@ -746,7 +737,7 @@ update msg model session =
                         , session = session, cmd = Cmd.none
                     }
 
-            ( Possibilities, Focus fieldNumber _, Just (Edit _) ) ->
+            ( False, ( Possibilities, Focus fieldNumber _, Just (Edit _) )) ->
                 let
                     fields = generateOptions model.fields fieldNumber |> setField fieldNumber model.fields
                 in
@@ -760,7 +751,7 @@ update msg model session =
                     , cmd = Cmd.none
                     }
 
-            ( Possibilities, Focus fieldNumber _, Just (Options _) ) ->
+            ( False, ( Possibilities, Focus fieldNumber _, Just (Options _) )) ->
                 let
                     fields = generateOptions model.fields fieldNumber |> setField fieldNumber model.fields
                 in
@@ -774,7 +765,7 @@ update msg model session =
                     , cmd = Cmd.none
                     }
 
-            ( ButtonClear, _, _ ) ->
+            ( _, ( ButtonClear, _, _ )) ->
                 { model =
                     { model
                     | fields = clearFields model.fields
@@ -786,7 +777,7 @@ update msg model session =
                     , cmd = Cmd.none
                     }
 
-            ( ButtonNew, _, _ ) ->
+            (_, ( ButtonNew, _, _ )) ->
                 let
                     ( model1, cmd ) = init session
                 in
@@ -795,7 +786,7 @@ update msg model session =
                     , cmd = cmd
                     }
 
-            ( _, _, _ ) ->
+            ( _, (_, _, _ )) ->
                 { model = model, session = session, cmd = Cmd.none }
 
 

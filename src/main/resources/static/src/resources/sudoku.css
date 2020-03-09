@@ -9,10 +9,7 @@
     --color-fault: hsl(20, 100%, 50%);
     --color-fault-dark: hsl(20, 70%, 50%);
 }
-div.center-explanations{
-    display: none;
-}
-div.center-message {
+div.explanations-container{
     display: none;
 }
 
@@ -30,39 +27,37 @@ div.sudoku-grid {
     height: 100vw;
 }
 div.sudoku-cell {
-  grid-column: span 3;
-  grid-row: span 3;
-  border: .2vw solid black;
-  text-align: center;
-  font-size: 5vw;
-  width: 11.1vw;
-  line-height: 11.1vw;
+    grid-column: span 3;
+    grid-row: span 3;
+    border: .2vw solid black;
+    text-align: center;
+    font-size: 5vw;
+    width: 11.1vw;
+    line-height: 11.1vw;
 }
 div.sudoku-options-grid {
-  border: .2vw solid black;
-  display: grid;
-  grid-column: span 3;
-  grid-row: span 3;
-  grid-template-columns: repeat (3, 1fr);
-  grid-template-rows: repeat (3, auto);
+    border: .2vw solid black;
+    display: grid;
+    grid-column: span 3;
+    grid-row: span 3;
+    grid-template-columns: repeat (3, 1fr);
+    grid-template-rows: repeat (3, auto);
 }
 div.sudoku-option-cell {
-  font-size: 3vw;
-  line-height: 3.5vw;
-  text-align: center;
+    font-size: 3vw;
+    line-height: 3.5vw;
+    text-align: center;
 }
 
-div.center-buttons{
-  position:absolute;
-  display:block;
-  width:80vw;
-  left:50%;
-  top:2vw;
-  margin-top: 2vw;
-  margin-left:-40vw;
-
-  display: flex;
-  justify-content: space-between;
+div.buttons-container{
+    position:absolute;
+    display:block;
+    width:80vw;
+    left:50%;
+    top:2vw;
+    margin-left:-40vw;
+    justify-content: space-between;
+    display: flex;
 }
 button.button {
     color: var(--color-text);
@@ -72,7 +67,7 @@ button.button {
     text-align: center;
     vertical-align: middle;
     padding: 1vw 1vw;
-    font-size: 4vw;
+    font-size: 3vw;
     border-radius: 1vw
 }
 
@@ -96,9 +91,10 @@ div.keyboard-cell {
     grid-column: span 1;
     grid-row: span 1;
     text-align: center;
-    font-size: 5vw;
+    font-size: 4vw;
     width: 8vw;
     line-height: 8vw;
+    justify-self: center;
 
     background-color: var(--color-background-info);
 
@@ -123,14 +119,104 @@ div.disabled {
     color: var(--color-text-disabled);
 }
 
-@media (min-width: 600px)
+/* mobile landscape */
+@media (max-height:600px) and (min-width: 900px)
 {
-    div.center-explanations{
+    div.sudoku-container{
+        width: 100vh;
+        height: 100vh;
+        margin-top: 0;
+        margin-left: calc(100vw /2 - 50vh);
+    }
+    div.buttons-container{
+        width: 30vh;
+        left: 5vh;
+        margin-left: 0;
+        height: 80vh;
+        width: 20vh;
+        top: 20vh;
+        display: block;
+    }
+    button.button {
+        color: var(--color-text);
+        background-color: var(--color-background-info);
+        display: inline-block;
+        width: 20vh;
+        text-align: center;
+        vertical-align: middle;
+        padding: 1vh 1vh;
+        font-size: 3vh;
+        border-radius: 1vh;
+        margin-bottom: 20vh;
+    }
+    div.sudoku-grid {
+        width: 100vh;
+        height: 100vh;
+    }
+    div.sudoku-cell {
+        border: .2vh solid black;
+        font-size: 5vh;
+        width: 11.1vh;
+        line-height: 11.1vh;
+    }
+    div.sudoku-options-grid {
+        border: .2vh solid black;
+    }
+    div.sudoku-option-cell {
+        font-size: 3vh;
+        line-height: 3.5vh;
+    }
+    div.keyboard-container {
+        position: fixed;
+        left: calc(100vw - 25vh);
+        top: 10px;
+        margin-top: 0;
+        margin-left: 0;
+    }
+    div.keyboard-grid {
+        display: grid;
+        grid-template-columns: repeat(2, [col] 1fr) ;
+        grid-template-rows: repeat(9, [row] 1fr) ;
+        text-align: center;
+        height: 90vh;
+        width: 20vh;
+        grid-gap: 1vh;
+        grid-auto-flow: column;
+    }
+    div.keyboard-cell {
+        grid-column: span 1;
+        grid-row: span 1;
+        text-align: center;
+        font-size: 4vh;
+        width: 8vh;
+        line-height: 8vh;
+        justify-self: center;
+
+        background-color: var(--color-background-info);
+
+        border: .2vh solid var(--color-text-disabled);
+        border-radius: 2vh;
+    }
+    div.keyboard-cell-span3 {
+        grid-column: span 1;
+        grid-row: span 3;
+        border-radius: 6vh;
+        line-height: 27vh;
+        align-self: center;
+    }
+}
+/* screen */
+@media (min-width: 600px) and (min-height:600px)
+{
+    html, body {
+        min-height: 600px;
+    }
+    div.explanations-container{
       position:absolute;
       display:block;
       width:600px;
       left:50%;
-      margin-top:50px;
+      margin-top: 30px;
       margin-left:-300px;
     }
 
@@ -140,7 +226,7 @@ div.disabled {
       height:450px;
       width:450px;
       left:50%;
-      top:50%;
+      top: max(50%, 330px);
       margin-top:-225px;
       margin-left:-222px;
     }
@@ -170,13 +256,12 @@ div.disabled {
       line-height: 13px;
       text-align: center;
     }
-    div.center-buttons{
+    div.buttons-container{
       position:absolute;
       display:block;
       width:240px;
       left:50%;
-      top:80%;
-      margin-top: 40px;
+      top: max(88%, 560px);
       margin-left:-120px;
 
       display: flex;
@@ -189,32 +274,21 @@ div.disabled {
         width: 100px;
         text-align: center;
         vertical-align: middle;
-        padding: .375rem .75rem;
-        font-size: 1rem;
+        font-size: small;
         line-height: 1.5;
         border-radius: .25rem;
-    }
-    div.center-message {
-      position:absolute;
-      display:block;
-      width:600px;
-      left:50%;
-      top:80%;
-      margin-top: 0px;
-      margin-left:-300px;
-
-      display: inline-block;
-      justify-content: space-between;
-      text-align: center;
-
-      font-size: x-large;
-      font-weight: bold;
-      color: var(--color-text);
     }
     div.keyboard-container {
         display: none;
     }
 
+}
+div.explanations-text {
+    color: var(--color-text);
+    background-color: var(--color-background-light);
+    border-radius .25rem;
+    font-size: small;
+    text-align: center;
 }
 div.edit {
   font-weight: normal;
