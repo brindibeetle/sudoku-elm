@@ -11,11 +11,6 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Session exposing (..)
-import Bootstrap.Form as Form
-import Bootstrap.Table as Table exposing (CellOption)
-import Bootstrap.Button as Button
-import Bootstrap.Form.Radio as Radio
-import Bootstrap.Form.Fieldset as Fieldset
 import Array exposing (..)
 import RemoteData exposing (RemoteData, WebData, succeed)
 import Icons exposing (..)
@@ -39,6 +34,7 @@ init session =
         , focus = FocusBlurred
         , faults = initFaults
         , highlight = Nothing
+        , retrieving = True
         }
         , getRandomSudokuQuiz SudokuQuizReceived session )
 
@@ -51,11 +47,11 @@ init session =
 view : Model -> Html Msg
 view model =
     let
-        isSolved = solved model.fields model.faults
+        animate = solved model.fields model.faults || model.retrieving
     in
         div [ class "center" ]
             [ viewExplanations
-             , viewSudoku model isSolved
+             , viewSudoku model animate
              , viewButtons
              , viewKeyboard model.fields model.focus model.highlight
             ]
@@ -95,32 +91,34 @@ viewExplainItem items =
 viewButtons : Html Msg
 viewButtons =
         div [ class "buttons-container" ]
-            [ Button.button [ Button.attrs [ class "button" ], Button.onClick ButtonNew ] [ text "New Quiz" ]
-            , Button.button [ Button.attrs [ class "button" ], Button.onClick ButtonClear ] [ text "Clear" ]
+            [
+                div [ class "buttons-grid" ]
+                [ div [ class "button", onClick ButtonNew ] [ text "New Quiz" ]
+                , div [ class "button", onClick ButtonClear ] [ text "Clear" ]
+                ]
             ]
 
-
 viewSudoku : Model -> Bool -> Html Msg
-viewSudoku model isSolved =
+viewSudoku model animate =
     div [ class "sudoku-container"]
         [ div [ class "sudoku-grid" ]
-            (viewCells model isSolved )
+            (viewCells model animate )
         ]
 
 viewCells : Model -> Bool -> List (Html Msg)
-viewCells model isSolved =
-    Array.initialize 81 (viewCell model isSolved)
+viewCells model animate =
+    Array.initialize 81 (viewCell model animate)
     |> Array.toList
 
 
 viewCell : Model -> Bool -> Int -> Html Msg
-viewCell model isSolved fieldNumber =
+viewCell model animate fieldNumber =
     let
         borders = getBorders fieldNumber
         field = modelToField model.fields fieldNumber
         focus = focusOnField model.focus fieldNumber
         fault = getFault fieldNumber model.faults
-        cssArgs = { css = borders, field = field, isFocus = (focus /= FocusBlurred), isFault = fault, isSolved = isSolved }
+        cssArgs = { css = borders, field = field, isFocus = (focus /= FocusBlurred), isFault = fault, animate = animate }
         (faultEdit, faultFrozen) = if getFault fieldNumber model.faults then (" fault-edit"," fault-frozen") else ("", "")
     in
         case ( field, focus ) of
@@ -185,8 +183,8 @@ getBorders fieldNumber =
             "normal-border-horizontal"
         )
 
-getCellClasses : { css : String, field : Field, isFocus : Bool, isFault : Bool, isSolved : Bool } -> Bool -> Int ->  Attribute Msg
-getCellClasses { css, field, isFocus, isFault, isSolved } isHighlight value =
+getCellClasses : { css : String, field : Field, isFocus : Bool, isFault : Bool, animate : Bool } -> Bool -> Int ->  Attribute Msg
+getCellClasses { css, field, isFocus, isFault, animate } isHighlight value =
     class
         ( "sudoku-cell"
             ++ " " ++ css
@@ -202,7 +200,7 @@ getCellClasses { css, field, isFocus, isFault, isSolved } isHighlight value =
             ++ " " ++ ( if isFocus then "focus" else ""  )
             ++ " " ++ ( if isFault then "fault" else ""  )
             ++ " " ++ ( if isHighlight then "highlight" else ""  )
-            ++ " " ++ ( if isSolved then "animation" ++ String.fromInt value else "" )
+            ++ " " ++ ( if animate then "animation" ++ String.fromInt value else "" )
          )
 
 
@@ -239,7 +237,7 @@ getOptionClasses optionNumber isFocus isFault =
             ++ ( if isFault then " fault" else ""  )
         )
 
--- if isSolved dan Focus is nooit meer
+-- if animate dan Focus is nooit meer
 viewKeyboard : Array Field -> Focus -> Maybe Int -> Html Msg
 viewKeyboard fields focus maybeHighlightValue =
     let
@@ -699,6 +697,7 @@ update msg model session =
                                 |> Array.fromList
                             , focus = FocusBlurred
                             , faults = initFaults
+                            , retrieving = False
                             }
                             , session = session, cmd = Cmd.none }
                         

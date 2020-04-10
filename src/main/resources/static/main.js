@@ -6307,7 +6307,21 @@ var $author$project$SudokuFaults$initFaults = $elm$core$Dict$fromList(
 			_Utils_Tuple2('row', $elm$core$Dict$empty),
 			_Utils_Tuple2('block', $elm$core$Dict$empty)
 		]));
-var $author$project$SudokuModel$sudokuExample = '004300209005009001070060043006002087190007400050083000600000105003508690042910300';
+var $elm$core$Bitwise$and = _Bitwise_and;
+var $elm$core$Bitwise$shiftRightBy = _Bitwise_shiftRightBy;
+var $elm$core$String$repeatHelp = F3(
+	function (n, chunk, result) {
+		return (n <= 0) ? result : A3(
+			$elm$core$String$repeatHelp,
+			n >> 1,
+			_Utils_ap(chunk, chunk),
+			(!(n & 1)) ? result : _Utils_ap(result, chunk));
+	});
+var $elm$core$String$repeat = F2(
+	function (n, chunk) {
+		return A3($elm$core$String$repeatHelp, n, chunk, '');
+	});
+var $author$project$SudokuModel$sudokuExample = A2($elm$core$String$repeat, 81, '0');
 var $elm$core$String$foldr = _String_foldr;
 var $elm$core$String$toList = function (string) {
 	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
@@ -6332,7 +6346,8 @@ var $author$project$Sudoku$init = function (session) {
 						$author$project$SudokuModel$charToCijfer,
 						$elm$core$String$toList($author$project$SudokuModel$sudokuExample)))),
 			focus: $author$project$SudokuModel$FocusBlurred,
-			highlight: $elm$core$Maybe$Nothing
+			highlight: $elm$core$Maybe$Nothing,
+			retrieving: true
 		},
 		A2($author$project$Domain$SudokuQuiz$getRandomSudokuQuiz, $author$project$Sudoku$SudokuQuizReceived, session));
 };
@@ -6758,7 +6773,6 @@ var $elm$core$Array$map = F2(
 var $author$project$SudokuModel$clearFields = function (fields) {
 	return A2($elm$core$Array$map, $author$project$SudokuModel$clearField, fields);
 };
-var $elm$core$Bitwise$and = _Bitwise_and;
 var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
 var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
 var $elm$core$Basics$ge = _Utils_ge;
@@ -8092,7 +8106,8 @@ var $author$project$Sudoku$update = F3(
 												$elm$core$List$map,
 												$author$project$SudokuModel$charToCijfer,
 												$elm$core$String$toList(sudokuQuiz.quiz)))),
-									focus: $author$project$SudokuModel$FocusBlurred
+									focus: $author$project$SudokuModel$FocusBlurred,
+									retrieving: false
 								}),
 							session: session
 						};
@@ -8297,197 +8312,22 @@ var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $author$project$Sudoku$ButtonClear = {$: 'ButtonClear'};
 var $author$project$Sudoku$ButtonNew = {$: 'ButtonNew'};
-var $rundis$elm_bootstrap$Bootstrap$Internal$Button$Attrs = function (a) {
-	return {$: 'Attrs', a: a};
-};
-var $rundis$elm_bootstrap$Bootstrap$Button$attrs = function (attrs_) {
-	return $rundis$elm_bootstrap$Bootstrap$Internal$Button$Attrs(attrs_);
-};
-var $elm$html$Html$button = _VirtualDom_node('button');
-var $elm$core$Maybe$andThen = F2(
-	function (callback, maybeValue) {
-		if (maybeValue.$ === 'Just') {
-			var value = maybeValue.a;
-			return callback(value);
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
-	});
-var $rundis$elm_bootstrap$Bootstrap$Internal$Button$applyModifier = F2(
-	function (modifier, options) {
-		switch (modifier.$) {
-			case 'Size':
-				var size = modifier.a;
-				return _Utils_update(
-					options,
-					{
-						size: $elm$core$Maybe$Just(size)
-					});
-			case 'Coloring':
-				var coloring = modifier.a;
-				return _Utils_update(
-					options,
-					{
-						coloring: $elm$core$Maybe$Just(coloring)
-					});
-			case 'Block':
-				return _Utils_update(
-					options,
-					{block: true});
-			case 'Disabled':
-				var val = modifier.a;
-				return _Utils_update(
-					options,
-					{disabled: val});
-			default:
-				var attrs = modifier.a;
-				return _Utils_update(
-					options,
-					{
-						attributes: _Utils_ap(options.attributes, attrs)
-					});
-		}
-	});
-var $elm$core$Tuple$second = function (_v0) {
-	var y = _v0.b;
-	return y;
-};
-var $elm$html$Html$Attributes$classList = function (classes) {
-	return $elm$html$Html$Attributes$class(
-		A2(
-			$elm$core$String$join,
-			' ',
-			A2(
-				$elm$core$List$map,
-				$elm$core$Tuple$first,
-				A2($elm$core$List$filter, $elm$core$Tuple$second, classes))));
-};
-var $rundis$elm_bootstrap$Bootstrap$Internal$Button$defaultOptions = {attributes: _List_Nil, block: false, coloring: $elm$core$Maybe$Nothing, disabled: false, size: $elm$core$Maybe$Nothing};
-var $elm$json$Json$Encode$bool = _Json_wrap;
-var $elm$html$Html$Attributes$boolProperty = F2(
-	function (key, bool) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			$elm$json$Json$Encode$bool(bool));
-	});
-var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
-var $rundis$elm_bootstrap$Bootstrap$Internal$Button$roleClass = function (role) {
-	switch (role.$) {
-		case 'Primary':
-			return 'primary';
-		case 'Secondary':
-			return 'secondary';
-		case 'Success':
-			return 'success';
-		case 'Info':
-			return 'info';
-		case 'Warning':
-			return 'warning';
-		case 'Danger':
-			return 'danger';
-		case 'Dark':
-			return 'dark';
-		case 'Light':
-			return 'light';
-		default:
-			return 'link';
-	}
-};
-var $rundis$elm_bootstrap$Bootstrap$General$Internal$screenSizeOption = function (size) {
-	switch (size.$) {
-		case 'XS':
-			return $elm$core$Maybe$Nothing;
-		case 'SM':
-			return $elm$core$Maybe$Just('sm');
-		case 'MD':
-			return $elm$core$Maybe$Just('md');
-		case 'LG':
-			return $elm$core$Maybe$Just('lg');
-		default:
-			return $elm$core$Maybe$Just('xl');
-	}
-};
-var $rundis$elm_bootstrap$Bootstrap$Internal$Button$buttonAttributes = function (modifiers) {
-	var options = A3($elm$core$List$foldl, $rundis$elm_bootstrap$Bootstrap$Internal$Button$applyModifier, $rundis$elm_bootstrap$Bootstrap$Internal$Button$defaultOptions, modifiers);
-	return _Utils_ap(
-		_List_fromArray(
-			[
-				$elm$html$Html$Attributes$classList(
-				_List_fromArray(
-					[
-						_Utils_Tuple2('btn', true),
-						_Utils_Tuple2('btn-block', options.block),
-						_Utils_Tuple2('disabled', options.disabled)
-					])),
-				$elm$html$Html$Attributes$disabled(options.disabled)
-			]),
-		_Utils_ap(
-			function () {
-				var _v0 = A2($elm$core$Maybe$andThen, $rundis$elm_bootstrap$Bootstrap$General$Internal$screenSizeOption, options.size);
-				if (_v0.$ === 'Just') {
-					var s = _v0.a;
-					return _List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('btn-' + s)
-						]);
-				} else {
-					return _List_Nil;
-				}
-			}(),
-			_Utils_ap(
-				function () {
-					var _v1 = options.coloring;
-					if (_v1.$ === 'Just') {
-						if (_v1.a.$ === 'Roled') {
-							var role = _v1.a.a;
-							return _List_fromArray(
-								[
-									$elm$html$Html$Attributes$class(
-									'btn-' + $rundis$elm_bootstrap$Bootstrap$Internal$Button$roleClass(role))
-								]);
-						} else {
-							var role = _v1.a.a;
-							return _List_fromArray(
-								[
-									$elm$html$Html$Attributes$class(
-									'btn-outline-' + $rundis$elm_bootstrap$Bootstrap$Internal$Button$roleClass(role))
-								]);
-						}
-					} else {
-						return _List_Nil;
-					}
-				}(),
-				options.attributes)));
-};
-var $rundis$elm_bootstrap$Bootstrap$Button$button = F2(
-	function (options, children) {
-		return A2(
-			$elm$html$Html$button,
-			$rundis$elm_bootstrap$Bootstrap$Internal$Button$buttonAttributes(options),
-			children);
-	});
-var $elm$virtual_dom$VirtualDom$MayPreventDefault = function (a) {
-	return {$: 'MayPreventDefault', a: a};
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
 };
 var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
-var $elm$html$Html$Events$preventDefaultOn = F2(
+var $elm$html$Html$Events$on = F2(
 	function (event, decoder) {
 		return A2(
 			$elm$virtual_dom$VirtualDom$on,
 			event,
-			$elm$virtual_dom$VirtualDom$MayPreventDefault(decoder));
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
 	});
-var $rundis$elm_bootstrap$Bootstrap$Button$onClick = function (message) {
-	return $rundis$elm_bootstrap$Bootstrap$Button$attrs(
-		_List_fromArray(
-			[
-				A2(
-				$elm$html$Html$Events$preventDefaultOn,
-				'click',
-				$elm$json$Json$Decode$succeed(
-					_Utils_Tuple2(message, true)))
-			]));
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
 };
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
@@ -8500,34 +8340,35 @@ var $author$project$Sudoku$viewButtons = A2(
 	_List_fromArray(
 		[
 			A2(
-			$rundis$elm_bootstrap$Bootstrap$Button$button,
+			$elm$html$Html$div,
 			_List_fromArray(
 				[
-					$rundis$elm_bootstrap$Bootstrap$Button$attrs(
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('button')
-						])),
-					$rundis$elm_bootstrap$Bootstrap$Button$onClick($author$project$Sudoku$ButtonNew)
+					$elm$html$Html$Attributes$class('buttons-grid')
 				]),
 			_List_fromArray(
 				[
-					$elm$html$Html$text('New Quiz')
-				])),
-			A2(
-			$rundis$elm_bootstrap$Bootstrap$Button$button,
-			_List_fromArray(
-				[
-					$rundis$elm_bootstrap$Bootstrap$Button$attrs(
+					A2(
+					$elm$html$Html$div,
 					_List_fromArray(
 						[
-							$elm$html$Html$Attributes$class('button')
+							$elm$html$Html$Attributes$class('button'),
+							$elm$html$Html$Events$onClick($author$project$Sudoku$ButtonNew)
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('New Quiz')
 						])),
-					$rundis$elm_bootstrap$Bootstrap$Button$onClick($author$project$Sudoku$ButtonClear)
-				]),
-			_List_fromArray(
-				[
-					$elm$html$Html$text('Clear')
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('button'),
+							$elm$html$Html$Events$onClick($author$project$Sudoku$ButtonClear)
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Clear')
+						]))
 				]))
 		]));
 var $author$project$Sudoku$viewExplainItem = function (items) {
@@ -8730,22 +8571,6 @@ var $author$project$Icons$minimize = A2(
 				]),
 			_List_Nil)
 		]));
-var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
-};
-var $elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$Normal(decoder));
-	});
-var $elm$html$Html$Events$onClick = function (msg) {
-	return A2(
-		$elm$html$Html$Events$on,
-		'click',
-		$elm$json$Json$Decode$succeed(msg));
-};
 var $author$project$Sudoku$viewKeyboardNumber = F2(
 	function (enabled, value) {
 		return enabled ? A2(
@@ -9068,7 +8893,7 @@ var $author$project$Sudoku$getCellClasses = F3(
 		var field = _v0.field;
 		var isFocus = _v0.isFocus;
 		var isFault = _v0.isFault;
-		var isSolved = _v0.isSolved;
+		var animate = _v0.animate;
 		return $elm$html$Html$Attributes$class(
 			'sudoku-cell' + (' ' + (css + (' ' + (function () {
 				switch (field.$) {
@@ -9079,7 +8904,7 @@ var $author$project$Sudoku$getCellClasses = F3(
 					default:
 						return 'sudoku-options-grid';
 				}
-			}() + (' ' + ((isFocus ? 'focus' : '') + (' ' + ((isFault ? 'fault' : '') + (' ' + ((isHighlight ? 'highlight' : '') + (' ' + (isSolved ? ('animation' + $elm$core$String$fromInt(value)) : '')))))))))))));
+			}() + (' ' + ((isFocus ? 'focus' : '') + (' ' + ((isFault ? 'fault' : '') + (' ' + ((isHighlight ? 'highlight' : '') + (' ' + (animate ? ('animation' + $elm$core$String$fromInt(value)) : '')))))))))))));
 	});
 var $author$project$SudokuFaults$getFault = F2(
 	function (fieldNumber, faults) {
@@ -9187,17 +9012,17 @@ var $author$project$Sudoku$viewOptions = F4(
 				A4($author$project$Sudoku$viewOption, options, faults, focus, fieldNumber)));
 	});
 var $author$project$Sudoku$viewCell = F3(
-	function (model, isSolved, fieldNumber) {
+	function (model, animate, fieldNumber) {
 		var focus = A2($author$project$SudokuModel$focusOnField, model.focus, fieldNumber);
 		var field = A2($author$project$SudokuModel$modelToField, model.fields, fieldNumber);
 		var fault = A2($author$project$SudokuFaults$getFault, fieldNumber, model.faults);
 		var borders = $author$project$Sudoku$getBorders(fieldNumber);
 		var cssArgs = {
+			animate: animate,
 			css: borders,
 			field: field,
 			isFault: fault,
-			isFocus: !_Utils_eq(focus, $author$project$SudokuModel$FocusBlurred),
-			isSolved: isSolved
+			isFocus: !_Utils_eq(focus, $author$project$SudokuModel$FocusBlurred)
 		};
 		var _v0 = A2($author$project$SudokuFaults$getFault, fieldNumber, model.faults) ? _Utils_Tuple2(' fault-edit', ' fault-frozen') : _Utils_Tuple2('', '');
 		var faultEdit = _v0.a;
@@ -9331,15 +9156,15 @@ var $author$project$Sudoku$viewCell = F3(
 		}
 	});
 var $author$project$Sudoku$viewCells = F2(
-	function (model, isSolved) {
+	function (model, animate) {
 		return $elm$core$Array$toList(
 			A2(
 				$elm$core$Array$initialize,
 				81,
-				A2($author$project$Sudoku$viewCell, model, isSolved)));
+				A2($author$project$Sudoku$viewCell, model, animate)));
 	});
 var $author$project$Sudoku$viewSudoku = F2(
-	function (model, isSolved) {
+	function (model, animate) {
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -9354,11 +9179,11 @@ var $author$project$Sudoku$viewSudoku = F2(
 						[
 							$elm$html$Html$Attributes$class('sudoku-grid')
 						]),
-					A2($author$project$Sudoku$viewCells, model, isSolved))
+					A2($author$project$Sudoku$viewCells, model, animate))
 				]));
 	});
 var $author$project$Sudoku$view = function (model) {
-	var isSolved = A2($author$project$Sudoku$solved, model.fields, model.faults);
+	var animate = A2($author$project$Sudoku$solved, model.fields, model.faults) || model.retrieving;
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
@@ -9368,7 +9193,7 @@ var $author$project$Sudoku$view = function (model) {
 		_List_fromArray(
 			[
 				$author$project$Sudoku$viewExplanations,
-				A2($author$project$Sudoku$viewSudoku, model, isSolved),
+				A2($author$project$Sudoku$viewSudoku, model, animate),
 				$author$project$Sudoku$viewButtons,
 				A3($author$project$Sudoku$viewKeyboard, model.fields, model.focus, model.highlight)
 			]));

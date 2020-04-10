@@ -3,7 +3,7 @@
     --color-background-light: hsl(46, 100%, 90%);
     --color-background-lighter: hsl(46, 100%, 94%);
 
-    --color-text: hsl(45, 94%, 27%);
+    --color-text: hsl(45, 94%, 30%);
     --color-text-disabled: hsl(45, 94%, 50%);
 
     --color-fault: hsl(20, 100%, 50%);
@@ -52,28 +52,32 @@ div.sudoku-option-cell {
 div.buttons-container{
     position:absolute;
     display:block;
-    width:80vw;
     left:50%;
-    top:2vw;
+    top:7vw;
     margin-left:-40vw;
-    justify-content: space-between;
-    display: flex;
 }
-button.button {
+div.buttons-grid{
+    display: grid;
+    grid-template-columns: 30vw 30vw ;
+    width:80vw;
+    grid-gap: 20vw;
+}
+div.button {
+    grid-column: span 1;
+    grid-row: span 1;
     color: var(--color-text);
     background-color: var(--color-background-info);
-    display: inline-block;
     width: 30vw;
     text-align: center;
-    vertical-align: middle;
     padding: 1vw 1vw;
     font-size: 3vw;
-    border-radius: 1vw
+    border: .2vw solid var(--color-text-disabled);
+    border-radius: 2vw;
 }
 
 div.keyboard-container {
     position: absolute;
-    margin-top: 16vw;
+    margin-top: 2vw;
     margin-left:-45vw;
     left:50%;
     width: 90vw;
@@ -118,9 +122,25 @@ div.enabled{
 div.disabled {
     color: var(--color-text-disabled);
 }
+div.fat-border-left {
+  border-left: 2px solid black;
+}
+div.fat-border-right {
+  border-right: 2px solid black;
+}
+div.normal-border-horizontal {
+}
+div.fat-border-top {
+  border-top: 2px solid black;
+}
+div.fat-border-bottom {
+  border-bottom: 2px solid black;
+}
+div.normal-border-vertical {
+}
 
 /* mobile landscape */
-@media (max-height:600px) and (min-width: 900px)
+@media (hover: none) and (orientation:landscape)
 {
     div.sudoku-container{
         width: 100vh;
@@ -129,32 +149,42 @@ div.disabled {
         margin-left: calc(100vw /2 - 50vh);
     }
     div.buttons-container{
-        width: 30vh;
-        left: 5vh;
+        position: absolute;
+        left: calc(50vw - 50vh - 7vh);
+        top: 16vh;
+        margin-top: 0;
         margin-left: 0;
-        height: 80vh;
-        width: 20vh;
-        top: 20vh;
-        display: block;
     }
-    button.button {
+    div.buttons-grid{
+        grid-template-columns: none;
+        grid-template-rows: 30vh 30vh;
+        height: 80vh;
+        width: 12vh;
+        grid-gap: 10vh;
+        grid-auto-flow: column;
+    }
+    div.button {
+        grid-column: span 1;
+        grid-row: span 1;
+        writing-mode: vertical-rl;
+        text-orientation: sideways-right;
         color: var(--color-text);
         background-color: var(--color-background-info);
         display: inline-block;
-        width: 20vh;
-        text-align: center;
-        vertical-align: middle;
-        padding: 1vh 1vh;
+        width: 6vh;
+        line-height: 5vh;
         font-size: 3vh;
-        border-radius: 1vh;
-        margin-bottom: 20vh;
+        border: .2vh solid var(--color-text-disabled);
+        border-radius: 2vh;
+        transform: rotate(180deg);
+        padding: 0 0 0 0;
     }
     div.sudoku-grid {
         width: 100vh;
         height: 100vh;
     }
     div.sudoku-cell {
-        border: .2vh solid black;
+        border: .12vh solid black;
         font-size: 5vh;
         width: 11.1vh;
         line-height: 11.1vh;
@@ -167,9 +197,9 @@ div.disabled {
         line-height: 3.5vh;
     }
     div.keyboard-container {
-        position: fixed;
-        left: calc(100vw - 25vh);
-        top: 10px;
+        position: absolute;
+        left: calc(50vw + 50vh + 1vh);
+        top: 5vh;
         margin-top: 0;
         margin-left: 0;
     }
@@ -179,7 +209,7 @@ div.disabled {
         grid-template-rows: repeat(9, [row] 1fr) ;
         text-align: center;
         height: 90vh;
-        width: 20vh;
+        width: 12vw;
         grid-gap: 1vh;
         grid-auto-flow: column;
     }
@@ -204,9 +234,26 @@ div.disabled {
         line-height: 27vh;
         align-self: center;
     }
+    div.fat-border-left {
+      border-left: .25vw solid black;
+    }
+    div.fat-border-right {
+      border-right: .25vw solid black;
+    }
+    div.normal-border-horizontal {
+    }
+    div.fat-border-top {
+      border-top: .25vw solid black;
+    }
+    div.fat-border-bottom {
+      border-bottom: .25vw solid black;
+    }
+    div.normal-border-vertical {
+    }
 }
 /* screen */
-@media (min-width: 600px) and (min-height:600px)
+/* @media (min-width: 600px) and (min-height:600px) and not (pointer:coarse) { */
+@media (hover: hover)
 {
     html, body {
         min-height: 600px;
@@ -226,7 +273,7 @@ div.disabled {
       height:450px;
       width:450px;
       left:50%;
-      top: max(50%, 330px);
+      top: 330px;
       margin-top:-225px;
       margin-left:-222px;
     }
@@ -259,29 +306,64 @@ div.disabled {
     div.buttons-container{
       position:absolute;
       display:block;
-      width:240px;
+      width:300px;
       left:50%;
-      top: max(88%, 560px);
-      margin-left:-120px;
+      top: 580px;
 
-      display: flex;
-      justify-content: space-between;
+      left:50%;
+      margin-left:-150px;
     }
-    button.button {
+    div.buttons-grid{
+        grid-template-columns: 100px 100px;
+        width: 300px;
+        grid-gap: 100px;
+        grid-auto-flow: column;
+    }
+    div.button {
         color: var(--color-text);
         background-color: var(--color-background-info);
         display: inline-block;
         width: 100px;
-        text-align: center;
-        vertical-align: middle;
+        height: 30px;
+        line-height: 30px;
         font-size: small;
-        line-height: 1.5;
         border-radius: .25rem;
+        cursor: pointer;
+        padding: 0 0 0 0;
+        border: none;
     }
     div.keyboard-container {
         display: none;
     }
-
+    div.fat-border-left {
+      border-left: 2px solid black;
+    }
+    div.fat-border-right {
+      border-right: 2px solid black;
+    }
+    div.normal-border-horizontal {
+    }
+    div.fat-border-top {
+      border-top: 2px solid black;
+    }
+    div.fat-border-bottom {
+      border-bottom: 2px solid black;
+    }
+    div.normal-border-vertical {
+    }
+    div.edit:hover {
+        background-color: var(--color-background-light);
+    }
+    div.frozen:hover {
+        background-color: var(--color-background-lighter);
+    }
+    div.option:hover {
+      background-color: lightgray;
+    }
+    div.button:hover {
+        color: var(--color-text);
+        font-weight: bold;
+    }
 }
 div.explanations-text {
     color: var(--color-text);
@@ -292,9 +374,11 @@ div.explanations-text {
 }
 div.edit {
   font-weight: normal;
+  color: var(--color-text);
 }
 div.frozen {
   font-weight: bold;
+  color: black;
 }
 div.focus {
   background-color: var(--color-background-info);
@@ -305,31 +389,6 @@ div.fault {
 div.highlight {
   background-color: var(--color-background-info);
 }
-
-div.edit:hover {
-    background-color: var(--color-background-light);
-}
-div.frozen:hover {
-    background-color: var(--color-background-lighter);
-}
-div.fat-border-left {
-  border-left: 2px solid black;
-}
-div.fat-border-right {
-  border-right: 2px solid black;
-}
-div.normal-border-horizontal {
-}
-div.fat-border-top {
-  border-top: 2px solid black;
-}
-div.fat-border-bottom {
-  border-bottom: 2px solid black;
-}
-div.normal-border-vertical {
-}
-
-
 
 div.option0 {
   grid-column: 1;
@@ -372,17 +431,10 @@ div.option-focus {
   background-color: var(--color-background-info);
   line-height: 12px;
 }
-div.option:hover {
-  background-color: lightgray;
-}
 div.fault {
   color: var(--color-fault);
 }
-button.button:hover {
-    color: var(--color-text);
-    font-weight: bold;
-}
-button.button:focus {
+div.button:focus {
     outline: 0;
     box-shadow: 0 0 0 0.1rem var(--color-text);
     font-weight: bold;

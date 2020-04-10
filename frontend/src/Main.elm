@@ -94,7 +94,7 @@ update msg model =
         ( SudokuMsg subMsg, Sudoku sudokuModel session ) ->
            let
                 updated = Sudoku.update subMsg sudokuModel session
-            in
+           in
                 toModel (Sudoku updated.model session) (updated.cmd |> Cmd.map SudokuMsg) updated.session
 
         ( LinkClicked _, _ ) ->
